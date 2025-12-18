@@ -1,0 +1,155 @@
+/* --- HERO SECTION --- */
+.hero-section {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.subtitle {
+  color: #666;
+  font-style: italic;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* --- TARJETAS DE PARTIDO --- */
+.matches-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.match-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  padding: 15px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Partido "En Vivo" */
+.live-border {
+  border-left: 4px solid #ff4d4d;
+}
+
+/* --- EQUIPOS --- */
+.team {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 10px;
+}
+
+.team-home {
+  justify-content: flex-end; /* Local alineado a la derecha del bloque izquierdo */
+  text-align: right;
+}
+
+.team-away {
+  justify-content: flex-start; /* Visitante alineado a la izquierda del bloque derecho */
+  text-align: left;
+}
+
+.team-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.team-name {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* --- MARCADOR --- */
+.score-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 15px;
+  min-width: 80px;
+}
+
+.score {
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #222;
+}
+
+.live-badge {
+  font-size: 0.75rem;
+  color: #ff4d4d;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.blink {
+  animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* --- TABLA CLASIFICACIÓN --- */
+.table-custom {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+  .table-custom th {
+    background-color: #f8f9fa;
+    color: #555;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+
+  .table-custom th, .table-custom td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #f1f1f1;
+  }
+
+.rank-cell {
+  font-weight: bold;
+  color: #777;
+}
+
+.points-cell {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.btn-link {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+  .btn-link:hover {
+    text-decoration: underline;
+  }

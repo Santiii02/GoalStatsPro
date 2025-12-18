@@ -1,0 +1,51 @@
+<div class="container fade-in">
+  <header class="mb-4">
+    <h2>Equipos de La Liga</h2>
+  </header>
+
+  <div *ngIf="loading" class="text-center mt-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2 text-muted">Sincronizando clasificación...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger mt-3" role="alert">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && teams.length === 0" class="text-center mt-5">
+    <div style="font-size: 2rem;">📊</div>
+    <p class="text-muted">No hay información disponible de la clasificación.</p>
+  </div>
+
+  <div *ngIf="!loading && !error" class="grid-teams">
+    <article *ngFor="let item of teams" class="team-card">
+
+      <div class="card-header">
+        <span class="rank" [class.top-rank]="$any(item.rank) <= 4">#{{ item.rank }}</span>
+
+        <div class="team-icon">⚽</div>
+      </div>
+
+      <h3 class="team-name">{{ item.teamName }}</h3>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-label">Puntos</span>
+          <span class="stat-value highlight">{{ item.points }}</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-label">Jugados</span>
+          <span class="stat-value">{{ item.matches }}</span>
+        </div>
+      </div>
+
+      <div class="stats-mini">
+        <small class="text-muted">Goles: {{ item.goals }} (Dif: {{ item.goalDiff }})</small>
+      </div>
+
+    </article>
+  </div>
+</div>

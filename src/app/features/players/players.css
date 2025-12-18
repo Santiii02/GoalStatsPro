@@ -1,0 +1,29 @@
+.construction-box {
+  padding: 40px 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  border: 1px dashed #ccc;
+  max-width: 600px;
+  margin: 40px auto; 
+}
+
+.construction-icon {
+  font-size: 4rem; /* Icono grande */
+  margin-bottom: 20px;
+  animation: bounce 2s infinite;
+}
+
+/* Pequeña animación simpática para el icono */
+/*@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-10px);
+  }
+
+  60% {
+    transform: translateY(-5px);
+  }
+}*/

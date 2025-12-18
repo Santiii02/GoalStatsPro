@@ -1,0 +1,9 @@
+/* Salvoconducto para desarrollo, evita errores CORS */
+{
+  "/api": {
+    "target": "https://api.sportdb.dev",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

@@ -1,0 +1,23 @@
+<div class="container fade-in">
+  <header class="mb-4">
+    <h2>Estadísticas de Jugadores</h2>
+  </header>
+
+  <div *ngIf="loading" class="text-center mt-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2 text-muted">Cargando base de datos...</p>
+  </div>
+
+  <div *ngIf="!loading && !error && players.length === 0" class="text-center mt-5 construction-box">
+    <div class="construction-icon">👟⚽</div>
+
+    <h3>Sección en Construcción</h3>
+
+    <p class="text-muted mt-3">
+      Estamos trabajando para traerte la tabla de máximos goleadores<br>
+      y las estadísticas avanzadas de cada jugador de La Liga.
+    </p>
+  </div>
+</div>

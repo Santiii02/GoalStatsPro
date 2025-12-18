@@ -1,0 +1,82 @@
+<div class="container fade-in">
+
+  <header class="hero-section">
+    <h1>GoalStatsPro ⚽</h1>
+    <p class="subtitle">Estadísticas y Predicciones con IA</p>
+  </header>
+
+  <section class="mt-4 dashboard-section">
+    <div class="section-header">
+      <h3>🔴 En Vivo</h3>
+      <small class="text-muted badge-filter">{{ filterMessage }}</small>
+    </div>
+
+    <div class="matches-grid" *ngIf="liveMatches.length > 0">
+      <div *ngFor="let match of liveMatches" class="match-card live-border">
+
+        <div class="team team-home">
+          <span class="team-name">{{ match.homeName }}</span>
+          <img [src]="match.homeLogo"
+               alt="Escudo local"
+               class="team-logo"
+               onerror="this.src='assets/placeholder.png'">
+        </div>
+
+        <div class="score-board">
+          <span class="score">{{ match.homeScore }} - {{ match.awayScore }}</span>
+          <div class="live-badge" *ngIf="match.gameTime">
+            <span class="blink">●</span> {{ match.gameTime }}'
+          </div>
+        </div>
+
+        <div class="team team-away">
+          <img [src]="match.awayLogo"
+               alt="Escudo visitante"
+               class="team-logo"
+               onerror="this.src='assets/placeholder.png'">
+          <span class="team-name">{{ match.awayName }}</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div *ngIf="liveMatches.length === 0" class="empty-state">
+      <p>No hay partidos en juego en este momento.</p>
+    </div>
+  </section>
+
+  <section class="mt-5 dashboard-section">
+    <h3>🏆 Clasificación La Liga (Top 5)</h3>
+
+    <div *ngIf="standings.length === 0 && !loading" class="alert alert-warning">
+      No se pudo cargar la información de la clasificación.
+    </div>
+
+    <table class="table-custom" *ngIf="standings.length > 0">
+      <thead>
+        <tr>
+          <th title="Posición">#</th>
+          <th>Equipo</th>
+          <th title="Puntos">Pts</th>
+          <th title="Partidos Jugados">PJ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of standings">
+          <td class="rank-cell">{{ item.rank }}</td>
+          <td>
+            <div class="team-row">
+              <strong>{{ item.teamName }}</strong>
+            </div>
+          </td>
+          <td class="points-cell">{{ item.points }}</td>
+          <td>{{ item.matches }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="text-center mt-3">
+      <a routerLink="/teams" class="btn-link">Ver clasificación completa →</a>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,62 @@
+<div class="container fade-in">
+  <header class="mb-4">
+    <h2>Próximos Partidos</h2>
+  </header>
+
+  <div *ngIf="loading" class="text-center mt-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2 text-muted">Sincronizando calendario oficial...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger mt-3" role="alert">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && matches.length === 0" class="text-center mt-5 empty-state">
+    <h3>Sin partidos a la vista</h3>
+    <p class="text-muted">No hay encuentros programados en el calendario para los próximos 21 días.</p>
+  </div>
+
+  <div *ngIf="!loading && !error" class="matches-grid">
+
+    <article *ngFor="let match of matches" class="match-card">
+
+      <div class="match-header" *ngIf="match.round">
+        <span class="badge-round">{{ match.round }}</span>
+      </div>
+
+      <div class="match-content">
+        <div class="team">
+          <img [src]="match.homeLogo"
+               [alt]="match.homeName"
+               width="40"
+               height="40"
+               loading="lazy"
+               onerror="this.src='assets/placeholder.png'">
+          <span class="team-name">{{ match.homeName }}</span>
+        </div>
+
+        <div class="match-info text-center">
+          <div class="date-box">
+            <span class="day">{{ match.processedDate | date:'dd MMM' }}</span>
+            <span class="hour">{{ match.processedDate | date:'HH:mm' }}</span>
+          </div>
+          <small class="text-muted">vs</small>
+        </div>
+
+        <div class="team">
+          <span class="team-name">{{ match.awayName }}</span>
+          <img [src]="match.awayLogo"
+               [alt]="match.awayName"
+               width="40"
+               height="40"
+               loading="lazy"
+               onerror="this.src='assets/placeholder.png'">
+        </div>
+      </div>
+
+    </article>
+  </div>
+</div>
