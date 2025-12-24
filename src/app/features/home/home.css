@@ -161,3 +161,15 @@
   object-fit: cover;
   border-radius: 50%;
 }
+
+/* --- TARJETA EQUIPO --- */
+.team-result-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  width: 150px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  background-color: white;
+}

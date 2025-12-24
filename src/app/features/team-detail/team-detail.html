@@ -1,0 +1,78 @@
+<div class="container fade-in" *ngIf="team">
+
+  <div class="mb-3">
+    <p-button label="Volver" icon="pi pi-arrow-left" routerLink="/" styleClass="p-button-text"></p-button>
+  </div>
+
+  <div class="hero-team"
+       [style.backgroundImage]="team.strStadium ? 'url(' + team.strStadium + ')' : 'none'"
+       style="background-color: #2c3e50;">
+
+    <div class="overlay">
+      <div class="team-header-content">
+
+        <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
+             alt="Escudo"
+             class="big-badge"
+             onerror="this.src='assets/images/Logo.png'">
+
+        <div class="team-info">
+          <h1>{{ team.strTeam }}</h1>
+          <p>
+            <i class="pi pi-map-marker"></i>
+            {{ team.strStadium || 'Estadio no disponible' }}
+            <span *ngIf="team.intFormedYear">({{ team.intFormedYear }})</span>
+          </p>
+          <span class="league-tag">{{ team.strLeague }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="description-section mt-4" *ngIf="team.strDescriptionES">
+    <h3>Historia</h3>
+    <p>{{ team.strDescriptionES }}</p>
+  </div>
+
+  <div class="mt-5">
+    <h3 class="mb-3">Jugadores Destacados </h3>
+
+    <div *ngIf="players.length === 0" class="alert alert-info">
+      No se encontraron jugadores disponibles en la versión gratuita.
+    </div>
+
+    <div class="players-grid">
+      <div class="player-card fade-in" *ngFor="let player of players">
+
+        <div class="player-img-container">
+          <img [src]="player.strCutout || player.strThumb || 'assets/images/player-placeholder.png'"
+               alt="{{ player.strPlayer }}"
+               loading="lazy"
+               onerror="this.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'">
+        </div>
+
+        <div class="player-info">
+          <strong>{{ player.strPlayer }}</strong>
+
+          <span class="position-badge"
+                [ngClass]="getPlayerRole(player.strPosition)">
+            {{ player.strPosition }}
+          </span>
+
+          <div class="nationality" *ngIf="player.strNationality">
+            <small>📍 {{ player.strNationality }}</small>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+
+<div *ngIf="loading" class="text-center mt-5">
+  <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+  <p>Cargando ficha del equipo...</p>
+</div>

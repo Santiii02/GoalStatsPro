@@ -81,4 +81,43 @@ export interface Standing {
 
   /* --- Representación en string del balance de goles (ej: "45:20") --- */
   goals?: string;
+
+  /* --- Logo del equipo --- */
+  teamBadge?: string;
+  teamLogo?: string;
+}
+
+/*
+ * INTERFAZ QUE REPRESENTA UN EQUIPO.
+ */
+export interface Team {
+  /* --- Identificador único del equipo --- */
+  idTeam: string;
+
+  /* --- Identificador único del equipo --- */
+  id?: string;
+
+  /* --- Nombre del equipo --- */
+  strTeam: string;
+
+  /* --- Logo del equipo --- */
+  strTeamBadge: string;
+
+  /* --- Logo del equipo --- */
+  strBadge?: string;
+
+  /* --- Nombre de la liga --- */
+  strLeague: string;
+
+  /* --- Estadio del equipo --- */
+  strStadium: string;
+
+  /* --- Descripción del equipo --- */
+  strDescriptionES?: string;
+
+  /* --- Año de creación --- */
+  intFormedYear?: string;
+
+  /* --- Deporte --- */
+  strSport?: string;
 }

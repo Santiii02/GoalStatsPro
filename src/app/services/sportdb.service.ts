@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Match, Standing } from '../models/sport.model';
+import { Match, Standing, Team } from '../models/sport.model';
 
 @Injectable({
   providedIn: 'root'
@@ -139,5 +139,55 @@ export class SportDbService {
         return of([]);
       })
     );
+  }
+
+  /* --- Buscar equipo por nombre --- */
+  searchTeams(name: string): Observable<Team[]> {
+    const theSportsDbUrl = 'https://www.thesportsdb.com/api/v1/json/3';
+
+    return this.http.get<{ teams: Team[] }>(`${theSportsDbUrl}/searchteams.php?t=${name}`)
+      .pipe(
+        map(response => {
+          const allTeams = response.teams || [];
+
+          // Solo devolvemos los de fútbol (Soccer)
+          const soccerTeams = allTeams.filter(team => team.strSport === 'Soccer');
+
+          return soccerTeams;
+        }),
+        catchError(err => {
+          console.error('Error en búsqueda:', err);
+          return of([]);
+        })
+      );
+  }
+
+  /* --- Obtener jugadores del equipo y ordenarlos por posición --- */
+  getTeamPlayers(teamId: string): Observable<any[]> {
+    const theSportsDbUrl = 'https://www.thesportsdb.com/api/v1/json/3';
+    return this.http.get<{ player: any[] }>(`${theSportsDbUrl}/lookup_all_players.php?id=${teamId}`)
+      .pipe(
+        map(response => {
+          let players = response.player || [];
+
+          players = players.filter(p => p.strPlayer && p.strPosition && p.strPosition !== 'Manager');
+
+          // Convertir posición específica a número 
+          const getPosWeight = (pos: string) => {
+            if (!pos) return 5;
+            const p = pos.toLowerCase();
+            if (p.includes('goalkeeper')) return 1; 
+            if (p.includes('back') || p.includes('defender')) return 2; 
+            if (p.includes('midfield')) return 3; 
+            if (p.includes('wing') || p.includes('forward') || p.includes('striker')) return 4; 
+            return 5; // Otros
+          };
+
+          // Ordenamos el array usando el peso
+          return players.sort((a, b) => {
+            return getPosWeight(a.strPosition) - getPosWeight(b.strPosition);
+          });
+        })
+      );
   }
 }

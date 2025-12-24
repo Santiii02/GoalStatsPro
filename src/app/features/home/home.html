@@ -1,10 +1,55 @@
 <div class="container fade-in">
 
+  <!-- Logo App -->
   <header class="hero-section">
     <img src="assets/images/Logo.png" alt="Logo de la Aplicación" class="app-logo">
     <p class="subtitle">Estadísticas y Predicciones con IA</p>
   </header>
 
+  <div class="search-container" style="text-align: center; margin: 30px 0;">
+
+    <!-- Buscar equipo -->
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input type="text"
+             pInputText
+             [(ngModel)]="searchQuery"
+             (keyup.enter)="searchTeam()"
+             placeholder="Buscar equipo (ej: Barcelona)..."
+             style="width: 300px" />
+    </span>
+
+    <p-button
+            label="Buscar"
+            icon="pi pi-search"
+            (click)="searchTeam()"
+            styleClass="ml-2"
+            [loading]="isSearching">
+    </p-button>
+
+  </div>
+
+  <div *ngIf="foundTeams.length > 0" style="margin-bottom: 30px;">
+    <h3>Resultados:</h3>
+    <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+
+<div *ngFor="let team of foundTeams"
+     (click)="goToTeamDetail(team)"
+     class="team-card-hover">
+
+        <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
+             width="80"
+             alt="Escudo"
+             onerror="this.src='assets/images/Logo.png'">
+
+        <p style="font-weight: bold; margin-top: 5px;">{{ team.strTeam }}</p>
+        <small>{{ team.strLeague }}</small>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Partidos En Vivo -->
   <section class="mt-4 dashboard-section">
     <div class="section-header">
       <h3>🔴 En Vivo</h3>
@@ -45,6 +90,7 @@
     </div>
   </section>
 
+  <!-- Top 5 -->
   <section class="mt-5 dashboard-section">
     <h3>🏆 Clasificación La Liga (Top 5)</h3>
 
@@ -65,7 +111,16 @@
         <tr *ngFor="let item of standings">
           <td class="rank-cell">{{ item.rank }}</td>
           <td>
-            <div class="team-row">
+            <div class="team-row" 
+            style="display: flex; align-items: center; gap: 10px;">
+
+              <img [src]="item.teamBadge || item.teamLogo || 'assets/images/Logo.png'"
+                   width="30"
+                   height="30"
+                   alt="Escudo"
+                   style="object-fit: contain;"
+                   onerror="this.src='assets/images/Logo.png'">
+
               <strong>{{ item.teamName }}</strong>
             </div>
           </td>
