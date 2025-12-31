@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
+import { Observable, of, throwError, timer } from 'rxjs';
+import { map, catchError, tap, retry } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Match, Standing, Team } from '../models/sport.model';
 
@@ -27,7 +27,7 @@ export class SportDbService {
 
   /* --- Tiempos de vida para la caché en milisegundos --- */
   private readonly CACHE_TTL = {
-    LIVE: 5 * 60 * 1000,        // 5 minuto (Datos volátiles)
+    LIVE: 60 * 60 * 1000,        // 5 minuto (Datos volátiles), para pruebas lo vamos a hacer cada hora para no agotar requests
     STATIC: 6 * 60 * 60 * 1000  // 6 horas (Datos estáticos como calendarios)
   };
 
@@ -73,6 +73,22 @@ export class SportDbService {
     localStorage.setItem(key, JSON.stringify(entry));
   }
 
+  /*
+   * ESTRATEGIA DE REINTENTO
+   */
+  private getRetryStrategy() {
+    return retry({
+      count: 5, // Intentar 5 veces antes de rendirse
+      delay: (error, retryCount) => {
+        // Si es error 429 (Too Many Requests) o 500 (Server Error)
+        if (error.status === 429 || error.status >= 500) {
+          console.warn(`⚠️ API inestable (${error.status}). Reintentando... (${retryCount}/5)`);
+          return timer(5000 * retryCount);
+        }
+        return throwError(() => error); // Otros errores
+      }
+    });
+  }
 
   /*
    * MÉTODOS PÚBLICOS (API INTERFACE)
@@ -84,14 +100,13 @@ export class SportDbService {
     if (cached) return of(cached);
 
     return this.http.get<any>(`${this.baseUrl}/api/flashscore/football/live`, { headers: this.getHeaders() }).pipe(
-      map(res => {
-        // Normalización: La API puede devolver array directo o { data: [...] }
-        return Array.isArray(res) ? res : res.data || [];
-      }),
+      this.getRetryStrategy(),
+      // Normalización: La API puede devolver array directo o { data: [...] }
+      map((res: any) => Array.isArray(res) ? res : res.data || []),
       tap(data => this.saveToCache(this.CACHE_KEYS.LIVE, data, this.CACHE_TTL.LIVE)),
       catchError(err => {
         console.error('Error fetching live matches:', err);
-        return of([]); // Fallback seguro: array vacío
+        return of([]);
       })
     );
   }
@@ -104,7 +119,8 @@ export class SportDbService {
     const url = `${this.baseUrl}/api/flashscore/football/spain:176/laliga:QVmLl54o/${this.CURRENT_SEASON}/standings`;
 
     return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
-      map(res => Array.isArray(res) ? res : res.data || []),
+      this.getRetryStrategy(),
+      map((res: any) => Array.isArray(res) ? res : res.data || []),
       tap(data => {
         if (data.length > 0) this.saveToCache(this.CACHE_KEYS.STANDINGS, data, this.CACHE_TTL.STATIC);
       }),
@@ -122,8 +138,9 @@ export class SportDbService {
 
     // Endpoint de Flashscore via SportDB
     const url = `${this.baseUrl}/api/flashscore/football/spain:176/laliga:QVmLl54o/${this.CURRENT_SEASON}/fixtures?page=1`;
-    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
-      map(res => {
+    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
+        this.getRetryStrategy(),
+        map((res: any) => {
         // Si la API devuelve null (endpoint vacío/caído), devolvemos array vacío
         if (!res) return [];
         return res.data || (Array.isArray(res) ? res : []);
@@ -141,19 +158,36 @@ export class SportDbService {
     );
   }
 
-  /* --- Buscar equipo por nombre --- */
+  /* --- Buscar equipo por nombre (utilizando la cache) --- */
   searchTeams(name: string): Observable<Team[]> {
-    const theSportsDbUrl = 'https://www.thesportsdb.com/api/v1/json/3';
+    // Generamos una clave única para guardar esto en memoria
+    const cacheKey = `goalstats_search_${name.replace(/\s/g, '_')}`;
+
+    // Comprobamos si ya lo tenemos guardado
+    const cached = this.getFromCache<Team[]>(cacheKey, this.CACHE_TTL.STATIC);
+    if (cached) {
+      return of(cached);
+    }
+
+    // Si no está en caché llamamos a la API (
+    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/3';
 
     return this.http.get<{ teams: Team[] }>(`${theSportsDbUrl}/searchteams.php?t=${name}`)
       .pipe(
-        map(response => {
+        this.getRetryStrategy(),
+        map((response: any) => {
           const allTeams = response.teams || [];
 
           // Solo devolvemos los de fútbol (Soccer)
-          const soccerTeams = allTeams.filter(team => team.strSport === 'Soccer');
+          return allTeams.filter((team: any) => team.strSport === 'Soccer');
+        }),
 
-          return soccerTeams;
+        // Guardamos el resultado en caché
+        tap(data => {
+            // Solo guardamos si hemos encontrado algo para no cachear errores
+            if (data && data.length > 0) {
+                this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
+            }
         }),
         catchError(err => {
           console.error('Error en búsqueda:', err);
@@ -162,15 +196,27 @@ export class SportDbService {
       );
   }
 
-  /* --- Obtener jugadores del equipo y ordenarlos por posición --- */
+  /* --- Obtener jugadores del equipo y ordenarlos por posición (utilizando la cache) --- */
   getTeamPlayers(teamId: string): Observable<any[]> {
-    const theSportsDbUrl = 'https://www.thesportsdb.com/api/v1/json/3';
+    // Generamos una clave única para guardar esto en memoria
+    const cacheKey = `goalstats_players_${teamId}`;
+
+    // Comprobamos si ya lo tenemos guardado
+    const cached = this.getFromCache<any[]>(cacheKey, this.CACHE_TTL.STATIC);
+    if (cached) {
+      return of(cached);
+    }
+
+    // Si no está en caché llamamos a la API (
+    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/3';    
+    
     return this.http.get<{ player: any[] }>(`${theSportsDbUrl}/lookup_all_players.php?id=${teamId}`)
       .pipe(
-        map(response => {
+        this.getRetryStrategy(),
+        map((response: any) => {
           let players = response.player || [];
 
-          players = players.filter(p => p.strPlayer && p.strPosition && p.strPosition !== 'Manager');
+          players = players.filter((p: any) => p.strPlayer && p.strPosition && p.strPosition !== 'Manager');
 
           // Convertir posición específica a número 
           const getPosWeight = (pos: string) => {
@@ -184,9 +230,19 @@ export class SportDbService {
           };
 
           // Ordenamos el array usando el peso
-          return players.sort((a, b) => {
-            return getPosWeight(a.strPosition) - getPosWeight(b.strPosition);
-          });
+          return players.sort((a: any, b: any) => getPosWeight(a.strPosition) - getPosWeight(b.strPosition));
+        }),
+
+        // Guardamos el resultado en caché
+        tap(data => {
+            // Solo guardamos si hemos encontrado algo para no cachear errores
+            if (data && data.length > 0) {
+                this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
+            }
+        }),
+        catchError(err => {
+          console.error('Error en búsqueda:', err);
+          return of([]);
         })
       );
   }

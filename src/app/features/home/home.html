@@ -29,21 +29,19 @@
 
   </div>
 
-  <div *ngIf="foundTeams.length > 0" style="margin-bottom: 30px;">
+<div *ngIf="foundTeams.length > 0" style="margin-bottom: 30px;">
     <h3>Resultados:</h3>
     <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
 
-<div *ngFor="let team of foundTeams"
-     (click)="goToTeamDetail(team)"
-     class="team-card-hover">
-
-        <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
+      <div *ngFor="let team of foundTeams"
+           (click)="goToTeamDetail(team)"
+           class="team-result-card fade-in"> <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
              width="80"
              alt="Escudo"
              onerror="this.src='assets/images/Logo.png'">
 
-        <p style="font-weight: bold; margin-top: 5px;">{{ team.strTeam }}</p>
-        <small>{{ team.strLeague }}</small>
+        <p style="font-weight: bold; margin-top: 10px;">{{ team.strTeam }}</p>
+        <small class="text-muted">{{ team.strLeague }}</small>
       </div>
 
     </div>

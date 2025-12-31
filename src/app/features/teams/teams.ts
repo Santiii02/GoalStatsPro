@@ -4,8 +4,11 @@
 
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { SportDbService } from '../../services/sportdb.service';
 import { Standing } from '../../models/sport.model';
+import { from, of } from 'rxjs';
+import { concatMap, catchError, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-teams',
@@ -17,6 +20,7 @@ import { Standing } from '../../models/sport.model';
 export class TeamsComponent implements OnInit {
   // Inyección de dependencias
   private sportService = inject(SportDbService);
+  private router = inject(Router);
 
   // Estado del componente
   teams: Standing[] = [];
@@ -28,7 +32,7 @@ export class TeamsComponent implements OnInit {
   }
 
   /* --- Carga de datos de los equipos --- */
-  private loadTeams(): void {
+private loadTeams(): void {
     this.loading = true;
     this.error = null;
 
@@ -36,12 +40,48 @@ export class TeamsComponent implements OnInit {
       next: (data: Standing[]) => {
         this.teams = data;
         this.loading = false;
+        
+        // Iniciamos la carga secuencial de imágenes
+        this.loadTeamImagesSequentially();
       },
       error: (err: any) => {
         console.error('Error fetching standings:', err);
-        this.error = 'No se pudo cargar la información de los equipos. Verifique su conexión.';
+        this.error = 'No se pudo cargar la información de los equipos.';
         this.loading = false;
       }
     });
+  }
+
+  // Cargamos la imagen una a una para no saturar la API
+  private loadTeamImagesSequentially() {
+    from(this.teams).pipe(
+      concatMap(team => {
+        return this.sportService.searchTeams(team.teamName).pipe(
+          tap(foundTeams => {
+             if (foundTeams && foundTeams.length > 0) {
+                 const bestMatch = foundTeams[0];
+                 team.teamBadge = bestMatch.strTeamBadge || bestMatch.strBadge;
+             }
+          }),
+          // Si falla una foto, que no pare el resto
+          catchError(() => of(null)) 
+        );
+      })
+    ).subscribe();
+  }
+
+  // Vamos a la info del equipo
+  goToTeamDetail(team: Standing): void {
+    this.router.navigate(['/team', team.teamName]);
+  }
+
+  // Devuelve true si está en Champions (Top 4)
+  isTopRank(rank: string | number): boolean {
+    return Number(rank) <= 4;
+  }
+
+  // Devuelve true si está en descenso (Puesto > 17)
+  isRelegationRank(rank: string | number): boolean {
+    return Number(rank) > 17;
   }
 }

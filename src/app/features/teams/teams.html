@@ -1,51 +1,63 @@
 <div class="container fade-in">
-  <header class="mb-4">
-    <h2>Equipos de La Liga</h2>
-  </header>
+  <h2 class="mb-4">Equipos de La Liga</h2>
 
-  <div *ngIf="loading" class="text-center mt-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Cargando...</span>
-    </div>
-    <p class="mt-2 text-muted">Sincronizando clasificación...</p>
+  <div *ngIf="loading" class="text-center p-5">
+    <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+    <p class="mt-2">Cargando estadísticas de los equipos...</p>
   </div>
 
-  <div *ngIf="error" class="alert alert-danger mt-3" role="alert">
+  <div *ngIf="error" class="alert alert-danger">
     {{ error }}
   </div>
 
-  <div *ngIf="!loading && !error && teams.length === 0" class="text-center mt-5">
-    <div style="font-size: 2rem;">📊</div>
-    <p class="text-muted">No hay información disponible de la clasificación.</p>
-  </div>
-
-  <div *ngIf="!loading && !error" class="grid-teams">
-    <article *ngFor="let item of teams" class="team-card">
+  <div class="teams-grid" *ngIf="!loading && !error">
+    
+    <div *ngFor="let team of teams" 
+         class="team-card" 
+         (click)="goToTeamDetail(team)">
 
       <div class="card-header">
-        <span class="rank" [class.top-rank]="$any(item.rank) <= 4">#{{ item.rank }}</span>
-
-        <div class="team-icon">⚽</div>
+        <span class="rank" [ngClass]="{'top-rank': isTopRank(team.rank), 'relegation-rank': isRelegationRank(team.rank)}">
+          #{{ team.rank }}
+        </span>
+        
+        <div class="team-identity">
+           <img [src]="team.teamBadge || team.teamLogo || 'assets/images/Logo.png'" 
+                alt="Escudo"
+                class="team-mini-badge"
+                onerror="this.src='assets/images/Logo.png'">
+           
+           <h3 class="team-name">{{ team.teamName }}</h3>
+        </div>
       </div>
 
-      <h3 class="team-name">{{ item.teamName }}</h3>
-
       <div class="stats-row">
-        <div class="stat-item">
-          <span class="stat-label">Puntos</span>
-          <span class="stat-value highlight">{{ item.points }}</span>
+        
+        <div class="stat-item highlight">
+          <span class="stat-value">{{ team.points }}</span>
+          <span class="stat-label">Pts</span>
         </div>
+
         <div class="stat-divider"></div>
+
         <div class="stat-item">
-          <span class="stat-label">Jugados</span>
-          <span class="stat-value">{{ item.matches }}</span>
+          <span class="stat-value">{{ team.matches }}</span>
+          <span class="stat-label">PJ</span>
         </div>
+
+        <div class="stat-divider"></div>
+
+        <div class="stat-item">
+          <span class="stat-value">{{ team.goalDiff }}</span>
+          <span class="stat-label">DG</span>
+        </div>
+
       </div>
 
       <div class="stats-mini">
-        <small class="text-muted">Goles: {{ item.goals }} (Dif: {{ item.goalDiff }})</small>
+        <small class="text-muted">Goles: {{ team.goals }}</small>
       </div>
 
-    </article>
+    </div>
   </div>
 </div>

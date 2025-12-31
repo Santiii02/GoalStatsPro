@@ -1,5 +1,12 @@
-/* Salvoconducto para desarrollo, evita errores CORS */
 {
+  "/api/thesportsdb": {
+    "target": "https://www.thesportsdb.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/thesportsdb": ""
+    }
+  },
   "/api": {
     "target": "https://api.sportdb.dev",
     "secure": true,

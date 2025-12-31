@@ -172,4 +172,20 @@
   cursor: pointer;
   transition: transform 0.2s;
   background-color: white;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+}
+
+.team-result-card:hover {
+  transform: translateY(-8px); 
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
+  border-color: var(--primary-color, #3b82f6); 
+}
+
+.team-result-card img {
+  transition: transform 0.3s ease;
+}
+
+.team-result-card:hover img {
+  transform: scale(1.1);
 }
