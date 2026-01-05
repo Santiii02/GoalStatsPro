@@ -1,8 +1,12 @@
+/*
+ *  INFORMACIÓN DEL EQUIPO.
+ */
+
 import { Component, Input, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Para *ngIf y *ngFor
-import { RouterModule } from '@angular/router'; // Para el botón de volver
-import { ButtonModule } from 'primeng/button';  // UI
-import { CardModule } from 'primeng/card';      // UI
+import { CommonModule } from '@angular/common'; 
+import { RouterModule, Router } from '@angular/router'; 
+import { ButtonModule } from 'primeng/button';  
+import { CardModule } from 'primeng/card';      
 import { SportDbService } from '../../services/sportdb.service';
 import { Team } from '../../models/sport.model';
 
@@ -20,6 +24,7 @@ export class TeamDetailComponent implements OnInit {
 
   /* --- Inyección del servicio --- */
   private sportService = inject(SportDbService);
+  private router = inject(Router);
 
   /* --- Variables de datos --- */
   team: Team | null = null;
@@ -45,6 +50,8 @@ export class TeamDetailComponent implements OnInit {
 
           if (this.team.idTeam) {
             this.loadPlayers(this.team.idTeam);
+          } else {
+            this.loading = false;
           }
         } else {
           this.loading = false; 
@@ -83,5 +90,10 @@ export class TeamDetailComponent implements OnInit {
     if (pos.includes('wing') || pos.includes('forward') || pos.includes('striker')) return 'fw';
 
     return '';
+  }
+
+  /* --- Ver el jugador --- */
+  goToPlayer(playerId: string): void {
+    this.router.navigate(['/player', playerId]);
   }
 }

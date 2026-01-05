@@ -35,7 +35,9 @@
 
       <div *ngFor="let team of foundTeams"
            (click)="goToTeamDetail(team)"
-           class="team-result-card fade-in"> <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
+           class="team-result-card fade-in"> 
+
+          <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
              width="80"
              alt="Escudo"
              onerror="this.src='assets/images/Logo.png'">

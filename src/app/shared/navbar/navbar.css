@@ -1,0 +1,68 @@
+:host {
+    display: flex;        
+    width: 100%;          
+    justify-content: center; 
+}
+
+/* --- CONTENEDOR PRINCIPAL DEL BUSCADOR --- */
+.search-widget {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-box {
+    width: 100%;
+    position: relative;
+}
+
+/* Ajustes de PrimeNG para que se vea limpio */
+:host ::ng-deep .p-autocomplete {
+    width: 100%;
+    display: block;
+}
+:host ::ng-deep .p-inputtext {
+    width: 100% !important;
+    height: 40px !important;
+    padding: 0.6rem 1rem; 
+    font-size: 0.95rem;
+    border-radius: 50px; 
+    border: none;       
+    background-color: white !important; 
+    color: #333 !important;
+}
+
+/* --- RESULTADOS (Dropdown) --- */
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px;
+}
+
+.hover-effect {
+    cursor: pointer;
+    background: #f0f2f5;
+    color: #555;
+    transition: 0.3s;
+}
+
+.hover-effect:hover {
+    background: #e4e6eb;
+    color: #000;
+}
+
+.result-img {
+    width: 35px; 
+    height: 35px; 
+    object-fit: contain; 
+    border-radius: 4px;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

@@ -28,6 +28,11 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  gap: 20px;
+}
+
+.nav-brand {
+  flex-shrink: 0; 
 }
 
 .nav-brand a {
@@ -38,6 +43,14 @@
   letter-spacing: 0.5px;
 }
 
+/* --- Buscador --- */
+.nav-search {
+  flex: 1;
+  display: flex;
+  padding: 0 20px;
+}
+
+/* --- Enlaces --- */
 .nav-links {
   list-style: none;
   display: flex;
@@ -89,17 +102,4 @@ main {
   margin-top: auto; 
 }
 
-/* --- Diseño para Móvil --- */
-@media (max-width: 600px) {
-  .navbar {
-    flex-direction: column;
-    height: auto;
-    padding: 10px;
-  }
 
-  .nav-links {
-    margin-top: 10px;
-    gap: 15px;
-    font-size: 0.9rem;
-  }
-}

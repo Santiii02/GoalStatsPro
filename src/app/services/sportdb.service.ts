@@ -169,7 +169,7 @@ export class SportDbService {
       return of(cached);
     }
 
-    // Si no está en caché llamamos a la API (
+    // Si no está en caché llamamos a la API 
     const theSportsDbUrl = '/api/thesportsdb/api/v1/json/3';
 
     return this.http.get<{ teams: Team[] }>(`${theSportsDbUrl}/searchteams.php?t=${name}`)
@@ -196,6 +196,43 @@ export class SportDbService {
       );
   }
 
+/* --- Buscar JUGADORES por nombre (utilizando la cache) --- */
+  searchPlayers(name: string): Observable<any[]> {
+    // Generamos una clave única para guardar esto en memoria
+    const cacheKey = `goalstats_search_player_${name.replace(/\s/g, '_')}`;
+
+    // Comprobamos si ya lo tenemos guardado
+    const cached = this.getFromCache<any[]>(cacheKey, this.CACHE_TTL.STATIC);
+    if (cached) {
+      return of(cached);
+    }
+
+    // Si no está en caché llamamos a la API 
+    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/3';
+
+    return this.http.get<{ player: any[] }>(`${theSportsDbUrl}/searchplayers.php?p=${name}`)
+      .pipe(
+        this.getRetryStrategy(),
+        map((response: any) => {
+          const allPlayers = response.player || []; 
+
+          return allPlayers.filter((p: any) => p.strSport === 'Soccer');
+        }),
+
+        // Guardamos el resultado en caché
+        tap(data => {
+            // Solo guardamos si hemos encontrado algo para no cachear errores
+            if (data && data.length > 0) {
+                this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
+            }
+        }),
+        catchError(err => {
+          console.error('Error buscando jugadores:', err);
+          return of([]);
+        })
+      );
+  }
+
   /* --- Obtener jugadores del equipo y ordenarlos por posición (utilizando la cache) --- */
   getTeamPlayers(teamId: string): Observable<any[]> {
     // Generamos una clave única para guardar esto en memoria
@@ -207,7 +244,7 @@ export class SportDbService {
       return of(cached);
     }
 
-    // Si no está en caché llamamos a la API (
+    // Si no está en caché llamamos a la API 
     const theSportsDbUrl = '/api/thesportsdb/api/v1/json/3';    
     
     return this.http.get<{ player: any[] }>(`${theSportsDbUrl}/lookup_all_players.php?id=${teamId}`)
@@ -243,6 +280,42 @@ export class SportDbService {
         catchError(err => {
           console.error('Error en búsqueda:', err);
           return of([]);
+        })
+      );
+  }
+
+  /* --- Obtener detalles de un jugador por ID (utilizando la cache) --- */
+  getPlayerById(playerId: string): Observable<any> {
+    // Generamos una clave única para guardar esto en memoria
+    const cacheKey = `goalstats_player_detail_${playerId}`;
+
+    // Comprobamos si ya lo tenemos guardado
+    const cached = this.getFromCache<any>(cacheKey, this.CACHE_TTL.STATIC);
+    if (cached) {
+      return of(cached);
+    }
+
+    // Si no está en caché llamamos a la API 
+    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/3';
+
+    return this.http.get<{ players: any[] }>(`${theSportsDbUrl}/lookupplayer.php?id=${playerId}`)
+      .pipe(
+        this.getRetryStrategy(),
+        map((res: any) => {
+          const players = res.players || [];
+          return players.length > 0 ? players[0] : null;
+        }),
+
+        // Guardamos el resultado en caché
+        tap(data => {
+          // Solo guardamos si hemos encontrado algo para no cachear errores
+          if (data) {
+            this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
+          }
+        }),
+        catchError(err => {
+          console.error('Error fetching player detail:', err);
+          return of(null);
         })
       );
   }

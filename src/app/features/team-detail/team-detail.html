@@ -42,7 +42,7 @@
     </div>
 
     <div class="players-grid">
-      <div class="player-card fade-in" *ngFor="let player of players">
+      <div class="player-card fade-in" *ngFor="let player of players" (click)="goToPlayer(player.idPlayer)">
 
         <div class="player-img-container">
           <img [src]="player.strCutout || player.strThumb || 'assets/images/player-placeholder.png'"

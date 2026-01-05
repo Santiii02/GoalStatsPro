@@ -1,0 +1,95 @@
+<div class="container fade-in" *ngIf="player">
+
+  <div class="mb-3">
+    <p-button label="Volver al equipo" icon="pi pi-arrow-left" (onClick)="goBack()" styleClass="p-button-text text-secondary"></p-button>
+  </div>
+
+  <div class="player-hero">
+    
+    <div class="hero-image-container">
+      <img [src]="player.strCutout || player.strThumb || 'https://www.thesportsdb.com/images/media/player/cutout/default.png'" 
+           alt="{{ player.strPlayer }}"
+           class="hero-img">
+    </div>
+
+    <div class="hero-info">
+      <div class="team-badge-mini" *ngIf="player.strTeam">
+        <small>{{ player.strTeam }}</small>
+      </div>
+      
+      <h1>{{ player.strPlayer }}</h1>
+      
+      <div class="main-stats">
+        <span class="position-tag">{{ player.strPosition }}</span>
+        <span class="number-tag" *ngIf="player.strNumber">#{{ player.strNumber }}</span>
+      </div>
+
+      <div class="social-links mt-3">
+        <a *ngIf="player.strInstagram" [href]="getSocialUrl(player.strInstagram)" target="_blank" class="social-btn insta">
+          <i class="pi pi-instagram"></i>
+        </a>
+        <a *ngIf="player.strTwitter" [href]="getSocialUrl(player.strTwitter)" target="_blank" class="social-btn twitter">
+          <i class="pi pi-twitter"></i>
+        </a>
+        <a *ngIf="player.strFacebook" [href]="getSocialUrl(player.strFacebook)" target="_blank" class="social-btn facebook">
+          <i class="pi pi-facebook"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-grid mt-4">
+    
+    <div class="stat-box">
+      <i class="pi pi-globe text-primary"></i>
+      <span class="label">Nacionalidad</span>
+      <strong>{{ player.strNationality || 'Desc.' }}</strong>
+    </div>
+
+    <div class="stat-box">
+      <i class="pi pi-calendar text-primary"></i>
+      <span class="label">Edad</span>
+      <strong>{{ age ? age + ' años' : 'N/A' }}</strong>
+      <small class="text-muted">{{ player.dateBorn }}</small>
+    </div>
+
+    <div class="stat-box">
+      <i class="pi pi-arrows-v text-primary"></i>
+      <span class="label">Altura</span>
+      <strong>{{ player.strHeight || 'N/A' }}</strong>
+    </div>
+
+    <div class="stat-box">
+      <i class="pi pi-chart-bar text-primary"></i>
+      <span class="label">Peso</span>
+      <strong>{{ player.strWeight || 'N/A' }}</strong>
+    </div>
+
+  </div>
+
+<div class="bio-section mt-4 mb-5 fade-in" 
+       *ngIf="player.strDescriptionES || player.strDescriptionEN">
+    
+    <h3>Biografía</h3>
+    
+    <p class="bio-text">
+      {{ player.strDescriptionES || player.strDescriptionEN || 'No hay información biográfica disponible para este jugador.' }}
+    </p>
+
+    <small class="text-muted" *ngIf="!player.strDescriptionES && player.strDescriptionEN">
+      * La información detallada solo está disponible en inglés en la base de datos oficial.
+    </small>
+
+</div>
+
+
+<div *ngIf="loading" class="text-center mt-5 p-5">
+  <i class="pi pi-spin pi-spinner text-primary" style="font-size: 3rem"></i>
+  <p class="mt-3 text-muted">Cargando perfil del jugador...</p>
+</div>
+
+<div *ngIf="!loading && !player" class="text-center mt-5">
+  <h2>Jugador no encontrado</h2>
+  <p>No se pudo recuperar la información solicitada.</p>
+  <p-button label="Volver" (onClick)="goBack()"></p-button>
+</div>

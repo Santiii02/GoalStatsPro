@@ -1,0 +1,177 @@
+/* --- HERO SECTION --- */
+.player-hero {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-radius: 16px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    color: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+}
+
+.player-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    transform: translate(30%, -30%);
+}
+
+.hero-image-container {
+    flex: 0 0 250px;
+    display: flex;
+    justify-content: center;
+    z-index: 2;
+}
+
+.hero-img {
+    max-width: 100%;
+    height: auto;
+    max-height: 280px;
+    filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+    transition: transform 0.3s ease;
+}
+
+.hero-img:hover {
+    transform: scale(1.05) rotate(2deg);
+}
+
+.hero-info {
+    flex: 1;
+    z-index: 2;
+}
+
+.hero-info h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 10px 0;
+    line-height: 1.1;
+}
+
+.team-badge-mini {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    font-weight: bold;
+}
+
+.main-stats {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.position-tag {
+    background-color: var(--primary-color, #3b82f6);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.number-tag {
+    border: 2px solid rgba(255,255,255,0.3);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+/* --- REDES SOCIALES --- */
+.social-links {
+    display: flex;
+    gap: 15px;
+}
+
+.social-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 1.2rem;
+}
+
+.social-btn:hover {
+    background: white;
+    transform: translateY(-3px);
+}
+
+.social-btn.insta:hover { color: #E1306C; }
+.social-btn.twitter:hover { color: #1DA1F2; }
+.social-btn.facebook:hover { color: #4267B2; }
+
+/* --- GRID DE ESTADÍSTICAS --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-left: 4px solid var(--primary-color, #3b82f6);
+}
+
+.stat-box i {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+.stat-box .label {
+    font-size: 0.85rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.stat-box strong {
+    font-size: 1.2rem;
+    color: #1e293b;
+    margin-top: 5px;
+}
+
+/* --- BIOGRAFÍA --- */
+.bio-section {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    line-height: 1.8;
+    color: #334155;
+}
+
+.bio-section h3 {
+    color: #1e293b;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.bio-text {
+    white-space: pre-line; 
+    text-align: justify;   
+    font-size: 1rem;
+    color: #4b5563;
+}
