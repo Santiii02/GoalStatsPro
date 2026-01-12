@@ -12,11 +12,11 @@
     <span class="p-input-icon-left">
       <i class="pi pi-search"></i>
       <input type="text"
-             pInputText
-             [(ngModel)]="searchQuery"
-             (keyup.enter)="searchTeam()"
-             placeholder="Buscar equipo (ej: Barcelona)..."
-             style="width: 300px" />
+            pInputText
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="searchTeam()"
+            placeholder="Buscar equipo (ej: Barcelona)..."
+            style="width: 300px" />
     </span>
 
     <p-button
@@ -34,13 +34,13 @@
     <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
 
       <div *ngFor="let team of foundTeams"
-           (click)="goToTeamDetail(team)"
-           class="team-result-card fade-in"> 
+          (click)="goToTeamDetail(team)"
+          class="team-result-card fade-in"> 
 
           <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
-             width="80"
-             alt="Escudo"
-             onerror="this.src='assets/images/Logo.png'">
+            width="80"
+            alt="Escudo"
+            onerror="this.src='assets/images/Logo.png'">
 
         <p style="font-weight: bold; margin-top: 10px;">{{ team.strTeam }}</p>
         <small class="text-muted">{{ team.strLeague }}</small>
@@ -57,14 +57,14 @@
     </div>
 
     <div class="matches-grid" *ngIf="liveMatches.length > 0">
-      <div *ngFor="let match of liveMatches" class="match-card live-border">
+      <div *ngFor="let match of liveMatches" class="match-card live-border clickable" (click)="goToMatch(match)">
 
         <div class="team team-home">
           <span class="team-name">{{ match.homeName }}</span>
           <img [src]="match.homeLogo"
-               alt="Escudo local"
-               class="team-logo"
-               onerror="this.src='assets/placeholder.png'">
+              alt="Escudo local"
+              class="team-logo"
+              onerror="this.src='assets/placeholder.png'">
         </div>
 
         <div class="score-board">
@@ -76,9 +76,9 @@
 
         <div class="team team-away">
           <img [src]="match.awayLogo"
-               alt="Escudo visitante"
-               class="team-logo"
-               onerror="this.src='assets/placeholder.png'">
+              alt="Escudo visitante"
+              class="team-logo"
+              onerror="this.src='assets/placeholder.png'">
           <span class="team-name">{{ match.awayName }}</span>
         </div>
 
@@ -115,11 +115,11 @@
             style="display: flex; align-items: center; gap: 10px;">
 
               <img [src]="item.teamBadge || item.teamLogo || 'assets/images/Logo.png'"
-                   width="30"
-                   height="30"
-                   alt="Escudo"
-                   style="object-fit: contain;"
-                   onerror="this.src='assets/images/Logo.png'">
+                  width="30"
+                  height="30"
+                  alt="Escudo"
+                  style="object-fit: contain;"
+                  onerror="this.src='assets/images/Logo.png'">
 
               <strong>{{ item.teamName }}</strong>
             </div>

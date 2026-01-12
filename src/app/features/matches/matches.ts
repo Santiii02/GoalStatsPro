@@ -6,6 +6,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SportDbService } from '../../services/sportdb.service';
 import { Match } from '../../models/sport.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-matches',
@@ -17,6 +18,7 @@ import { Match } from '../../models/sport.model';
 export class MatchesComponent implements OnInit {
   // Inyección de dependencias
   private sportService = inject(SportDbService);
+  private router = inject(Router);
 
   // Estado del componente
   matches: Match[] = [];
@@ -54,6 +56,14 @@ export class MatchesComponent implements OnInit {
     });
   }
 
+  /* --- Información detalla del partido  --- */
+  goToMatch(match: Match): void {
+      if (match && match.eventId) {
+          this.router.navigate(['/match', match.eventId], {
+            state: { data: match } 
+          });
+      }
+  }
 
   /* --- Filtra partidos de hoy y futuros --- */
   private filterUpcomingMatches(allMatches: Match[]): Match[] {

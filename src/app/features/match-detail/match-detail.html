@@ -1,0 +1,131 @@
+<div class="container fade-in">
+
+    <div class="mb-3">
+        <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()"
+            styleClass="p-button-text text-secondary"></p-button>
+    </div>
+
+    <div *ngIf="loading" class="text-center p-5">
+        <i class="pi pi-spin pi-spinner" style="font-size: 3rem; color: var(--primary-color)"></i>
+        <p class="mt-3 text-muted">Cargando datos del partido...</p>
+    </div>
+
+    <div *ngIf="!loading && !match" class="text-center mt-5">
+        <h2>Partido no encontrado</h2>
+        <p class="text-muted">No se pudo recuperar la información de este encuentro.</p>
+    </div>
+
+    <div *ngIf="!loading && match">
+
+        <div class="match-hero">
+
+            <div class="team-col home">
+                <img [src]="match.homeLogo || 'assets/placeholder.png'" class="team-badge-lg" alt="Local">
+                <h2 class="team-name">{{ match.homeTeam }}</h2>
+            </div>
+
+            <div class="score-board">
+                <div class="score-display">
+                    <span class="score-num">{{ match.homeScore ?? '-' }}</span>
+                    <span class="divider">:</span>
+                    <span class="score-num">{{ match.awayScore ?? '-' }}</span>
+                </div>
+
+                <div class="match-status" [class.live-pulse]="isLive(match.status)">
+                    <span *ngIf="isLive(match.status)" class="live-dot">●</span>
+                    {{ match.status }}
+                </div>
+
+                <small class="text-muted mt-2 d-block">{{ match.league }}</small>
+            </div>
+
+            <div class="team-col away">
+                <img [src]="match.awayLogo || 'assets/placeholder.png'" class="team-badge-lg" alt="Visitante">
+                <h2 class="team-name">{{ match.awayTeam }}</h2>
+            </div>
+
+        </div>
+
+        <div class="match-tabs mt-4" *ngIf="startingLineups || matchStats.length > 0">
+            <p-tabView [(activeIndex)]="activeTab">
+
+                <p-tabPanel header="Alineaciones" *ngIf="startingLineups">
+                    <div class="lineups-grid">
+
+                        <div class="lineup-col">
+                            <h4 class="mb-3 text-center">{{ match.homeTeam }}</h4>
+                            <small class="d-block text-center text-muted mb-3">
+                                Formación: {{ startingLineups.home[0]?.formation || 'N/A' }}
+                            </small>
+
+                            <ul class="player-list">
+                                <li *ngFor="let p of startingLineups.home">
+                                    <span class="p-number">{{ p.participantNumber }}</span>
+                                    <span class="p-name">{{ p.participantName }}</span>
+                                    <i *ngIf="p.participantSpecialPosition === '(C)'"
+                                        class="pi pi-star-fill text-warning ml-2" style="font-size: 0.7rem"></i>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="lineup-col">
+                            <h4 class="mb-3 text-center">{{ match.awayTeam }}</h4>
+                            <small class="d-block text-center text-muted mb-3">
+                                Formación: {{ startingLineups.away[0]?.formation || 'N/A' }}
+                            </small>
+
+                            <ul class="player-list">
+                                <li *ngFor="let p of startingLineups.away">
+                                    <span class="p-number">{{ p.participantNumber }}</span>
+                                    <span class="p-name">{{ p.participantName }}</span>
+                                    <i *ngIf="p.participantSpecialPosition === '(C)'"
+                                        class="pi pi-star-fill text-warning ml-2" style="font-size: 0.7rem"></i>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-4" *ngIf="substitutes">
+                        <h5 class="text-center text-muted">Suplentes</h5>
+                        <div class="lineups-grid">
+                            <div class="lineup-col">
+                                <ul class="player-list text-muted">
+                                    <li *ngFor="let p of substitutes.home">
+                                        <small>{{ p.participantNumber }} - {{ p.participantName }}</small>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="lineup-col">
+                                <ul class="player-list text-muted">
+                                    <li *ngFor="let p of substitutes.away">
+                                        <small>{{ p.participantNumber }} - {{ p.participantName }}</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </p-tabPanel>
+
+                <p-tabPanel header="Estadísticas" *ngIf="matchStats.length > 0">
+                    <div class="stats-container">
+                        <div class="stat-row" *ngFor="let stat of matchStats">
+                            <div class="stat-val home">{{ stat.homeValue }}</div>
+
+                            <div class="stat-label">{{ stat.statName }}</div>
+
+                            <div class="stat-val away">{{ stat.awayValue }}</div>
+
+                            <div class="stat-bar-bg mt-1">
+                                <div class="stat-bar home-bar" [style.width.%]="getStatPercent(stat.homeValue)"></div>
+                                <div class="stat-bar away-bar" [style.width.%]="getStatPercent(stat.awayValue)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </p-tabPanel>
+
+            </p-tabView>
+        </div>
+
+    </div>
+</div>

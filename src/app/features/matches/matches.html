@@ -21,7 +21,7 @@
 
   <div *ngIf="!loading && !error" class="matches-grid">
 
-    <article *ngFor="let match of matches" class="match-card">
+    <article *ngFor="let match of matches" class="match-card" (click)="goToMatch(match)">
 
       <div class="match-header" *ngIf="match.round">
         <span class="badge-round">{{ match.round }}</span>
@@ -30,11 +30,11 @@
       <div class="match-content">
         <div class="team">
           <img [src]="match.homeLogo"
-               [alt]="match.homeName"
-               width="40"
-               height="40"
-               loading="lazy"
-               onerror="this.src='assets/placeholder.png'">
+              [alt]="match.homeName"
+              width="40"
+              height="40"
+              loading="lazy"
+              onerror="this.src='assets/placeholder.png'">
           <span class="team-name">{{ match.homeName }}</span>
         </div>
 
@@ -49,11 +49,11 @@
         <div class="team">
           <span class="team-name">{{ match.awayName }}</span>
           <img [src]="match.awayLogo"
-               [alt]="match.awayName"
-               width="40"
-               height="40"
-               loading="lazy"
-               onerror="this.src='assets/placeholder.png'">
+              [alt]="match.awayName"
+              width="40"
+              height="40"
+              loading="lazy"
+              onerror="this.src='assets/placeholder.png'">
         </div>
       </div>
 

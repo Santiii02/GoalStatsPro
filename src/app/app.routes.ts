@@ -9,6 +9,7 @@ import { TeamsComponent } from './features/teams/teams';
 import { PlayersComponent } from './features/players/players';
 import { TeamDetailComponent } from './features/team-detail/team-detail';
 import { PlayerDetailComponent } from './features/player-detail/player-detail';
+import { MatchDetailComponent } from './features/match-detail/match-detail';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, title: 'Inicio - GoalStatsPro' },
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'players', component: PlayersComponent, title: 'Jugadores - GoalStatsPro' },
   { path: 'team/:name', component: TeamDetailComponent, title: 'Equipo - GoalStatsPro' },
   { path: 'player/:id', component: PlayerDetailComponent, title: 'Jugador - GoalStatsPro' },
+  { path: 'match/:id', component: MatchDetailComponent, title: 'Partido - GoalStatsPro' },
 
   // Cualquier ruta desconocida redirige al Home
   { path: '**', redirectTo: '' }

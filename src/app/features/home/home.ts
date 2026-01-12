@@ -134,4 +134,13 @@ export class HomeComponent implements OnInit {
       }
     }
   }
+
+  /* --- Información detalla del partido  --- */
+  goToMatch(match: Match): void {
+    if (match && match.eventId) {
+      this.router.navigate(['/match', match.eventId], {
+        state: { data: match } 
+      });
+    }
+  }
 }

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, throwError, timer } from 'rxjs';
+import { Observable, of, throwError, timer, forkJoin } from 'rxjs';
 import { map, catchError, tap, retry } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Match, Standing, Team } from '../models/sport.model';
@@ -22,7 +22,8 @@ export class SportDbService {
   private readonly CACHE_KEYS = {
     LIVE: 'goalstats_live',
     STANDINGS: `goalstats_standings_${this.CURRENT_SEASON}`,
-    FIXTURES: `goalstats_fixtures_${this.CURRENT_SEASON}`
+    FIXTURES: `goalstats_fixtures_${this.CURRENT_SEASON}`,
+    MATCH_DETAIL_PREFIX: 'goalstats_match_details_'
   };
 
   /* --- Tiempos de vida para la caché en milisegundos --- */
@@ -318,5 +319,83 @@ export class SportDbService {
           return of(null);
         })
       );
+  }
+
+  /* --- Información basica de un partido. Busca tanto en partidos en vivo como en el calendario --- */
+  getMatchBasicInfo(matchId: string): Observable<any> {
+    // Limpiamos el ID 
+    const cleanId = matchId.replace('g_1_', '');
+
+    // Buscamos en getFixtures y getLiveMatches
+    return forkJoin({
+      fixtures: this.getFixtures(), 
+      live: this.getLiveMatches()   
+    }).pipe(
+      map(results => {
+        // Unificamos las listas
+        const allMatches = [...(results.fixtures || []), ...(results.live || [])];
+        
+        // Buscamos el partido por ID (con o sin prefijo)
+        return allMatches.find(m => m.eventId === cleanId || m.eventId === `g_1_${cleanId}`);
+      }),
+      catchError(() => of(null))
+    );
+  }
+  
+  /* --- Obtener detalles de un partido (Alineaciones, Eventos, Stats) --- */
+  getMatchDetails(matchId: string): Observable<any> {
+    // Generamos una clave única para guardar esto en memoria
+    const cacheKey = `${this.CACHE_KEYS.MATCH_DETAIL_PREFIX}${matchId}`;
+    
+    // Comprobamos si ya lo tenemos guardado
+    const cached = this.getFromCache<any>(cacheKey, this.CACHE_TTL.LIVE); 
+    if (cached) {
+      return of(cached);
+    }
+
+    // Limpieza de ID para la URL
+    const cleanId = matchId.replace('g_1_', '');
+
+    // Si no está en caché llamamos a la API 
+    const urlLineups = `${this.baseUrl}/api/flashscore/match/${cleanId}/lineups`;
+    const urlStats   = `${this.baseUrl}/api/flashscore/match/${cleanId}/stats`;
+
+    // Ejecución paralela
+    return forkJoin({
+      // Usamos catchError individual y retry strategy, si falla uno y no falla el otro que no falle toda la carga
+      lineups: this.http.get<any>(urlLineups, { headers: this.getHeaders() })
+        .pipe(
+          this.getRetryStrategy(), 
+          catchError(() => of(null))
+        ),
+        
+      stats: this.http.get<any>(urlStats, { headers: this.getHeaders() })
+        .pipe(this.getRetryStrategy(), catchError(() => of(null)))
+    }).pipe(
+      map((results: any) => {
+        const lineupsData = results.lineups?.data || results.lineups || null;
+        const statsData   = results.stats?.data   || results.stats   || null;
+
+        // Si ambos endpoints fallan o están vacíos, devolvemos null
+        if (!lineupsData && !statsData) return null;
+
+        return {
+          lineups: lineupsData,
+          stats: statsData
+        };
+      }),
+
+      // Guardamos el resultado en caché
+      tap(data => {
+        // Solo guardamos si hemos encontrado algo para no cachear errores
+        if (data) {
+          this.saveToCache(cacheKey, data, this.CACHE_TTL.LIVE);
+        }
+      }),
+      catchError(err => {
+        console.error('Error obteniendo detalles del partido:', err);
+        return of(null);
+      })
+    );
   }
 }

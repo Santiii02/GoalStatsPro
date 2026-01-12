@@ -1,0 +1,286 @@
+/* --- HERO SECTION: MARCADOR --- */
+.match-hero {
+    background: linear-gradient(to bottom, #1e293b, #0f172a);
+    color: white;
+    border-radius: 16px;
+    padding: 30px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Columnas de equipo local y visitante */
+.team-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+    z-index: 2;
+}
+
+.team-badge-lg {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+    transition: transform 0.3s;
+}
+
+.team-badge-lg:hover {
+    transform: scale(1.1);
+}
+
+.team-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* --- MARCADOR --- */
+.score-board {
+    flex: 0 0 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+}
+
+.score-display {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.score-display .divider {
+    color: rgba(255,255,255,0.5);
+    font-size: 2.5rem;
+    vertical-align: middle;
+    margin: 0 5px;
+}
+
+/* --- ESTADO DEL PARTIDO --- */
+.match-status {
+    margin-top: 15px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(5px);
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Animación de "En Vivo" */
+.live-pulse {
+    background: #ef4444; /* Rojo intenso */
+    color: white;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    animation: pulse 2s infinite;
+}
+
+.live-dot { 
+    margin-right: 6px; 
+    font-size: 1.2em;
+    vertical-align: sub;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { opacity: 1; box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* --- PESTAÑAS --- */
+.match-tabs {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
+    margin-top: 25px;
+}
+
+/* Estilos específicos de PrimeNG Tabs */
+:host ::ng-deep .p-tabview .p-tabview-nav {
+    background: transparent;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: center;
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: var(--primary-color, #3b82f6);
+    border-bottom: 3px solid var(--primary-color, #3b82f6);
+}
+
+/* --- ALINEACIONES --- */
+.lineups-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding: 10px;
+}
+
+.lineup-col h4 {
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    font-weight: 800;
+    color: #1e293b;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+}
+
+.player-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.player-list li {
+    padding: 10px 0;
+    border-bottom: 1px dashed #e2e8f0;
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.player-list li:last-child {
+    border-bottom: none;
+}
+
+.p-number {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 28px;
+    height: 28px;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-right: 12px;
+}
+
+.p-name {
+    font-weight: 500;
+    color: #334155;
+}
+
+/* --- ESTADÍSTICAS --- */
+.stats-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+.stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stat-val {
+    width: 15%;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+.stat-val.home { 
+    text-align: left; 
+    color: var(--primary-color, #3b82f6); 
+}
+
+.stat-val.away { 
+    text-align: right; 
+    color: #ef4444; 
+}
+
+/* Etiqueta central */
+.stat-label {
+    width: 70%;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+/* Contenedor de las barras (Ocupa toda la fila inferior) */
+.stat-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: #f1f5f9; /* Fondo gris claro */
+    border-radius: 4px;
+    display: flex; /* Flex para poner las dos barras */
+    overflow: hidden;
+    margin-top: 5px;
+    position: relative;
+}
+
+/* Barra Izquierda (Local) */
+.home-bar-container {
+    width: 50%;
+    display: flex;
+    justify-content: flex-end;
+    border-right: 1px solid white; /* Pequeña separación visual */
+}
+
+.home-bar {
+    height: 100%;
+    background-color: var(--primary-color, #3b82f6);
+    border-radius: 4px 0 0 4px;
+    transition: width 1s ease-out;
+}
+
+/* Barra Derecha (Visitante) */
+.away-bar-container {
+    width: 50%;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.away-bar {
+    height: 100%;
+    background-color: #ef4444;
+    border-radius: 0 4px 4px 0;
+    transition: width 1s ease-out;
+}
+
+/* --- ESTADO VACÍO --- */
+.empty-tab {
+    text-align: center;
+    padding: 60px 20px;
+    color: #cbd5e1;
+}
+.empty-tab i { 
+    font-size: 3rem; 
+    margin-bottom: 15px; 
+    display: block; 
+}
+.empty-tab p {
+    font-size: 1.1rem;
+    margin: 0;
+}

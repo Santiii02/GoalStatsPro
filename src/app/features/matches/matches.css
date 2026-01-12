@@ -16,12 +16,13 @@
   flex-direction: column;
   align-items: center;
   border: 1px solid transparent;
+  cursor: pointer;
 }
 
   .match-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    border-color: #e9ecef;
+    border-color: var(--primary-color, #3b82f6);
   }
 
 .match-content {
