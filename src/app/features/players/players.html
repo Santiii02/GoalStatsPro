@@ -1,23 +1,106 @@
 <div class="container fade-in">
-  <header class="mb-4">
-    <h2>Estadísticas de Jugadores</h2>
-  </header>
-
-  <div *ngIf="loading" class="text-center mt-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Cargando...</span>
+  <div class="filters-header mb-4">
+    <div class="header-text">
+      <h2>Explorador de Jugadores</h2>
+      <p class="text-muted">Busca en toda la base de datos o filtra por equipos de La Liga.</p>
     </div>
-    <p class="mt-2 text-muted">Cargando base de datos...</p>
+
+    <div class="filters-actions">
+      <p-dropdown
+        [options]="teamsList"
+        [(ngModel)]="selectedTeam"
+        optionLabel="name"
+        placeholder="Seleccionar Equipo"
+        (onChange)="onTeamChange($event)"
+        [style]="{ width: '220px' }"
+        scrollHeight="300px"
+        [filter]="true"
+        filterBy="name"
+      >
+        <ng-template pTemplate="selectedItem">
+          <div class="flex align-items-center gap-2" *ngIf="selectedTeam">
+            <img
+              [src]="selectedTeam.badge"
+              style="width: 20px; margin-right: 5px; vertical-align: middle"
+            />
+            <span>{{ selectedTeam.name }}</span>
+          </div>
+        </ng-template>
+
+        <ng-template let-team pTemplate="item">
+          <div class="flex align-items-center gap-2">
+            <img
+              [src]="team.badge"
+              style="width: 20px; margin-right: 8px; vertical-align: middle"
+            />
+            <span>{{ team.name }}</span>
+          </div>
+        </ng-template>
+      </p-dropdown>
+
+      <span class="divider-text">O</span>
+
+      <div class="p-input-icon-right search-box">
+        <i class="pi pi-search clickable" (click)="searchPlayerGlobal()"></i>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="searchQuery"
+          (keyup.enter)="searchPlayerGlobal()"
+          placeholder="Buscar nombre (ej: Vinicius)..."
+        />
+      </div>
+    </div>
   </div>
 
-  <div *ngIf="!loading && !error && players.length === 0" class="text-center mt-5 construction-box">
-    <div class="construction-icon">👟⚽</div>
+  <div *ngIf="loading" class="text-center py-5">
+    <i class="pi pi-spin pi-spinner text-primary" style="font-size: 3rem"></i>
+    <p class="mt-3 text-muted">Scouting jugadores...</p>
+  </div>
 
-    <h3>Sección en Construcción</h3>
+  <div *ngIf="!loading">
+    <h3 class="section-title mb-4" *ngIf="players.length > 0">
+      {{ currentFilter }}
+      <span class="badge-count">({{ players.length }})</span>
+    </h3>
 
-    <p class="text-muted mt-3">
-      Estamos trabajando para traerte la tabla de máximos goleadores<br>
-      y las estadísticas avanzadas de cada jugador de La Liga.
-    </p>
+    <div *ngIf="players.length === 0" class="empty-state">
+      <i class="pi pi-users"></i>
+      <p>No se encontraron jugadores con ese criterio.</p>
+    </div>
+
+    <div class="players-grid">
+      <div class="player-card fade-in" *ngFor="let p of players" (click)="goToPlayer(p)">
+        <div class="player-img-container">
+          <img
+            [src]="p.strCutout || p.strThumb || 'assets/images/player-placeholder.png'"
+            alt="{{ p.strPlayer }}"
+            loading="lazy"
+            onerror="
+              this.src = 'https://www.thesportsdb.com/images/media/player/cutout/default.png'
+            "
+          />
+        </div>
+
+        <div class="player-info">
+          <strong>{{ p.strPlayer }}</strong>
+
+          <div class="meta-tags">
+            <span class="position-badge" [ngClass]="getPlayerRole(p.strPosition)">
+              {{ p.strPosition }}
+            </span>
+            <span class="number-badge" *ngIf="p.strNumber">#{{ p.strNumber }}</span>
+          </div>
+
+          <div class="nationality" *ngIf="p.strNationality">
+            <small>📍 {{ p.strNationality }}</small>
+          </div>
+
+          <div class="team-mini" *ngIf="!selectedTeam">
+            <small><i class="pi pi-shield"></i> {{ p.strTeam }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

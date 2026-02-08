@@ -1,15 +1,177 @@
-.construction-box {
-  padding: 40px 20px;
-  background-color: #f9f9f9;
-  border-radius: 12px;
-  border: 1px dashed #ccc;
-  max-width: 600px;
-  margin: 40px auto; 
+/* --- CABECERA Y FILTROS --- */
+.filters-header {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    border: 1px solid #f0f0f0;
 }
 
-.construction-icon {
-  font-size: 4rem; /* Icono grande */
-  margin-bottom: 20px;
-  animation: bounce 2s infinite;
+.header-text h2 { margin: 0 0 5px 0; color: #1e293b; }
+.header-text p { margin: 0; font-size: 0.95rem; }
+
+.filters-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.divider-text {
+    font-weight: bold;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+}
+
+.search-box input {
+    width: 250px;
+}
+
+.search-box i { cursor: pointer; }
+
+/* --- TITULO SECCIÓN --- */
+.section-title {
+    font-weight: 300;
+    color: #444;
+    border-left: 4px solid var(--primary-color, #3b82f6);
+    padding-left: 15px;
+    margin-top: 10px;
+}
+
+.badge-count {
+    font-size: 0.8em;
+    color: #888;
+    font-weight: normal;
+}
+
+/* --- JUGADORES --- */
+.players-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding-bottom: 40px;
+}
+
+.player-card {
+    background: white;
+    border-radius: 12px; 
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    border: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+}
+
+.player-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
+    border-color: var(--primary-color, #3b82f6);
+}
+
+.player-img-container {
+    height: 200px;
+    background: radial-gradient(circle at bottom, #eef2f3, #d9e2e6);    
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    padding-bottom: 0;
+}
+
+.player-img-container img {
+    max-height: 95%;
+    max-width: 100%;
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.player-card:hover .player-img-container img {
+    transform: scale(1.1) translateY(-5px); 
+}
+
+/* Información del Jugador */
+.player-info {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-grow: 1;
+}
+
+.player-info strong {
+    display: block;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+/* Player tags */
+.meta-tags {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.position-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: #eee;
+    color: #555;
+}
+
+.number-badge {
+    color: #64748b;
+    font-weight: bold;
+    font-size: 0.8rem;
+    align-self: center;
+}
+
+.gk { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+.df { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.mf { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+.fw { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+.nationality {
+    color: #888;
+    font-size: 0.8rem;
+    margin-top: 4px;
+}
+
+.team-mini {
+    margin-top: auto; 
+    padding-top: 10px;
+    border-top: 1px solid #f5f5f5;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* --- EMPTY STATE --- */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #cbd5e1;
+    background: #f9fafb;
+    border-radius: 12px;
+}
+.empty-state i { 
+    font-size: 3rem; 
+    margin-bottom: 15px; 
+    display: block; 
 }
 
