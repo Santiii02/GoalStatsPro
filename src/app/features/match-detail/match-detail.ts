@@ -2,18 +2,20 @@
  *  INFORMACIÓN DETALLADA DEL PARTIDO.
  */
 
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TabViewModule } from 'primeng/tabview'; 
 import { TagModule } from 'primeng/tag';
 import { SportDbService } from '../../services/sportdb.service';
+import { AiService } from '../../services/ai.service';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-match-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TabViewModule, TagModule],
+  imports: [CommonModule, RouterModule, ButtonModule, TabViewModule, TagModule, ProgressSpinnerModule],
   templateUrl: './match-detail.html',
   styleUrl: './match-detail.css'
 })
@@ -26,6 +28,8 @@ export class MatchDetailComponent implements OnInit {
   private sportService = inject(SportDbService);
   private location = inject(Location);
   private router = inject(Router);
+  private aiService = inject(AiService);
+  private cdr = inject(ChangeDetectorRef);
 
   // Estado del componente
   match: any = null;
@@ -35,6 +39,11 @@ export class MatchDetailComponent implements OnInit {
   startingLineups: any = null;
   substitutes: any = null;
   matchStats: any[] = [];
+
+  // Variables para la IA
+  aiAnalysis: string | null = null;
+  aiLoading: boolean = false;
+  aiError: boolean = false;
 
   ngOnInit(): void {
     // Intentar recuperar datos (equipos, marcador)
@@ -132,6 +141,54 @@ export class MatchDetailComponent implements OnInit {
         }
       });
     }
+  }
+
+  /* --- Generar Análisis o Pronóstico con IA (Gemini) --- */
+  async generateAnalysis(): Promise<void> {
+    this.aiLoading = true;
+    this.aiError = false;
+    this.cdr.detectChanges();
+
+    try {
+      const response = await this.aiService.generateMatchAnalysis(
+        this.match.homeTeam, 
+        this.match.awayTeam, 
+        this.matchStats || [], // Si es null, pasamos array vacío
+        this.match.league || 'La Liga', 
+        this.hasRealStats
+      );
+
+      this.aiAnalysis = this.formatAiText(response);
+      this.cdr.detectChanges();
+
+    } catch (e) {
+      console.error(e);
+      this.aiError = true;
+      this.cdr.detectChanges();
+    } finally {
+      this.aiLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  /* --- Comprueba si las estadísticas no están todas a cero, el partido ha comenzado y tenemos estadísticas reales --- */
+  get hasRealStats(): boolean {
+    if (!this.matchStats || this.matchStats.length === 0) return false;
+    
+    // Busca si al menos un valor de todo el array es mayor que 0
+    return this.matchStats.some(s => {
+      // Limpiamos los posibles '%' para convertir a número
+      const home = parseFloat(s.homeValue?.toString().replace('%', '')) || 0;
+      const away = parseFloat(s.awayValue?.toString().replace('%', '')) || 0;
+      return home > 0 || away > 0;
+    });
+  }
+
+  /* --- Formatea el Markdown de la IA a HTML --- */
+  private formatAiText(text: string): string {
+    if (!text) return '';
+    // Reemplaza **texto** por <strong>texto</strong>
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   }
 
   /* --- Botón Volver  --- */
