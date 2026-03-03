@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/thesportsdb/:path*",
+      "destination": "https://www.thesportsdb.com/:path*"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://api.sportdb.dev/api/:path*"
     },
