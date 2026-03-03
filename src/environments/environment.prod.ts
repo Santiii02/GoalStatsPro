@@ -3,7 +3,7 @@ export const environment = {
 
   apiBaseUrl: '',
   apiKey: 'SPe8I2ZQPzhIWkoGOKcq9gPjJcdEamywT7uUnw69',
-  geminiApiKey: 'AIzaSyB_NuBpW6u6-TD57uZLhxBQORtjj88fsC8'
+  geminiApiKey: 'AIzaSyAk0k_J-S2oTiq1fWsa_W7KPphAQBQsRr0'
 
 
 };
