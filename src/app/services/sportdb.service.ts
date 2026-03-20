@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, throwError, timer, forkJoin } from 'rxjs';
-import { map, catchError, tap, retry } from 'rxjs/operators';
+import { Observable, of, throwError, timer, forkJoin, from } from 'rxjs';
+import { map, catchError, tap, retry, concatMap, toArray, delay } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Match, Standing, Team } from '../models/sport.model';
 
@@ -23,6 +23,7 @@ export class SportDbService {
     LIVE: 'goalstats_live',
     STANDINGS: `goalstats_standings_${this.CURRENT_SEASON}`,
     FIXTURES: `goalstats_fixtures_${this.CURRENT_SEASON}`,
+    RESULTS: `goalstats_results_${this.CURRENT_SEASON}`,
     MATCH_DETAIL_PREFIX: 'goalstats_match_details_'
   };
 
@@ -155,6 +156,37 @@ export class SportDbService {
       catchError(err => {
         console.error('Error fetching fixtures:', err);
         return of([]);
+      })
+    );
+  }
+
+/* --- Obtiene el calendario pasado en fila india para evitar el Error 429 (Too Many Requests) --- */
+  getResults(): Observable<Match[]> {
+    const cached = this.getFromCache<Match[]>(this.CACHE_KEYS.RESULTS, this.CACHE_TTL.STATIC);
+    if (cached) return of(cached);
+
+    const pages = [1, 2, 3, 4]; // La API no devuelve todos los resultados en una sola página, así que tenemos que paginar. 
+    
+    // Convertimos el array en un flujo que emite 1, luego 2, luego 3...
+    return from(pages).pipe(
+      // concatMap espera a que termine la petición de una página antes de lanzar la siguiente
+      concatMap(page => {
+        const url = `${this.baseUrl}/api/flashscore/football/spain:176/laliga:QVmLl54o/${this.CURRENT_SEASON}/results?page=${page}`;
+        
+        return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
+          this.getRetryStrategy(),
+          delay(500), // Esperamos medio segundo entre página y página para evitar bloqueos por parte de la API
+          map((res: any) => res?.data || (Array.isArray(res) ? res : [])),
+          catchError(() => of([]))
+        );
+      }),
+      // Una vez terminan las 4 peticiones, junta los 4 arrays en uno solo
+      toArray(),
+      map(resultsArray => resultsArray.flat()),
+      tap(data => {
+        if (data && data.length > 0) {
+          this.saveToCache(this.CACHE_KEYS.RESULTS, data, this.CACHE_TTL.STATIC);
+        }
       })
     );
   }

@@ -44,22 +44,27 @@
             </div>
         </div>
 
-        <div class="match-tabs mt-4">
+        <div *ngIf="loadingDetails" class="text-center my-5 fade-in">
+            <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <h5 class="text-muted">Obteniendo datos del partido...</h5>
+            <p class="text-muted small">Recopilando alineaciones y estadísticas</p>
+        </div>
+
+        <div *ngIf="!loadingDetails" class="match-tabs mt-4 fade-in">
             <p-tabView [(activeIndex)]="activeTab">
 
                 <p-tabPanel header="🤖 Míster IA">
                     <div class="ai-section fade-in">
                         <div class="ai-header">
                             <h4 class="ai-title">
-                                <i class="pi pi-sparkles"></i> 
+                                <i class="pi pi-sparkles"></i>
                                 {{ hasRealStats ? 'Análisis del Partido' : 'Pronóstico Pre-Partido' }}
                             </h4>
-                            
-                            <p-button *ngIf="!aiAnalysis && !aiLoading" 
-                                    label="Preguntar al Míster" 
-                                    icon="pi pi-bolt" 
-                                    (onClick)="generateAnalysis()" 
-                                    styleClass="p-button-outlined p-button-sm">
+
+                            <p-button *ngIf="!aiAnalysis && !aiLoading" label="Preguntar al Míster" icon="pi pi-bolt"
+                                (onClick)="generateAnalysis()" styleClass="p-button-outlined p-button-sm">
                             </p-button>
                         </div>
 
@@ -77,7 +82,7 @@
                         <div *ngIf="aiAnalysis" class="ai-content mt-3 fade-in">
                             <p class="ai-text" style="white-space: pre-line;" [innerHTML]="aiAnalysis"></p>
                         </div>
-                        
+
                         <div *ngIf="!aiAnalysis && !aiLoading && !aiError" class="text-center mt-3 text-muted">
                             <i class="pi pi-info-circle mb-2" style="font-size: 1.5rem"></i>
                             <p class="m-0" *ngIf="hasRealStats">Genera un análisis basado en las estadísticas reales del partido.</p>
@@ -140,6 +145,18 @@
                 </p-tabPanel>
 
                 <p-tabPanel header="Estadísticas" *ngIf="matchStats.length > 0">
+                    <div class="row align-items-center mb-4">
+                        
+                        <div class="col-md-6 text-center">
+                            <h5 class="text-muted mb-3">Balance Global</h5>
+                            <p-chart type="radar" [data]="radarData" [options]="radarOptions" height="300px"></p-chart>
+                        </div>
+
+                    </div>
+                    
+                    <hr class="text-muted opacity-25 mb-4">
+                    
+                    <h5 class="text-muted text-center mb-4">Estadísticas principales</h5>
                     <div class="stats-container">
                         <div class="stat-row" *ngFor="let stat of matchStats">
                             <div class="stat-val home">{{ stat.homeValue }}</div>

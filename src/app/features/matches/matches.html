@@ -1,6 +1,25 @@
 <div class="container fade-in">
-  <header class="mb-4">
-    <h2>Próximos Partidos</h2>
+  
+  <header class="mb-4 d-flex justify-content-between align-items-end flex-wrap gap-3 border-bottom pb-3">
+    <h2 class="m-0 text-primary fw-bold">
+      <i class="pi pi-calendar me-2"></i>
+      {{ selectedRound === 'upcoming' ? 'Próximos Partidos' : selectedRound }}
+    </h2>
+
+    <div class="filter-group">
+      <label for="roundSelect" class="form-label text-muted small mb-1">Filtrar por jornada:</label>
+      <select id="roundSelect" 
+              class="form-select shadow-sm border-primary" 
+              [(ngModel)]="selectedRound" 
+              (change)="onFilterChange()">
+        
+        <option value="upcoming">Próximos Partidos</option>
+        
+        <optgroup label="Jornadas disponibles" *ngIf="rounds.length > 0">
+          <option *ngFor="let round of rounds" [value]="round">{{ round }}</option>
+        </optgroup>
+      </select>
+    </div>
   </header>
 
   <div *ngIf="loading" class="text-center mt-5">
@@ -15,14 +34,14 @@
   </div>
 
   <div *ngIf="!loading && !error && matches.length === 0" class="text-center mt-5 empty-state">
+    <i class="pi pi-calendar-times text-muted" style="font-size: 3rem; margin-bottom: 15px;"></i>
     <h3>Sin partidos a la vista</h3>
-    <p class="text-muted">No hay encuentros programados en el calendario para los próximos 21 días.</p>
+    <p class="text-muted" *ngIf="selectedRound === 'upcoming'">No hay encuentros programados en el calendario para los próximos 21 días.</p>
+    <p class="text-muted" *ngIf="selectedRound !== 'upcoming'">No se encontraron partidos para la jornada seleccionada.</p>
   </div>
 
   <div *ngIf="!loading && !error" class="matches-grid">
-
     <article *ngFor="let match of matches" class="match-card" (click)="goToMatch(match)">
-
       <div class="match-header" *ngIf="match.round">
         <span class="badge-round">{{ match.round }}</span>
       </div>
@@ -39,11 +58,18 @@
         </div>
 
         <div class="match-info text-center">
-          <div class="date-box">
+          
+          <div class="score-box" *ngIf="selectedRound !== 'upcoming' && match.homeScore !== undefined">
+            <span class="score">{{ match.homeScore }}</span>
+            <span class="score-divider">-</span>
+            <span class="score">{{ match.awayScore }}</span>
+          </div>
+
+          <div class="date-box" *ngIf="selectedRound === 'upcoming' || match.homeScore === undefined">
             <span class="day">{{ match.processedDate | date:'dd MMM' }}</span>
             <span class="hour">{{ match.processedDate | date:'HH:mm' }}</span>
           </div>
-          <small class="text-muted">vs</small>
+          <small class="text-muted status-badge">{{ match.eventStatus || 'vs' }}</small>
         </div>
 
         <div class="team">

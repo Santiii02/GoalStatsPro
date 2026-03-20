@@ -4,6 +4,8 @@
 
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { SportDbService } from '../../services/sportdb.service';
 import { Match } from '../../models/sport.model';
 import { Router } from '@angular/router';
@@ -11,7 +13,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-matches',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './matches.html',
   styleUrl: './matches.css'
 })
@@ -21,7 +23,10 @@ export class MatchesComponent implements OnInit {
   private router = inject(Router);
 
   // Estado del componente
+  allMatches: Match[] = [];
   matches: Match[] = [];
+  rounds: string[] = [];
+  selectedRound: string = 'upcoming';
   loading: boolean = true;
   error: string | null = null;
 
@@ -38,22 +43,88 @@ export class MatchesComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.sportService.getFixtures().subscribe({
-      next: (data: Match[]) => {
-        // Nos aseguramos que recibimos un array
-        const allMatches = Array.isArray(data) ? data : [];
+  // Pedimos tanto los partidos futuros (fixtures) como los resultados recientes (results)
+    forkJoin({
+      fixtures: this.sportService.getFixtures(),
+      results: this.sportService.getResults()
+    }).subscribe({
+      next: (data) => {
+        // Aseguramos que recibimos arrays válidos
+        const rawFixtures = Array.isArray(data.fixtures) ? data.fixtures : [];
+        const rawResults = Array.isArray(data.results) ? data.results : [];
 
-        // Procesamiento y filtrado de datos
-        this.matches = this.filterUpcomingMatches(allMatches);
+        // Juntamos todas las jornadas en un solo array
+        const rawMatches = [...rawResults, ...rawFixtures];
 
+        // Normalizamos los datos de cada partido 
+        this.allMatches = rawMatches.map(match => {
+          let matchDate: Date | undefined;
+          if (match.eventStartTime) {
+            matchDate = new Date(Number(match.eventStartTime) * 1000);
+          } else if (match.startDateTimeUtc) {
+            matchDate = new Date(match.startDateTimeUtc);
+          }
+          match.processedDate = matchDate;
+
+          // Normalización de Escudos
+          const imgBase = 'https://static.flashscore.com/res/image/data/';
+          if (match.homeLogo && !match.homeLogo.startsWith('http')) {
+            match.homeLogo = imgBase + match.homeLogo;
+          }
+          if (match.awayLogo && !match.awayLogo.startsWith('http')) {
+            match.awayLogo = imgBase + match.awayLogo;
+          }
+          
+          return match;
+        }).filter(m => m.processedDate); // Descartamos los que no tengan fecha válida
+
+        // Usamos un Set para obtener jornadas únicas
+        const uniqueRounds = new Set<string>();
+        this.allMatches.forEach(m => {
+          if (m.round) uniqueRounds.add(m.round);
+        });
+
+        // Ordenamos las jornadas numéricamente
+        this.rounds = Array.from(uniqueRounds).sort((a, b) => {
+          const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
+          const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+          return numA - numB;
+        });
+
+        // Filtro por defecto ("Próximos partidos")
+        this.applyFilter();
         this.loading = false;
       },
       error: (err: any) => {
-        console.error('Error fetching fixtures:', err);
-        this.error = 'No se pudo obtener el calendario de partidos. Inténtelo más tarde.';
+        this.error = 'No se pudo obtener el calendario completo. Inténtelo más tarde.';
         this.loading = false;
       }
     });
+  }
+
+  /* --- Evento al cambiar el select en el HTML --- */
+  onFilterChange(): void {
+    this.applyFilter();
+  }
+
+  /* --- Filtra la lista  de todos los partidos según la opción seleccionada --- */
+  private applyFilter(): void {
+    const now = new Date();
+
+    if (this.selectedRound === 'upcoming') {
+      // Próximos partidos
+      const limitDate = new Date();
+      limitDate.setDate(now.getDate() + this.DAYS_RANGE);
+
+      this.matches = this.allMatches
+        .filter(match => match.processedDate! >= now && match.processedDate! <= limitDate)
+        .sort((a, b) => a.processedDate!.getTime() - b.processedDate!.getTime());
+    } else {
+      // Partidos de una jornada específica
+      this.matches = this.allMatches
+        .filter(match => match.round === this.selectedRound)
+        .sort((a, b) => a.processedDate!.getTime() - b.processedDate!.getTime());
+    }
   }
 
   /* --- Información detalla del partido  --- */
@@ -63,43 +134,5 @@ export class MatchesComponent implements OnInit {
             state: { data: match } 
           });
       }
-  }
-
-  /* --- Filtra partidos de hoy y futuros --- */
-  private filterUpcomingMatches(allMatches: Match[]): Match[] {
-    const now = new Date();
-    // Resetear horas para comparar solo fechas si fuera necesario, 
-    // pero aquí mantenemos precisión por hora para no mostrar partidos ya jugados hoy.
-
-    const limitDate = new Date();
-    limitDate.setDate(now.getDate() + this.DAYS_RANGE);
-
-    return allMatches
-      .filter(match => {
-        let matchDate: Date;
-
-        // Normalización de Fecha
-        if (match.eventStartTime) {
-          // Caso A: Unix Timestamp (segundos) lo convertimos a milisegundos
-          matchDate = new Date(Number(match.eventStartTime) * 1000);
-        } else if (match.startDateTimeUtc) {
-          // Caso B: ISO String standard
-          matchDate = new Date(match.startDateTimeUtc);
-        } else {
-          return false; // Descartar eventos sin fecha válida
-        }
-
-        // Persistir la fecha procesada para uso en la vista
-        match.processedDate = matchDate;
-
-        // Partidos entre hoy y la fecha limite (21 dias)
-        return matchDate >= now && matchDate <= limitDate;
-      })
-      .sort((a, b) => {
-        // Orden cronológico ascendente
-        const dateA = a.processedDate?.getTime() || 0;
-        const dateB = b.processedDate?.getTime() || 0;
-        return dateA - dateB;
-      });
   }
 }

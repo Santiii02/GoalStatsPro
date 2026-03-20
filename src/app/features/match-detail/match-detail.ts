@@ -11,11 +11,12 @@ import { TagModule } from 'primeng/tag';
 import { SportDbService } from '../../services/sportdb.service';
 import { AiService } from '../../services/ai.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ChartModule } from 'primeng/chart';
 
 @Component({
   selector: 'app-match-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TabViewModule, TagModule, ProgressSpinnerModule],
+  imports: [CommonModule, RouterModule, ButtonModule, TabViewModule, TagModule, ProgressSpinnerModule, ChartModule],
   templateUrl: './match-detail.html',
   styleUrl: './match-detail.css'
 })
@@ -34,6 +35,7 @@ export class MatchDetailComponent implements OnInit {
   // Estado del componente
   match: any = null;
   loading: boolean = true;
+  loadingDetails: boolean = true;
   activeTab: number = 0; // 0: Alineaciones, 1: Estadisticas
 
   startingLineups: any = null;
@@ -44,6 +46,10 @@ export class MatchDetailComponent implements OnInit {
   aiAnalysis: string | null = null;
   aiLoading: boolean = false;
   aiError: boolean = false;
+
+  // Variables para el Gráfico
+  radarData: any;
+  radarOptions: any;
 
   ngOnInit(): void {
     // Intentar recuperar datos (equipos, marcador)
@@ -96,6 +102,9 @@ export class MatchDetailComponent implements OnInit {
 
   /* --- Cargar Alineaciones y Estadisticas --- */
   private loadMatchDetails(): void {
+    this.loadingDetails = true;
+    this.cdr.detectChanges();
+
     this.sportService.getMatchDetails(this.id).subscribe({
       next: (data) => {
         if (data) {
@@ -110,14 +119,19 @@ export class MatchDetailComponent implements OnInit {
 
           // Procesar estadisticas
           if (data.stats && Array.isArray(data.stats)) {
-            const globalStats = data.stats.find((s: any) => s.period === 'Match');
+            const globalStats = data.stats.find((s: any) => s && s.period === 'Match');
             this.matchStats = globalStats ? globalStats.stats : [];
+            this.initRadarChart();
           }
         }
-        this.loading = false;
+        this.loadingDetails = false;   
+        this.cdr.detectChanges();
       },
       // Si no hay detalles se muestra solo la cabecera
-      error: () => this.loading = false 
+      error: () => {
+        this.loadingDetails = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -191,6 +205,106 @@ export class MatchDetailComponent implements OnInit {
     return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   }
 
+/* --- Configurar Gráfico de Radar (Escala Proporcional de Dominio) --- */
+  private initRadarChart(): void {
+    // Si no hay estadísticas, no hacemos nada
+    if (!this.matchStats || this.matchStats.length === 0) return;
+
+    // Elegimos y definimos métricas a mostrar
+    const searchKeys = ['possession', 'total shots', 'corner', 'fouls', 'duels won'];
+    const labels = ['Posesión', 'Tiros Totales', 'Córners', 'Faltas', 'Duelos Ganados'];
+    
+    // Arrays para guardar los porcentajes calculados para pintar el gráfico (0-100%)
+    const homeData: number[] = [];
+    const awayData: number[] = [];
+    
+    // Arrays para guardar el dato real
+    const realHomeValues: string[] = [];
+    const realAwayValues: string[] = [];
+
+    // Procesamos cada estadística
+    searchKeys.forEach(key => {
+      const stat = this.matchStats.find(s => 
+        s.statName && s.statName.toLowerCase().includes(key)
+      );
+      
+      const homeRaw = stat?.homeValue?.toString() || '0';
+      const awayRaw = stat?.awayValue?.toString() || '0';
+      
+      realHomeValues.push(homeRaw);
+      realAwayValues.push(awayRaw);
+
+      // Limpiamos los strings, eliminamos los símbolos de porcentaje y los paréntesis
+      const homeNum = parseFloat(homeRaw.split('%')[0].split('(')[0]) || 0;
+      const awayNum = parseFloat(awayRaw.split('%')[0].split('(')[0]) || 0;
+
+      // Calculamos el dominio de cada estadística como un porcentaje del total (home + away)
+      const total = homeNum + awayNum;
+      if (total === 0) {
+        homeData.push(0);
+        awayData.push(0);
+      } else {
+        homeData.push(Math.round((homeNum / total) * 100));
+        awayData.push(Math.round((awayNum / total) * 100));
+      }
+    });
+
+    // Configuración visual del Gráfico
+    this.radarData = {
+      labels: labels,
+      datasets: [
+        {
+          label: this.match.homeTeam,
+          backgroundColor: 'rgba(59, 130, 246, 0.2)', 
+          borderColor: 'rgba(59, 130, 246, 1)',
+          pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(59, 130, 246, 1)',
+          data: homeData
+        },
+        {
+          label: this.match.awayTeam,
+          backgroundColor: 'rgba(239, 68, 68, 0.2)', 
+          borderColor: 'rgba(239, 68, 68, 1)',
+          pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(239, 68, 68, 1)',
+          data: awayData
+        }
+      ]
+    };
+
+    // Personalizamos el aspecto de la leyenda, los ejes y reescribimos los Tooltips.
+    this.radarOptions = {
+      plugins: {
+        legend: {
+          labels: { color: '#495057' }
+        },
+        tooltip: {
+          callbacks: {
+            // Reemplazamos el texto del Tooltip por el valor real de la estadística
+            label: function(context: any) {
+              const isHome = context.datasetIndex === 0;
+              const realVal = isHome ? realHomeValues[context.dataIndex] : realAwayValues[context.dataIndex];
+              return `${context.dataset.label}: ${realVal} (Dominio: ${context.raw}%)`;
+            }
+          }
+        }
+      },
+      scales: {
+        r: {
+          min: 0,
+          max: 100, // Fijamos el límite del radar en 100% para que sea una telaraña perfecta
+          grid: { color: '#e9ecef' },
+          pointLabels: { color: '#6c757d', font: { size: 11, weight: 'bold' } },
+          ticks: { display: false } 
+        }
+      }
+    };
+  }
+  
   /* --- Botón Volver  --- */
   goBack(): void {
     this.location.back();
