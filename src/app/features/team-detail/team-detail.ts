@@ -30,6 +30,7 @@ export class TeamDetailComponent implements OnInit {
   team: Team | null = null;
   players: any[] = [];
   loading: boolean = true;
+  teamForm: string[] = [];
 
   ngOnInit(): void {
     if (this.name) {
@@ -48,11 +49,20 @@ export class TeamDetailComponent implements OnInit {
         if (teams && teams.length > 0) {
           this.team = teams[0];
 
+          // Cargamos los jugadores 
           if (this.team.idTeam) {
             this.loadPlayers(this.team.idTeam);
           } else {
             this.loading = false;
           }
+          
+          // Cargamos la racha V-E-D del equipo
+          if (this.team.strTeam) {
+            this.sportService.getTeamForm(this.team.strTeam).subscribe(form => {
+              this.teamForm = form;
+            });
+          }
+
         } else {
           this.loading = false; 
         }
@@ -95,5 +105,13 @@ export class TeamDetailComponent implements OnInit {
   /* --- Ver el jugador --- */
   goToPlayer(playerId: string): void {
     this.router.navigate(['/player', playerId]);
+  }
+  
+  /* --- Mapeo de colores para las insignias V-E-D --- */
+  getFormColorClass(result: string): string {
+    if (result === 'V') return 'form-win';
+    if (result === 'E') return 'form-draw';
+    if (result === 'D') return 'form-loss';
+    return '';
   }
 }

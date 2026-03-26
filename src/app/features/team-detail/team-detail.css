@@ -180,3 +180,29 @@
     color: #4a4a4a;            
     font-size: 1rem;
 }
+
+/* --- RACHA DE EQUIPO (V-E-D) --- */
+.team-form {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.form-badge {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    cursor: help;
+}
+
+/* Colores de resultados */
+.form-win { background-color: #22c55e; }  
+.form-draw { background-color: #94a3b8; } 
+.form-loss { background-color: #ef4444; } 

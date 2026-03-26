@@ -51,6 +51,10 @@ export class MatchDetailComponent implements OnInit {
   radarData: any;
   radarOptions: any;
 
+  // Variables para la Racha de los equipos (V-E-D)
+  homeForm: string[] = [];
+  awayForm: string[] = [];
+
   ngOnInit(): void {
     // Intentar recuperar datos (equipos, marcador)
     const stateData = history.state?.data;
@@ -81,6 +85,7 @@ export class MatchDetailComponent implements OnInit {
     this.loading = false;
     this.loadMatchDetails();
     this.upgradeImages();  
+    this.loadTeamForms();
   }
 
   /* --- Normaliza los datos --- */
@@ -305,6 +310,16 @@ export class MatchDetailComponent implements OnInit {
     };
   }
   
+  /* --- Cargar la Guía de Forma (Rachas V-E-D) --- */
+  private loadTeamForms(): void {
+    if (this.match.homeTeam) {
+      this.sportService.getTeamForm(this.match.homeTeam).subscribe(form => this.homeForm = form);
+    }
+    if (this.match.awayTeam) {
+      this.sportService.getTeamForm(this.match.awayTeam).subscribe(form => this.awayForm = form);
+    }
+  }
+
   /* --- Botón Volver  --- */
   goBack(): void {
     this.location.back();
@@ -322,5 +337,13 @@ export class MatchDetailComponent implements OnInit {
     if (!value) return 0;
     const numberPart = value.split('%')[0].split('(')[0]; 
     return parseFloat(numberPart) || 0;
+  }
+
+  /* --- Mapeo de colores para las insignias V-E-D --- */
+  getFormColorClass(result: string): string {
+    if (result === 'V') return 'form-win';
+    if (result === 'E') return 'form-draw';
+    if (result === 'D') return 'form-loss';
+    return '';
   }
 }

@@ -5,25 +5,36 @@
   </div>
 
   <div class="hero-team"
-       [style.backgroundImage]="team.strStadium ? 'url(' + team.strStadium + ')' : 'none'"
-       style="background-color: #2c3e50;">
+      [style.backgroundImage]="team.strStadium ? 'url(' + team.strStadium + ')' : 'none'"
+      style="background-color: #2c3e50;">
 
     <div class="overlay">
       <div class="team-header-content">
 
         <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
-             alt="Escudo"
-             class="big-badge"
-             onerror="this.src='assets/images/Logo.png'">
+            alt="Escudo"
+            class="big-badge"
+            onerror="this.src='assets/images/Logo.png'">
 
-        <div class="team-info">
+<div class="team-info">
           <h1>{{ team.strTeam }}</h1>
-          <p>
+          <p class="mb-2">
             <i class="pi pi-map-marker"></i>
             {{ team.strStadium || 'Estadio no disponible' }}
             <span *ngIf="team.intFormedYear">({{ team.intFormedYear }})</span>
           </p>
           <span class="league-tag">{{ team.strLeague }}</span>
+          
+          <div class="team-form mt-3" *ngIf="teamForm.length > 0">
+            <span class="text-white-alpha-70 small text-uppercase fw-bold me-2" style="font-size: 0.8rem;">Racha:</span>
+             <span *ngFor="let result of teamForm" 
+                class="form-badge" 
+                [ngClass]="getFormColorClass(result)"
+                [title]="result === 'V' ? 'Victoria' : result === 'E' ? 'Empate' : 'Derrota'">
+              {{ result }}
+            </span>
+          </div>
+
         </div>
       </div>
     </div>
@@ -46,9 +57,9 @@
 
         <div class="player-img-container">
           <img [src]="player.strCutout || player.strThumb || 'assets/images/player-placeholder.png'"
-               alt="{{ player.strPlayer }}"
-               loading="lazy"
-               onerror="this.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'">
+              alt="{{ player.strPlayer }}"
+              loading="lazy"
+              onerror="this.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'">
         </div>
 
         <div class="player-info">

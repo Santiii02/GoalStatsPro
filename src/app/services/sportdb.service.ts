@@ -24,7 +24,8 @@ export class SportDbService {
     STANDINGS: `goalstats_standings_${this.CURRENT_SEASON}`,
     FIXTURES: `goalstats_fixtures_${this.CURRENT_SEASON}`,
     RESULTS: `goalstats_results_${this.CURRENT_SEASON}`,
-    MATCH_DETAIL_PREFIX: 'goalstats_match_details_'
+    MATCH_DETAIL_PREFIX: 'goalstats_match_details_',
+    TEAM_FORM_PREFIX: 'goalstats_team_form_'
   };
 
   /* --- Tiempos de vida para la caché en milisegundos --- */
@@ -428,6 +429,64 @@ export class SportDbService {
         console.error('Error obteniendo detalles del partido:', err);
         return of(null);
       })
+    );
+  }
+
+  /* --- Calcula la Racha (Últimos 5 partidos: V-E-D) de un equipo --- */
+  getTeamForm(teamName: string, limit: number = 5): Observable<string[]> {
+    if (!teamName) return of([]);
+
+    // Comprobamos si ya lo tenemos guardado
+    const cacheKey = `${this.CACHE_KEYS.TEAM_FORM_PREFIX}${teamName.replace(/\s/g, '_')}`;
+    const cached = this.getFromCache<string[]>(cacheKey, this.CACHE_TTL.STATIC);
+    if (cached) return of(cached);
+
+    // Obtenemos todo el historial de resultados de la temporada
+    return this.getResults().pipe(
+      map(matches => {
+        // Filtramos solo los partidos que haya jugado este equipo y que tengan resultado
+        const teamMatches = matches.filter(m => 
+          (m.homeName === teamName || m.awayName === teamName) && 
+          m.homeScore !== undefined && m.awayScore !== undefined
+        );
+
+        // Ordenamos por fecha (del más reciente al más antiguo)
+        teamMatches.sort((a, b) => {
+          const dateA = a.eventStartTime ? Number(a.eventStartTime) : 0;
+          const dateB = b.eventStartTime ? Number(b.eventStartTime) : 0;
+          return dateB - dateA;
+        });
+
+        // Cogemos solo los últimos 'N' partidos (por defecto 5)
+        const lastMatches = teamMatches.slice(0, limit);
+
+        // Calculamos si fue Victoria (V), Empate (E) o Derrota (D)
+        const form: string[] = lastMatches.map(m => {
+          const homeScore = Number(m.homeScore);
+          const awayScore = Number(m.awayScore);
+          
+          // Si el partido terminó en empate
+          if (homeScore === awayScore) return 'E';
+
+          // Vemos si jugaba el equipo como local o visitante para determinar si fue victoria o derrota
+          const isHome = m.homeName === teamName;
+
+          if (isHome) {
+            return homeScore > awayScore ? 'V' : 'D';
+          } else {
+            return awayScore > homeScore ? 'V' : 'D';
+          }
+        });
+
+        return form; 
+      }),
+      tap(form => {
+        // Guardamos la racha en caché
+        if (form.length > 0) {
+          this.saveToCache(cacheKey, form, this.CACHE_TTL.STATIC);
+        }
+      }),
+      catchError(() => of([]))
     );
   }
 }

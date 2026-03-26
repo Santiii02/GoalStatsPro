@@ -21,6 +21,15 @@
             <div class="team-col home">
                 <img [src]="match.homeLogo || 'assets/placeholder.png'" class="team-badge-lg" alt="Local">
                 <h2 class="team-name">{{ match.homeTeam }}</h2>
+
+                <div class="team-form mt-2" *ngIf="homeForm.length > 0">
+                   <span *ngFor="let result of homeForm" 
+                        class="form-badge" 
+                        [ngClass]="getFormColorClass(result)"
+                        [title]="result === 'V' ? 'Victoria' : result === 'E' ? 'Empate' : 'Derrota'">
+                        {{ result }}
+                    </span>
+                </div>
             </div>
 
             <div class="score-board">
@@ -41,6 +50,15 @@
             <div class="team-col away">
                 <img [src]="match.awayLogo || 'assets/placeholder.png'" class="team-badge-lg" alt="Visitante">
                 <h2 class="team-name">{{ match.awayTeam }}</h2>
+
+                <div class="team-form mt-2" *ngIf="awayForm.length > 0">
+                   <span *ngFor="let result of awayForm" 
+                        class="form-badge" 
+                        [ngClass]="getFormColorClass(result)"
+                        [title]="result === 'V' ? 'Victoria' : result === 'E' ? 'Empate' : 'Derrota'">
+                        {{ result }}
+                    </span>
+                </div>
             </div>
         </div>
 
