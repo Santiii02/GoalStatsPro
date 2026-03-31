@@ -1,0 +1,49 @@
+<div class="auth-container fade-in">
+    <p-card styleClass="auth-card shadow-4">
+
+        <div class="text-center mb-4">
+            <img src="assets/images/Logo.png" alt="Logo GoalStatsPro" class="mb-3" style="width: 200px; height: auto;">            
+            <h2 class="m-0 font-bold text-900">
+                {{ isLoginMode ? 'Bienvenido a GoalStatsPro' : 'Crea tu cuenta' }}
+            </h2>
+            <p class="text-500 mt-2">
+                {{ isLoginMode ? 'Inicia sesión para continuar' : 'Únete para guardar tus favoritos' }}
+            </p>
+        </div>
+
+        <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage" styleClass="w-full mb-4"></p-message>
+
+        <form (ngSubmit)="onSubmit()" class="flex flex-column gap-3">
+
+            <div class="field">
+                <label for="email" class="font-semibold block mb-2">Correo Electrónico</label>
+                <input id="email" type="email" pInputText [(ngModel)]="email" name="email" class="w-full p-inputtext-lg"
+                    placeholder="ejemplo@correo.com" required>
+            </div>
+
+            <div class="field">
+                <label for="password" class="font-semibold block mb-2">Contraseña</label>
+                <p-password id="password" [(ngModel)]="password" name="password" [toggleMask]="true"
+                    [feedback]="!isLoginMode" styleClass="w-full" inputStyleClass="w-full p-inputtext-lg"
+                    promptLabel="Introduce una contraseña" weakLabel="Débil" mediumLabel="Media" strongLabel="Fuerte"
+                    placeholder="••••••••" required>
+                </p-password>
+            </div>
+
+            <p-button [label]="isLoginMode ? 'Iniciar Sesión' : 'Registrarse'" type="submit"
+                styleClass="w-full mt-3 p-button-lg" [loading]="isLoading">
+            </p-button>
+
+        </form>
+
+        <div class="text-center mt-4 pt-3 border-top-1 border-300">
+            <p class="text-600 mb-2">
+                {{ isLoginMode ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?' }}
+            </p>
+            <p-button [label]="isLoginMode ? 'Regístrate aquí' : 'Inicia sesión aquí'" (onClick)="toggleMode()"
+                styleClass="p-button-text p-button-sm font-bold">
+            </p-button>
+        </div>
+
+    </p-card>
+</div>

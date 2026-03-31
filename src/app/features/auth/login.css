@@ -1,0 +1,25 @@
+/* --- VISTA DE AUTENTICACIÓN (LOGIN / REGISTRO) --- */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 150px); /* Restamos aprox el tamaño del navbar y footer */
+    padding: 2rem;
+    background-color: #f8fafc; 
+}
+
+/* Estilos específicos de PrimeNG Tabs */
+:host ::ng-deep .auth-card {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+:host ::ng-deep .auth-card .p-card-body {
+    padding: 2.5rem;
+}
+
+:host ::ng-deep .p-password-input {
+    width: 100%;
+}
