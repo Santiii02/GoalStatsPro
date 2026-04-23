@@ -197,3 +197,26 @@
 .team-result-card:hover img {
   transform: scale(1.1);
 }
+
+/* --- SECCIÓN FAVORITOS --- */
+.text-warning {
+  color: #f59e0b;
+}
+
+.league-tag-small {
+  display: inline-block;
+  background-color: #f1f5f9;
+  color: #475569;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%;
+}
+
+.favorites-section {
+  border: 1px solid #e2e8f0;
+}

@@ -9,9 +9,10 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { SportDbService } from '../../services/sportdb.service';
-import { Match, Standing } from '../../models/sport.model';
+import { Match, Standing, Team } from '../../models/sport.model';
 import { ButtonModule } from 'primeng/button';
-import { Team } from '../../models/sport.model';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-home',
@@ -23,6 +24,8 @@ import { Team } from '../../models/sport.model';
 export class HomeComponent implements OnInit {
   // Inyección de dependencias
   private sportService = inject(SportDbService);
+  public authService = inject(AuthService);
+  private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
 
@@ -43,10 +46,30 @@ export class HomeComponent implements OnInit {
   foundTeams: Team[] = [];  
   isSearching: boolean = false; 
 
+  // Variables para favoritos
+  favoriteTeamsData: Team[] = [];
+  loadingFavorites: boolean = false;
+
   ngOnInit(): void {
     this.loadData();
+    
+    // Si el usuario ya está logueado al entrar, cargamos sus favoritos
+    if (this.authService.currentUser) {
+      this.loadFavoriteTeams();
+    }
+
+    // Escuchamos cambios en la autenticación para recargar favoritos cuando el usuario inicie sesión o cierre sesión
+    this.authService.user$.subscribe(user => {
+      // Evitamos peticiones duplicadas si ya se están cargando o ya hay datos cargados
+      if (user && this.favoriteTeamsData.length === 0 && !this.loadingFavorites) {
+        this.loadFavoriteTeams();
+      } else if (!user) {
+        this.favoriteTeamsData = []; // Limpiamos si cierra sesión
+      }
+    });
   }
 
+  
   /* --- Busca el equipo que quiera el usuario --- */
   searchTeam(): void {
     if (!this.searchQuery.trim()) return; // No buscar si está vacío
@@ -132,6 +155,34 @@ export class HomeComponent implements OnInit {
       } else {
         this.filterMessage = ''; // No hay ningún partido
       }
+    }
+  }
+
+  /* --- Carga de equipos favoritos --- */
+  private async loadFavoriteTeams() {
+    this.loadingFavorites = true;
+    this.cdr.detectChanges();
+
+    try {
+      const favNames = await this.userService.getFavoriteTeams();
+      this.favoriteTeamsData = []; // Reseteamos array
+      
+      // Hacemos una petición a la API por cada nombre de equipo guardado en Firestore
+      for (const name of favNames) {
+        this.sportService.searchTeams(name).subscribe({
+          next: (teams) => {
+            if (teams && teams.length > 0) {
+              this.favoriteTeamsData.push(teams[0]);
+              this.cdr.detectChanges();
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error cargando favoritos en Home', error);
+    } finally {
+      this.loadingFavorites = false;
+      this.cdr.detectChanges();
     }
   }
 

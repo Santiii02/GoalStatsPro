@@ -4,33 +4,43 @@
     <p-button label="Volver" icon="pi pi-arrow-left" routerLink="/" styleClass="p-button-text"></p-button>
   </div>
 
-  <div class="hero-team"
-      [style.backgroundImage]="team.strStadium ? 'url(' + team.strStadium + ')' : 'none'"
-      style="background-color: #2c3e50;">
+  <div class="hero-team" 
+    [style.backgroundImage]="team.strStadium ? 'url(' + team.strStadium + ')' : 'none'"
+    style="background-color: #2c3e50;">
 
     <div class="overlay">
       <div class="team-header-content">
 
-        <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
-            alt="Escudo"
-            class="big-badge"
-            onerror="this.src='assets/images/Logo.png'">
+        <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'" 
+          alt="Escudo" 
+          class="big-badge"
+          onerror="this.src='assets/images/Logo.png'">
 
-<div class="team-info">
-          <h1>{{ team.strTeam }}</h1>
-          <p class="mb-2">
+        <div class="team-info">
+          <div class="title-and-fav">
+            <h1>{{ team.strTeam }}</h1>
+
+            <p-button *ngIf="authService.user$ | async" [icon]="isFavorite ? 'pi pi-star-fill' : 'pi pi-star'"
+              (onClick)="toggleFavorite()" [loading]="isFavLoading"
+              [styleClass]="isFavorite ? 'p-button-rounded p-button-warning fav-btn' : 'p-button-rounded p-button-outlined p-button-secondary fav-btn'"
+              [pTooltip]="isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'" tooltipPosition="top">
+            </p-button>
+          </div>
+
+
+          <p class="mb-2 mt-2">
             <i class="pi pi-map-marker"></i>
             {{ team.strStadium || 'Estadio no disponible' }}
             <span *ngIf="team.intFormedYear">({{ team.intFormedYear }})</span>
           </p>
           <span class="league-tag">{{ team.strLeague }}</span>
-          
+
           <div class="team-form mt-3" *ngIf="teamForm.length > 0">
             <span class="text-white-alpha-70 small text-uppercase fw-bold me-2" style="font-size: 0.8rem;">Racha:</span>
-             <span *ngFor="let result of teamForm" 
-                class="form-badge" 
-                [ngClass]="getFormColorClass(result)"
-                [title]="result === 'V' ? 'Victoria' : result === 'E' ? 'Empate' : 'Derrota'">
+            <span *ngFor="let result of teamForm" 
+              class="form-badge" 
+              [ngClass]="getFormColorClass(result)"
+              [title]="result === 'V' ? 'Victoria' : result === 'E' ? 'Empate' : 'Derrota'">
               {{ result }}
             </span>
           </div>
@@ -57,16 +67,16 @@
 
         <div class="player-img-container">
           <img [src]="player.strCutout || player.strThumb || 'assets/images/player-placeholder.png'"
-              alt="{{ player.strPlayer }}"
-              loading="lazy"
-              onerror="this.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'">
+            alt="{{ player.strPlayer }}" 
+            loading="lazy"
+            onerror="this.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'">
         </div>
 
         <div class="player-info">
           <strong>{{ player.strPlayer }}</strong>
 
-          <span class="position-badge"
-                [ngClass]="getPlayerRole(player.strPosition)">
+          <span class="position-badge" 
+              [ngClass]="getPlayerRole(player.strPosition)">
             {{ player.strPosition }}
           </span>
 

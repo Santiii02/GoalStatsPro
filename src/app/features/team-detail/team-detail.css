@@ -206,3 +206,25 @@
 .form-win { background-color: #22c55e; }  
 .form-draw { background-color: #94a3b8; } 
 .form-loss { background-color: #ef4444; } 
+
+/* --- Estrella de favorito --- */
+.title-and-fav {
+    display: flex;
+    align-items: center;
+    gap: 15px; 
+}
+
+:host ::ng-deep .fav-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+:host ::ng-deep .p-button-secondary.p-button-outlined {
+    color: white !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+:host ::ng-deep .p-button-secondary.p-button-outlined:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: white !important;
+}

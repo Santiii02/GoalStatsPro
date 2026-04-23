@@ -6,6 +6,27 @@
     <p class="subtitle">Estadísticas y Predicciones con IA</p>
   </header>
 
+  <div *ngIf="(authService.user$ | async) && favoriteTeamsData.length > 0" class="favorites-section mt-4 mb-5 p-4 rounded bg-white shadow-sm">
+    <h3 class="mb-4" style="color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
+      <i class="pi pi-star-fill text-warning"></i> Mis Equipos
+    </h3>
+    
+    <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;">
+      <div *ngFor="let team of favoriteTeamsData"
+          (click)="goToTeamDetail(team)"
+          class="team-result-card fade-in" style="min-width: 150px;"> 
+
+          <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
+            width="80"
+            alt="Escudo"
+            onerror="this.src='assets/images/Logo.png'">
+
+        <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px;">{{ team.strTeam }}</p>
+        <span class="league-tag-small">{{ team.strLeague }}</span>
+      </div>
+    </div>
+  </div>
+
   <div class="search-container" style="text-align: center; margin: 30px 0;">
 
     <!-- Buscar equipo -->

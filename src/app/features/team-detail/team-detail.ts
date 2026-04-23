@@ -2,18 +2,21 @@
  *  INFORMACIÓN DEL EQUIPO.
  */
 
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject, ChangeDetectorRef} from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { RouterModule, Router } from '@angular/router'; 
 import { ButtonModule } from 'primeng/button';  
 import { CardModule } from 'primeng/card';      
+import { TooltipModule } from 'primeng/tooltip';
 import { SportDbService } from '../../services/sportdb.service';
 import { Team } from '../../models/sport.model';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-team-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, CardModule],
+  imports: [CommonModule, RouterModule, ButtonModule, CardModule, TooltipModule],
   templateUrl: './team-detail.html',
   styleUrl: './team-detail.css'     
 })
@@ -25,12 +28,17 @@ export class TeamDetailComponent implements OnInit {
   /* --- Inyección del servicio --- */
   private sportService = inject(SportDbService);
   private router = inject(Router);
+  public authService = inject(AuthService); 
+  private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef);
 
   /* --- Variables de datos --- */
   team: Team | null = null;
   players: any[] = [];
   loading: boolean = true;
   teamForm: string[] = [];
+  isFavorite: boolean = false;
+  isFavLoading: boolean = false;
 
   ngOnInit(): void {
     if (this.name) {
@@ -48,6 +56,8 @@ export class TeamDetailComponent implements OnInit {
       next: (teams) => {
         if (teams && teams.length > 0) {
           this.team = teams[0];
+
+          this.checkIfFavorite();
 
           // Cargamos los jugadores 
           if (this.team.idTeam) {
@@ -87,6 +97,42 @@ export class TeamDetailComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  /*
+   * COMPROBAMOS SI EL EQUIPO ES FAVORITO DEL USUARIO
+   */
+  private async checkIfFavorite() {
+    if (!this.authService.currentUser || !this.team?.strTeam) return;
+    
+    try {
+      const favorites = await this.userService.getFavoriteTeams();
+      this.isFavorite = favorites.includes(this.team.strTeam);
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error("Error al cargar favoritos", error);
+    }
+  }
+
+  /*
+   * CAMBIAMOS EL ESTADO DE FAVORITO DEL EQUIPO Y LO GUARDAMOS EN FIRESTORE
+   */
+  async toggleFavorite() {
+    if (!this.authService.currentUser || !this.team?.strTeam) return;
+
+    this.isFavLoading = true;
+    this.cdr.detectChanges();
+    try {
+      // Llamamos a Firestore
+      await this.userService.toggleFavorite(this.team.strTeam, this.isFavorite);
+      // Actualizamos el estado local del favorito
+      this.isFavorite = !this.isFavorite; 
+    } catch (error) {
+      console.error('Error al guardar favorito', error);
+    } finally {
+      this.isFavLoading = false;
+      this.cdr.detectChanges();
+    }
   }
 
   /* --- Posición del jugador --- */
