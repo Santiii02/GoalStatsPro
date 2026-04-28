@@ -1,0 +1,16 @@
+.header-admin h2 {
+    font-weight: 800;
+    color: #2c3e50;
+    margin: 0;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead>tr>th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 700;
+    padding: 1.2rem;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody>tr>td {
+    padding: 1rem 1.2rem;
+}

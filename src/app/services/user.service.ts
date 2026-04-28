@@ -4,7 +4,7 @@
  */
 
 import { Injectable, inject } from '@angular/core';
-import { Firestore, doc, setDoc, getDoc, arrayUnion, arrayRemove } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, arrayUnion, arrayRemove, collection, getDocs} from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -27,9 +27,7 @@ export class UserService {
     return doc(this.firestore, `users/${user.uid}`);
   }
 
-  /*
-   * OBTENER LOS EQUIPOS FAVORITOS
-   */
+  /* --- Obtenemos los equipos favoritos --- */
   async getFavoriteTeams(): Promise<string[]> {
     try {
       const user = this.authService.currentUser;
@@ -51,28 +49,71 @@ export class UserService {
     }
   }
 
-  /*
-   * AÑADIR O QUITAR UN EQUIPO DE FAVORITOS
-   */  
+  /* --- Añadir o quitar equipo de favoritos, el email del usuario se guarda en el documento --- */
   async toggleFavorite(teamName: string, isCurrentlyFavorite: boolean): Promise<void> {
     try {
       const docRef = this.getUserDocRef();
+      const user = this.authService.currentUser;
 
       if (isCurrentlyFavorite) {
         // Si ya era favorito, lo eliminamos de la base de datos
         // Eliminamos solo el equipo del array, no el documento completo
         await setDoc(docRef, {
+          email: user?.email,
           favoriteTeams: arrayRemove(teamName)
         }, { merge: true }); // merge:true para no borrar otros campos del documento
         
       } else {
         // Si no era favorito, lo añadimos
         await setDoc(docRef, {
+          email: user?.email,
           favoriteTeams: arrayUnion(teamName)
         }, { merge: true });
       }
     } catch (error) {
       console.error('Error al actualizar el favorito:', error);
+      throw error;
+    }
+  }
+
+  /* --- Obtenemos el rol del usuario --- */
+  async getUserRole(): Promise<string> {
+    try {
+      const user = this.authService.currentUser;
+      if (!user) return 'user'; // Si no hay sesión, es un usuario normal
+
+      // Documento del usuario en Firestore
+      const docRef = this.getUserDocRef();
+      const docSnap = await getDoc(docRef);
+
+      // Si el documento existe, devolvemos su rol. Si no, asumimos que es un usuario normal
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        return data['role'] || 'user';
+      } else {
+        return 'user';
+      }
+    } catch (error) {
+      console.error('Error al obtener el rol del usuario:', error);
+      return 'user';
+    }
+  }
+
+
+  /* --- Obtenemos todos los usuarios (Solo para Admin) --- */
+  async getAllUsers(): Promise<any[]> {
+    try {
+      // Obtenemos todos los documentos de la colección 'users'
+      const usersRef = collection(this.firestore, 'users');
+      const querySnapshot = await getDocs(usersRef);
+      
+      // Mapeamos los documentos a un array de objetos legibles
+      return querySnapshot.docs.map(doc => ({
+        uid: doc.id,
+        ...doc.data()
+      }));
+    } catch (error) {
+      console.error('Error al obtener la lista de usuarios:', error);
       throw error;
     }
   }

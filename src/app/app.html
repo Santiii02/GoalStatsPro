@@ -25,22 +25,23 @@
         <div class="auth-widget">
           <ng-container *ngIf="authService.user$ | async as user; else loggedOut">
             <div class="user-info" style="display: flex; align-items: center; gap: 8px;">
+              <p-button *ngIf="isAdmin" icon="pi pi-cog" routerLink="/admin"
+                styleClass="p-button-rounded p-button-text p-button-secondary" pTooltip="Panel Admin"
+                tooltipPosition="bottom">
+              </p-button>
+
               <i class="pi pi-user user-icon"></i>
               <span class="user-email" style="font-size: 0.85rem; font-weight: bold;">{{ user.email }}</span>
-              <p-button icon="pi pi-sign-out" 
-                        (onClick)="logout()" 
-                        styleClass="p-button-rounded p-button-text p-button-danger" 
-                        pTooltip="Cerrar sesión" 
-                        tooltipPosition="bottom">
+              <p-button icon="pi pi-sign-out" (onClick)="logout()"
+                styleClass="p-button-rounded p-button-text p-button-danger" pTooltip="Cerrar sesión"
+                tooltipPosition="bottom">
               </p-button>
             </div>
           </ng-container>
 
           <ng-template #loggedOut>
-            <p-button label="Entrar" 
-                      icon="pi pi-sign-in" 
-                      routerLink="/login" 
-                      styleClass="p-button-rounded p-button-primary p-button-sm">
+            <p-button label="Entrar" icon="pi pi-sign-in" routerLink="/login"
+              styleClass="p-button-rounded p-button-primary p-button-sm">
             </p-button>
           </ng-template>
         </div>

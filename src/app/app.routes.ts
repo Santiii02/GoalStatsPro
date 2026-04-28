@@ -11,6 +11,8 @@ import { TeamDetailComponent } from './features/team-detail/team-detail';
 import { PlayerDetailComponent } from './features/player-detail/player-detail';
 import { MatchDetailComponent } from './features/match-detail/match-detail';
 import { LoginComponent } from './features/auth/login';
+import { AdminPanelComponent } from './features/admin-panel/admin-panel';
+import { adminGuard } from './guards/admin-guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, title: 'Inicio - GoalStatsPro' },
@@ -21,7 +23,8 @@ export const routes: Routes = [
   { path: 'player/:id', component: PlayerDetailComponent, title: 'Jugador - GoalStatsPro' },
   { path: 'match/:id', component: MatchDetailComponent, title: 'Partido - GoalStatsPro' },
   { path: 'login', component: LoginComponent, title: 'Login - GoalStatsPro' },
-
+  // Ruta protegida para administradores
+  { path: 'admin', component: AdminPanelComponent, title: 'Panel de Administración - GoalStatsPro', canActivate: [adminGuard] },
   // Cualquier ruta desconocida redirige al Home
   { path: '**', redirectTo: '' }
 ];
