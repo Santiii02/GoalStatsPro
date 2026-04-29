@@ -27,6 +27,12 @@
                         {{ user.favoriteTeams?.length || 0 }} equipos guardados
                     </span>
                 </td>
+                <td>
+                    <p-button *ngIf="user.role !== 'admin'" icon="pi pi-trash"
+                        styleClass="p-button-rounded p-button-danger p-button-text" (onClick)="deleteUser(user.uid)"
+                        pTooltip="Borrar usuario datos">
+                    </p-button>
+                </td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

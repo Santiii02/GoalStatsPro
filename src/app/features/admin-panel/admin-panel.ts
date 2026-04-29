@@ -40,4 +40,22 @@ export class AdminPanelComponent implements OnInit {
       this.cdr.detectChanges();
     }
   }
+
+  /* --- Borrar usuario --- */
+  async deleteUser(uid: string) {
+    // Pedimos confirmación al administrador para evitar accidentes
+    const confirmed = window.confirm('¿Estás seguro de que quieres eliminar los datos de este usuario? Esta acción no se puede deshacer.');
+    
+    if (confirmed) {
+      try {
+        await this.userService.deleteUserDocument(uid);
+        
+        // Volvemos a cargar la lista para que el usuario desaparezca de la tabla visualmente
+        this.loadUsers();
+      } catch (error) {
+        console.error("Error al borrar el usuario", error);
+        alert('Hubo un error al intentar borrar el usuario.');
+      }
+    }
+  }
 }

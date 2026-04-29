@@ -4,7 +4,7 @@
  */
 
 import { Injectable, inject } from '@angular/core';
-import { Firestore, doc, setDoc, getDoc, arrayUnion, arrayRemove, collection, getDocs} from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, arrayUnion, arrayRemove, collection, getDocs, deleteDoc} from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -99,7 +99,6 @@ export class UserService {
     }
   }
 
-
   /* --- Obtenemos todos los usuarios (Solo para Admin) --- */
   async getAllUsers(): Promise<any[]> {
     try {
@@ -114,6 +113,18 @@ export class UserService {
       }));
     } catch (error) {
       console.error('Error al obtener la lista de usuarios:', error);
+      throw error;
+    }
+  }
+
+  /* --- Elimina documento de usuario (Solo para Admin) --- */
+  async deleteUserDocument(uid: string): Promise<void> {
+    try {
+      // Documento exacto del usuario que el admin quiere borrar
+      const userDocRef = doc(this.firestore, `users/${uid}`);
+      await deleteDoc(userDocRef);
+    } catch (error) {
+      console.error('Error al eliminar el documento del usuario:', error);
       throw error;
     }
   }
