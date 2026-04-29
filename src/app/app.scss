@@ -102,9 +102,49 @@ main {
   background-color: #1a1a1a;
   color: #666;
   text-align: center;
-  padding: 15px;
-  font-size: 0.8rem;
+  padding: 25px 15px;
+  font-size: 0.85rem;
   margin-top: auto; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px; 
+  border-top: 1px solid #333;
+}
+
+/* Contenedor de los iconos */
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+/* Estilo de los iconos (LinkedIn, GitHub, Email) */
+.footer-links a {
+  color: #888;
+  font-size: 1.3rem;
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+/* Efecto al pasar el ratón por los iconos */
+.footer-links a:hover {
+  color: #ffd700;
+  transform: translateY(-3px); 
+}
+
+/* Estilo del texto del Copyright */
+.copyright-text {
+  margin: 0;
+}
+
+.copyright-text a {
+  color: #666;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.copyright-text a:hover {
+  color: #aaaaaa;
 }
 
 
