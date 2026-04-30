@@ -28,7 +28,8 @@
 }
 
 .search-box input {
-    width: 250px;
+    width: 100%;
+    min-width: 200px;
 }
 
 .search-box i { cursor: pointer; }
@@ -175,3 +176,16 @@
     display: block; 
 }
 
+/* Diseño responsive */
+@media (max-width: 768px) {
+    .filters-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    .filters-actions p-dropdown, .search-box {
+        width: 100%;
+    }
+    :host ::ng-deep .p-dropdown {
+        width: 100% !important;
+    }
+}

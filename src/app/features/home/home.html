@@ -10,16 +10,16 @@
     <h3 class="mb-4" style="color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
       <i class="pi pi-star-fill text-warning"></i> Mis Equipos
     </h3>
-    
-    <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;">
-      <div *ngFor="let team of favoriteTeamsData"
-          (click)="goToTeamDetail(team)"
-          class="team-result-card fade-in" style="min-width: 150px;"> 
 
-          <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
-            width="80"
-            alt="Escudo"
-            onerror="this.src='assets/images/Logo.png'">
+    <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;">
+      <div *ngFor="let team of favoriteTeamsData" 
+        (click)="goToTeamDetail(team)"
+        class="team-result-card fade-in" style="min-width: 150px;">
+
+        <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'" 
+          width="80" 
+          alt="Escudo"
+          onerror="this.src='assets/images/Logo.png'">
 
         <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px;">{{ team.strTeam }}</p>
         <span class="league-tag-small">{{ team.strLeague }}</span>
@@ -32,12 +32,12 @@
     <!-- Buscar equipo -->
     <span class="p-input-icon-left">
       <i class="pi pi-search"></i>
-      <input type="text"
-            pInputText
-            [(ngModel)]="searchQuery"
+      <input type="text" 
+            pInputText 
+            [(ngModel)]="searchQuery" 
             (keyup.enter)="searchTeam()"
-            placeholder="Buscar equipo (ej: Barcelona)..."
-            style="width: 300px" />
+            placeholder="Buscar equipo (ej: Barcelona)..." 
+            style="width: 100%; max-width: 300px" />
     </span>
 
     <p-button
@@ -50,7 +50,7 @@
 
   </div>
 
-<div *ngIf="foundTeams.length > 0" style="margin-bottom: 30px;">
+  <div *ngIf="foundTeams.length > 0" style="margin-bottom: 30px;">
     <h3>Resultados:</h3>
     <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
 
@@ -119,19 +119,20 @@
       No se pudo cargar la información de la clasificación.
     </div>
 
-    <table class="table-custom" *ngIf="standings.length > 0">
-      <thead>
-        <tr>
-          <th title="Posición">#</th>
-          <th>Equipo</th>
-          <th title="Puntos">Pts</th>
-          <th title="Partidos Jugados">PJ</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of standings">
-          <td class="rank-cell">{{ item.rank }}</td>
-          <td>
+    <div style="overflow-x: auto; border-radius: 8px;">
+      <table class="table-custom" *ngIf="standings.length > 0">
+        <thead>
+          <tr>
+            <th title="Posición">#</th>
+            <th>Equipo</th>
+            <th title="Puntos">Pts</th>
+            <th title="Partidos Jugados">PJ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of standings">
+            <td class="rank-cell">{{ item.rank }}</td>
+            <td>
             <div class="team-row" 
             style="display: flex; align-items: center; gap: 10px;">
 
@@ -144,12 +145,13 @@
 
               <strong>{{ item.teamName }}</strong>
             </div>
-          </td>
-          <td class="points-cell">{{ item.points }}</td>
-          <td>{{ item.matches }}</td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td class="points-cell">{{ item.points }}</td>
+            <td>{{ item.matches }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="text-center mt-3">
       <a routerLink="/teams" class="btn-link">Ver clasificación completa →</a>

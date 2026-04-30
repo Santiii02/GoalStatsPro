@@ -175,3 +175,21 @@
     font-size: 1rem;
     color: #4b5563;
 }
+
+/* Diseño responsive */
+@media (max-width: 768px) {
+    .player-hero {
+        flex-direction: column; 
+        text-align: center;
+        padding: 20px;
+        gap: 15px;
+    }
+    
+    .hero-info h1 {
+        font-size: 2rem; 
+    }
+    
+    .main-stats, .social-links {
+        justify-content: center; 
+    }
+}

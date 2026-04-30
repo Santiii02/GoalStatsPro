@@ -23,3 +23,14 @@
 :host ::ng-deep .p-password-input {
     width: 100%;
 }
+
+/* Diseño responsive */
+@media (max-width: 768px) {
+    :host ::ng-deep .auth-card .p-card-body {
+        padding: 1.5rem 1rem;
+    }
+    
+    .auth-card img {
+        width: 150px !important;
+    }
+}

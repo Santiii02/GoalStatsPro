@@ -360,3 +360,59 @@
 .form-win { background-color: #22c55e; }  
 .form-draw { background-color: #94a3b8; } 
 .form-loss { background-color: #ef4444; } 
+
+/* Diseño responsive */
+@media (max-width: 768px) {
+    .match-hero {
+        padding: 15px 5px; 
+        gap: 0; 
+    }
+    
+    /* Hacemos que los escudos sean más pequeños */
+    .team-badge-lg {
+        width: 45px; /* De 50 a 45 */
+        height: 45px;
+    }
+    
+    /* Letra más pequeña */
+    .team-name {
+        font-size: 0.8rem;
+        word-break: break-word;
+    }
+
+    /* Flexibilidad al marcador central */
+    .score-board {
+        flex: 0 1 auto;
+        min-width: 70px;
+        padding: 0 5px;
+    }
+    
+    .score-display {
+        font-size: 2rem;
+    }
+
+    .score-display .divider {
+        font-size: 1.5rem;
+        margin: 0 2px;
+    }
+
+    /* Aseguramos que la racha V-E-D no se salga de la pantalla */
+    .team-form {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .form-badge {
+        width: 20px; 
+        height: 20px;
+        font-size: 0.65rem;
+    }
+    
+    /* Alineaciones y Estadísticas */
+    .lineups-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .stat-val { width: 15%; font-size: 0.9rem; }
+    .stat-label { width: 70%; font-size: 0.65rem; }
+}

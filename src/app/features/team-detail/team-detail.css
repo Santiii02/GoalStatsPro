@@ -228,3 +228,43 @@
     background: rgba(255, 255, 255, 0.1) !important;
     border-color: white !important;
 }
+
+/* Diseño responsive */
+@media (max-width: 768px) {
+    .hero-team {
+        height: auto;
+        min-height: 300px;
+    }
+
+    /* Apilamos el escudo y el texto en vertical */
+    .team-header-content {
+        flex-direction: column;
+        text-align: center;
+        width: 100%;
+        gap: 15px;
+    }
+
+    /* Reducimos el escudo */
+    .big-badge {
+        width: 100px;
+        height: 100px;
+    }
+
+    /* Centramos toda la info del equipo */
+    .team-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Centramos el título y el botón de estrella */
+    .title-and-fav {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Reducimos el tamaño del nombre */
+    .team-info h1 {
+        font-size: 2.2rem;
+    }
+}

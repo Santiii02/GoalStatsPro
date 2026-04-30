@@ -220,3 +220,46 @@
 .favorites-section {
   border: 1px solid #e2e8f0;
 }
+
+/* Diseño responsive */
+@media (max-width: 768px) {
+  /* Ajuste del buscador y su botón */
+  .search-container {
+    display: flex;
+    justify-content: center;
+    padding: 0 10px;
+  }
+  .search-container .p-input-icon-left {
+    flex: 1; 
+    max-width: 250px;
+  }
+  .search-container p-button {
+    flex-shrink: 0; 
+  }
+
+  /* Ajuste de los marcadores en vivo para nombres largos */
+  .match-card {
+    padding: 12px 10px;
+  }
+  .team-name {
+    font-size: 0.75rem; 
+    word-break: break-word; 
+  }
+  .team-logo {
+    width: 28px;
+    height: 28px;
+  }
+  .score {
+    font-size: 1.1rem; 
+  }
+  .score-board {
+    min-width: 60px; 
+    margin: 0 5px;
+  }
+  
+  /* Ajustes de la tabla de clasificación */
+  .table-custom th, .table-custom td {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+}
