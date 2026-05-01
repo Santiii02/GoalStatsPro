@@ -6,6 +6,7 @@
     <p class="subtitle">Estadísticas y Predicciones con IA</p>
   </header>
 
+  <!-- Equipos favoritos -->
   <div *ngIf="(authService.user$ | async) && favoriteTeamsData.length > 0" class="favorites-section mt-4 mb-5 p-4 rounded bg-white shadow-sm">
     <h3 class="mb-4" style="color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
       <i class="pi pi-star-fill text-warning"></i> Mis Equipos
@@ -79,30 +80,41 @@
 
     <div class="matches-grid" *ngIf="liveMatches.length > 0">
       <div *ngFor="let match of liveMatches" class="match-card live-border clickable" (click)="goToMatch(match)">
-
-        <div class="team team-home">
-          <span class="team-name">{{ match.homeName }}</span>
-          <img [src]="match.homeLogo"
-              alt="Escudo local"
-              class="team-logo"
-              onerror="this.src='assets/placeholder.png'">
+    
+        <div class="match-card-header">
+          <span class="tournament-name">{{ match.tournamentName || 'Competición' }}</span>
         </div>
-
-        <div class="score-board">
-          <span class="score">{{ match.homeScore }} - {{ match.awayScore }}</span>
-          <div class="live-badge" *ngIf="match.gameTime">
-            <span class="blink">●</span> {{ match.gameTime }}'
+    
+        <div class="match-content">
+          <div class="team team-home">
+            <span class="team-name">{{ match.homeName }}</span>
+            <img [src]="match.homeLogo" alt="Escudo local" class="team-logo" onerror="this.src='assets/placeholder.png'">
+          </div>
+    
+          <div class="score-board">
+    
+            <div class="score-box" *ngIf="match.homeScore !== undefined && match.homeScore !== null; else noScore">
+              <span class="score-number">{{ match.homeScore }}</span>
+              <span class="score-separator">-</span>
+              <span class="score-number">{{ match.awayScore }}</span>
+            </div>
+    
+            <ng-template #noScore>
+              <div class="vs-badge">VS</div>
+            </ng-template>
+    
+            <div class="live-badge" *ngIf="match.gameTime && match.gameTime !== '-1'">
+              <span class="blink">●</span> {{ match.gameTime }}'
+            </div>
+          </div>
+    
+          <div class="team team-away">
+            <img [src]="match.awayLogo" alt="Escudo visitante" class="team-logo"
+              onerror="this.src='assets/placeholder.png'">
+            <span class="team-name">{{ match.awayName }}</span>
           </div>
         </div>
-
-        <div class="team team-away">
-          <img [src]="match.awayLogo"
-              alt="Escudo visitante"
-              class="team-logo"
-              onerror="this.src='assets/placeholder.png'">
-          <span class="team-name">{{ match.awayName }}</span>
-        </div>
-
+    
       </div>
     </div>
 

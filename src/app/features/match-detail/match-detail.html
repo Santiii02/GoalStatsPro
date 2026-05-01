@@ -42,6 +42,10 @@
                 <div class="match-status" [class.live-pulse]="isLive(match.status)">
                     <span *ngIf="isLive(match.status)" class="live-dot">●</span>
                     {{ match.status }}
+                    <div *ngIf="match.status === 'Programado' && match.matchDate" 
+                        style="font-size: 0.75rem; margin-top: 2px; opacity: 0.9;">
+                        {{ match.matchDate | date:'dd MMM - HH:mm' }}
+                    </div>
                 </div>
 
                 <small class="text-muted mt-2 d-block">{{ match.league }}</small>

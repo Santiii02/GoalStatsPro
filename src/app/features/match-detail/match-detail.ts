@@ -90,6 +90,32 @@ export class MatchDetailComponent implements OnInit {
 
   /* --- Normaliza los datos --- */
   private normalizeBasicData(basic: any): any {
+
+    let currentStatus = basic.status || basic.eventStatus;
+
+    if (!currentStatus) {
+      currentStatus = (basic.homeScore !== undefined && basic.homeScore !== null) ? 'Finalizado' : 'Programado';
+    } else {
+      // Diccionario de traducción estado partido
+      if (currentStatus === 'FT' || currentStatus === 'Finished') currentStatus = 'Finalizado';
+      else if (currentStatus === 'Scheduled') currentStatus = 'Programado';
+      else if (currentStatus === 'AET') currentStatus = 'Final tras Prórroga';
+      else if (currentStatus === 'PEN') currentStatus = 'Final tras Penaltis';
+      else if (currentStatus === 'Postponed') currentStatus = 'Aplazado';
+      else if (currentStatus === 'Cancelled' || currentStatus === 'Canceled') currentStatus = 'Cancelado';
+    }
+
+    const realLeague = basic.tournamentName || basic.league || 'Competición Oficial';
+
+    let matchDate: Date | undefined;
+    if (basic.processedDate) {
+      matchDate = new Date(basic.processedDate); 
+    } else if (basic.eventStartTime) {
+      matchDate = new Date(Number(basic.eventStartTime) * 1000); 
+    } else if (basic.startDateTimeUtc) {
+      matchDate = new Date(basic.startDateTimeUtc); 
+    }
+
     return {
       homeTeam: basic.homeName || basic.homeTeam,
       awayTeam: basic.awayName || basic.awayTeam,
@@ -97,10 +123,11 @@ export class MatchDetailComponent implements OnInit {
       awayLogo: basic.awayLogo,
       homeScore: basic.homeScore, 
       awayScore: basic.awayScore,
-      status: basic.status || 'Programado',
-      league: basic.league || 'La Liga',
+      status: currentStatus,
+      league: realLeague,
       round: basic.round,
       eventId: basic.eventId || this.id,
+      matchDate: matchDate,
       ...basic
     };
   }
@@ -328,8 +355,13 @@ export class MatchDetailComponent implements OnInit {
   /* --- Comprueba si el partido está en juego --- */
   isLive(status: string): boolean {
     if (!status) return false;
-    // Finalizado (FT), Prórroga terminada (AET), Penaltis (PEN)
-    return !['FT', 'AET', 'PEN', 'Finished'].includes(status) && !status.includes(':'); 
+    const notLiveStatuses = [
+      'Finalizado', 'Final tras Prórroga', 'Final tras Penaltis', 
+      'Programado', 'Aplazado', 'Cancelado', 
+      'FT', 'Finished', 'AET', 'PEN', 'Scheduled'
+    ];
+
+    return !notLiveStatuses.includes(status) && !status.includes(':');
   }
 
   /* --- Cambia valores porcentuales por barras de progreso --- */
