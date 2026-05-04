@@ -16,9 +16,7 @@ export class UserService {
   private firestore = inject(Firestore);
   private authService = inject(AuthService);
 
-  /*
-   * OBTENEMOS UNA REFERENCIA AL DOCUMENTO DEL USUARIO EN FIRESTORE
-   */
+  /* --- Obtenemos una referencia al documento del usuario en Firestore --- */
   private getUserDocRef() {
     const user = this.authService.currentUser;
     if (!user) throw new Error('No hay un usuario autenticado');
@@ -125,6 +123,23 @@ export class UserService {
       await deleteDoc(userDocRef);
     } catch (error) {
       console.error('Error al eliminar el documento del usuario:', error);
+      throw error;
+    } 
+  }
+
+  /* --- Crear documento inicial del usuario --- */
+  async createInitialUserDocument(uid: string, email: string | null): Promise<void> {
+    if (!email) return;
+    
+    try {
+      const userDocRef = doc(this.firestore, `users/${uid}`);
+      await setDoc(userDocRef, {
+        email: email,
+        role: 'user', 
+        favoriteTeams: [],
+      });
+    } catch (error) {
+      console.error('Error al crear el documento base del usuario:', error);
       throw error;
     }
   }

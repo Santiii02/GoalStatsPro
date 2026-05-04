@@ -12,6 +12,7 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
     selector: 'app-login',
@@ -23,6 +24,7 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent {
     // Inyección de dependencias
     private authService = inject(AuthService);
+    private userService = inject(UserService);
     private router = inject(Router);
     private cdr = inject(ChangeDetectorRef);
 
@@ -59,7 +61,14 @@ export class LoginComponent {
                 await this.authService.login(this.email, this.password);
             } else {
                 // Modo Registro
-                await this.authService.register(this.email, this.password);
+                const userCredential = await this.authService.register(this.email, this.password);
+                
+                // Extraemos los datos del usuario recién creado
+                const uid = userCredential.user.uid;
+                const email = userCredential.user.email;
+
+                // Le creamos su carpeta en Firestore para que el Admin pueda verlo aunque no tenga favoritos aún
+                await this.userService.createInitialUserDocument(uid, email);
             }
 
             // Si todo va bien, redirigimos al inicio
