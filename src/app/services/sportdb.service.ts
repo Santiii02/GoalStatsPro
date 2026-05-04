@@ -204,7 +204,7 @@ export class SportDbService {
     }
 
     // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/3';
+    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/5032939090';
 
     return this.http.get<{ teams: Team[] }>(`${theSportsDbUrl}/searchteams.php?t=${name}`)
       .pipe(
@@ -242,7 +242,7 @@ export class SportDbService {
     }
 
     // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/3';
+    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/5032939090';
 
     return this.http.get<{ player: any[] }>(`${theSportsDbUrl}/searchplayers.php?p=${name}`)
       .pipe(
@@ -279,7 +279,7 @@ export class SportDbService {
     }
 
     // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/3';    
+    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/5032939090';    
     
     return this.http.get<{ player: any[] }>(`${theSportsDbUrl}/lookup_all_players.php?id=${teamId}`)
       .pipe(
@@ -330,7 +330,7 @@ export class SportDbService {
     }
 
     // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/3';
+    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/5032939090';
 
     return this.http.get<{ players: any[] }>(`${theSportsDbUrl}/lookupplayer.php?id=${playerId}`)
       .pipe(

@@ -5,7 +5,7 @@
   </div>
 
   <div class="hero-team" 
-    [style.backgroundImage]="team.strStadium ? 'url(' + team.strStadium + ')' : 'none'"
+    [ngStyle]="{'background-image': getHeroBackground()}"
     style="background-color: #2c3e50;">
 
     <div class="overlay">
@@ -35,6 +35,12 @@
           </p>
           <span class="league-tag">{{ team.strLeague }}</span>
 
+          <div class="social-links mt-3" *ngIf="team.strTwitter || team.strInstagram || team.strYoutube">
+            <a *ngIf="team.strTwitter" [href]="formatUrl(team.strTwitter)" target="_blank" class="social-icon twitter" pTooltip="Twitter" tooltipPosition="bottom"><i class="pi pi-twitter"></i></a>
+            <a *ngIf="team.strInstagram" [href]="formatUrl(team.strInstagram)" target="_blank" class="social-icon instagram" pTooltip="Instagram" tooltipPosition="bottom"><i class="pi pi-instagram"></i></a>
+            <a *ngIf="team.strYoutube" [href]="formatUrl(team.strYoutube)" target="_blank" class="social-icon youtube" pTooltip="YouTube" tooltipPosition="bottom"><i class="pi pi-youtube"></i></a>
+          </div>
+
           <div class="team-form mt-3" *ngIf="teamForm.length > 0">
             <span class="text-white-alpha-70 small text-uppercase fw-bold me-2" style="font-size: 0.8rem;">Racha:</span>
             <span *ngFor="let result of teamForm" 
@@ -50,16 +56,37 @@
     </div>
   </div>
 
-  <div class="description-section mt-4" *ngIf="team.strDescriptionES">
+  <div class="description-section mt-4" *ngIf="team.strDescriptionES || team.strDescriptionEN">
     <h3>Historia</h3>
-    <p>{{ team.strDescriptionES }}</p>
+    <p>{{ team.strDescriptionES || team.strDescriptionEN }}</p>
+  </div>
+
+  <div class="mt-5" *ngIf="team.strEquipment">
+    <h3 class="mb-3">Equipación</h3>
+    
+    <div class="players-grid">
+      <div class="player-card fade-in" style="cursor: default; max-width: 200px;">
+        
+        <div class="player-img-container" style="padding: 15px;">
+          <img [src]="team.strEquipment" 
+              alt="Equipación {{ team.strTeam }}" 
+              loading="lazy" 
+              style="object-fit: contain;">
+        </div>
+
+        <div class="player-info">
+          <strong>Equipación Titular</strong>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <div class="mt-5">
-    <h3 class="mb-3">Jugadores Destacados </h3>
+    <h3 class="mb-3">Plantilla Principal</h3>
 
     <div *ngIf="players.length === 0" class="alert alert-info">
-      No se encontraron jugadores disponibles en la versión gratuita.
+      No se encontraron jugadores disponibles para este equipo.
     </div>
 
     <div class="players-grid">

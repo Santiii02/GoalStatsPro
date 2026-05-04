@@ -67,9 +67,15 @@ export class TeamDetailComponent implements OnInit {
           }
           
           // Cargamos la racha V-E-D del equipo
-          if (this.team.strTeam) {
-            this.sportService.getTeamForm(this.team.strTeam).subscribe(form => {
-              this.teamForm = form;
+          if (this.team?.strTeam) {
+            this.sportService.getTeamForm(this.team.strTeam).subscribe({
+              next: (form) => {
+                this.teamForm = form;
+              },
+              error: (err) => {
+                console.warn('No se pudo cargar la racha del equipo', err);
+                this.teamForm = [];
+              },
             });
           }
 
@@ -159,5 +165,24 @@ export class TeamDetailComponent implements OnInit {
     if (result === 'E') return 'form-draw';
     if (result === 'D') return 'form-loss';
     return '';
+  }
+
+  /* --- Formateamos la URL de las redes sociales para asegurarnos de que tenga el formato correcto --- */
+  formatUrl(url: string): string {
+    if (!url) return '';
+    return url.startsWith('http') ? url : `https://${url}`;
+  }
+
+  /* --- Selecciona el mejor fondo disponible para el Hero --- */
+  getHeroBackground(): string {
+    if (!this.team) return 'none';
+    
+    // Prioridad: 1. Banner, 2. Foto del estadio, 3. Fanart1
+    const bgImage = this.team['strBanner'] || 
+                    this.team['strTeamBanner'] ||
+                    this.team['strStadiumThumb'] ||
+                    this.team['strFanart1'];
+                    
+    return bgImage ? `url(${bgImage})` : 'none';
   }
 }

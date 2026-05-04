@@ -110,14 +110,29 @@ export interface Team {
   strLeague: string;
 
   /* --- Estadio del equipo --- */
-  strStadium: string;
+  strStadium?: string;
+  strStadiumThumb?: string;
+
+  /* --- Banner del equipo --- */
+  strTeamBanner?: string;
+  strBanner?: string;
+  strFanart1?: string;
 
   /* --- Descripción del equipo --- */
   strDescriptionES?: string;
+  strDescriptionEN?: string;
 
   /* --- Año de creación --- */
   intFormedYear?: string;
 
   /* --- Deporte --- */
   strSport?: string;
+
+  /* --- Equipación del equipo --- */
+  strEquipment?: string;
+
+  /* --- Redes sociales del equipo --- */
+  strTwitter?: string;
+  strInstagram?: string;
+  strYoutube?: string;
 }
