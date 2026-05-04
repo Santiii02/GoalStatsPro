@@ -4,6 +4,7 @@ import { Observable, of, throwError, timer, forkJoin, from } from 'rxjs';
 import { map, catchError, tap, retry, concatMap, toArray, delay } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Match, Standing, Team } from '../models/sport.model';
+import { normalizeTeamName } from '../models/team-mapper';
 
 @Injectable({
   providedIn: 'root'
@@ -193,9 +194,13 @@ export class SportDbService {
   }
 
   /* --- Buscar equipo por nombre (utilizando la cache) --- */
-  searchTeams(name: string): Observable<Team[]> {
+  searchTeams(teamName: string): Observable<Team[]> {
+
+    // Normalizamos el nombre para las búsquedas
+    const translatedName = normalizeTeamName(teamName);
+
     // Generamos una clave única para guardar esto en memoria
-    const cacheKey = `goalstats_search_${name.replace(/\s/g, '_')}`;
+    const cacheKey = `goalstats_search_${translatedName.replace(/\s/g, '_')}`;
 
     // Comprobamos si ya lo tenemos guardado
     const cached = this.getFromCache<Team[]>(cacheKey, this.CACHE_TTL.STATIC);
@@ -206,7 +211,7 @@ export class SportDbService {
     // Si no está en caché llamamos a la API 
     const theSportsDbUrl = '/api/thesportsdb/api/v1/json/5032939090';
 
-    return this.http.get<{ teams: Team[] }>(`${theSportsDbUrl}/searchteams.php?t=${name}`)
+    return this.http.get<{ teams: Team[] }>(`${theSportsDbUrl}/searchteams.php?t=${translatedName}`)
       .pipe(
         this.getRetryStrategy(),
         map((response: any) => {

@@ -12,6 +12,7 @@ import { SportDbService } from '../../services/sportdb.service';
 import { Team } from '../../models/sport.model';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
+import { getFlashscoreName } from '../../models/team-mapper';
 
 @Component({
   selector: 'app-team-detail',
@@ -68,14 +69,17 @@ export class TeamDetailComponent implements OnInit {
           
           // Cargamos la racha V-E-D del equipo
           if (this.team?.strTeam) {
-            this.sportService.getTeamForm(this.team.strTeam).subscribe({
+            // Pasamos el nombre de TheSportsDB a Flashscore
+            const flashscoreName = getFlashscoreName(this.team.strTeam);
+
+            this.sportService.getTeamForm(flashscoreName).subscribe({
               next: (form) => {
                 this.teamForm = form;
               },
               error: (err) => {
-                console.warn('No se pudo cargar la racha del equipo', err);
-                this.teamForm = [];
-              },
+                console.warn("No se pudo cargar la racha del equipo", err);
+                this.teamForm = []; 
+              }
             });
           }
 
