@@ -8,6 +8,8 @@ import { RouterModule, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';  
 import { CardModule } from 'primeng/card';      
 import { TooltipModule } from 'primeng/tooltip';
+import { FormsModule } from '@angular/forms';
+import { DropdownModule } from 'primeng/dropdown';
 import { SportDbService } from '../../services/sportdb.service';
 import { Team } from '../../models/sport.model';
 import { AuthService } from '../../services/auth.service';
@@ -17,7 +19,7 @@ import { getFlashscoreName } from '../../models/team-mapper';
 @Component({
   selector: 'app-team-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, CardModule, TooltipModule],
+  imports: [CommonModule, RouterModule, ButtonModule, CardModule, TooltipModule, FormsModule, DropdownModule],
   templateUrl: './team-detail.html',
   styleUrl: './team-detail.css'     
 })
@@ -40,6 +42,21 @@ export class TeamDetailComponent implements OnInit {
   teamForm: string[] = [];
   isFavorite: boolean = false;
   isFavLoading: boolean = false;
+  pastMatches: any[] = [];
+  upcomingMatches: any[] = [];
+  displayedMatches: any[] = [];
+  showFullHistory: boolean = false;
+  cleanedHistoryText: string = '';
+
+ /* --- Opciones para el desplegable de partidos --- */
+  matchFilterOptions = [
+    { label: 'Últimos Resultados', value: 'past' },
+    { label: 'Próximos Partidos ', value: 'future' }
+  ];
+  selectedMatchType: string = 'past';
+  
+  /* --- Estadísticas totales de la temporada (V-E-D) --- */
+  matchStats = { played: 0, wins: 0, draws: 0, losses: 0 };
 
   ngOnInit(): void {
     if (this.name) {
@@ -57,6 +74,10 @@ export class TeamDetailComponent implements OnInit {
       next: (teams) => {
         if (teams && teams.length > 0) {
           this.team = teams[0];
+
+          // Limpiamos el texto de historia para eliminar la basura de Wikipedia usando regex
+          const rawHistory = this.team.strDescriptionES || this.team.strDescriptionEN || '';
+          this.cleanedHistoryText = this.cleanWikipediaText(rawHistory);
 
           this.checkIfFavorite();
 
@@ -80,6 +101,23 @@ export class TeamDetailComponent implements OnInit {
                 console.warn("No se pudo cargar la racha del equipo", err);
                 this.teamForm = []; 
               }
+            });
+
+            // Cargamos los partidos pasados para la tabla y estadísticas
+            this.sportService.getResults().subscribe(matches => {
+              this.pastMatches = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
+              this.pastMatches.sort((a, b) => (b.eventStartTime || 0) - (a.eventStartTime || 0));
+              this.calculateStats(flashscoreName);
+              this.onMatchTypeChange(); 
+              this.cdr.detectChanges();
+            });
+
+            // Cargamos los partidos futuros
+            this.sportService.getFixtures().subscribe(matches => {
+              this.upcomingMatches = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
+              this.upcomingMatches.sort((a, b) => (a.eventStartTime || 0) - (b.eventStartTime || 0));
+              this.onMatchTypeChange();
+              this.cdr.detectChanges();
             });
           }
 
@@ -145,6 +183,61 @@ export class TeamDetailComponent implements OnInit {
     }
   }
 
+  /*
+   * CÁLCULO DE ESTADÍSTICAS TOTALES DE LA TEMPORADA (V-E-D)
+   */
+  private calculateStats(teamName: string): void {
+    let w = 0, d = 0, l = 0;
+    
+    this.pastMatches.forEach(m => {
+      const homeScore = Number(m.homeScore);
+      const awayScore = Number(m.awayScore);
+
+      if (homeScore === awayScore) {
+        d++;
+      } else {
+        const isHome = m.homeName === teamName;
+        if (isHome) { homeScore > awayScore ? w++ : l++; } 
+        else { awayScore > homeScore ? w++ : l++; }
+      }
+    });
+
+    this.matchStats = { played: this.pastMatches.length, wins: w, draws: d, losses: l };
+  }
+
+  /*
+   * LIMPIADOR DE TEXTO DE WIKIPEDIA USANDO REGEX
+   */
+  private cleanWikipediaText(text: string): string {
+    if (!text) return '';
+
+    return text
+      // Elimina la "n" seguida de un espacio y un número (ej: "BBVA,n 3" -> "BBVA,")
+      .replace(/n \d+/g, '')
+      // Elimina números pegados justo después de un punto o coma (ej: "United.17" -> "United.")
+      .replace(/(?<=[.,])\d+/g, '')
+      // Elimina números pegados justo después de una letra (ej: "culés6" -> "culés")
+      .replace(/(?<=[a-zA-ZáéíóúÁÉÍÓÚñÑ])\d+/g, '')
+      // Limpia los espacios dobles que hayan podido quedar al borrar números
+      .replace(/\s{2,}/g, ' ')
+      // Elimina comas perdidas sin sentido (ej: "socios, " -> "socios ")
+      .replace(/,\s*(?=[.,\s])/g, '')
+      .trim();
+  }
+
+  /* --- Extraer la jornada del partido para mostrar --- */
+  getRoundLabel(match: any): string {
+    const roundInfo = match.roundInfo?.round || match.round || match.stage;
+    if (!roundInfo) return '';
+    
+    // Si ya es un número puro
+    if (!isNaN(Number(roundInfo))) return `J${roundInfo}`;
+    
+    // Si trae texto ("Round X" o "Jornada X"), extraemos solo el número
+    const num = String(roundInfo).replace(/\D/g, ''); 
+    return num ? `J${num}` : roundInfo;
+  }
+
   /* --- Posición del jugador --- */
   getPlayerRole(position: string): string {
     if (!position) return '';
@@ -152,15 +245,57 @@ export class TeamDetailComponent implements OnInit {
 
     if (pos.includes('goalkeeper')) return 'gk';
     if (pos.includes('back') || pos.includes('defender')) return 'df';
-    if (pos.includes('midfield')) return 'mf';
-    if (pos.includes('wing') || pos.includes('forward') || pos.includes('striker')) return 'fw';
+    if (pos.includes('midfield')) return 'mf'; 
+    if (pos.includes('wing') || pos.includes('forward') || pos.includes('striker') || pos.includes('attacker')) return 'fw';
 
     return '';
+  }
+
+  /* --- Traductor de Posiciones (Inglés a Español) --- */
+  translatePosition(position: string): string {
+    if (!position) return 'Desconocido';
+    const pos = position.toLowerCase();
+
+    // Porteros
+    if (pos.includes('goalkeeper')) return 'Portero';
+
+    // Defensas
+    if (pos.includes('left-back') || pos === 'left back') return 'Lat. Izquierdo';
+    if (pos.includes('right-back') || pos === 'right back') return 'Lat. Derecho';
+    if (pos.includes('centre-back') || pos.includes('center back')) return 'Def. Central';
+    if (pos.includes('defender') || pos.includes('back')) return 'Defensa';
+
+    // Centrocampistas
+    if (pos.includes('defensive midfield')) return 'Pivote';
+    if (pos.includes('attacking midfield')) return 'Mediapunta';
+    if (pos.includes('central midfield')) return 'Centrocampista';
+    if (pos.includes('left midfield') || pos.includes('left midfielder')) return 'Int. Izquierdo';
+    if (pos.includes('right midfield') || pos.includes('right midfielder')) return 'Int. Derecho';
+    if (pos.includes('midfield')) return 'Centrocampista';
+
+    // Delanteros
+    if (pos.includes('left wing')) return 'Ext. Izquierdo';
+    if (pos.includes('right wing')) return 'Ext. Derecho';
+    if (pos.includes('centre-forward') || pos.includes('center forward') || pos.includes('striker')) return 'Delantero Centro';
+    if (pos === 'winger') return 'Extremo'; 
+    if (pos.includes('forward') || pos.includes('wing') || pos.includes('attacker')) return 'Delantero';
+
+    // Si es una posición desconocida, devolvemos el original
+    return position;
   }
 
   /* --- Ver el jugador --- */
   goToPlayer(playerId: string): void {
     this.router.navigate(['/player', playerId]);
+  }
+
+  /* --- Ver el partido --- */
+  goToMatch(match: any): void {
+      if (match && match.eventId) {
+          this.router.navigate(['/match', match.eventId], {
+            state: { data: match } 
+          });
+      }
   }
   
   /* --- Mapeo de colores para las insignias V-E-D --- */
@@ -188,5 +323,16 @@ export class TeamDetailComponent implements OnInit {
                     this.team['strFanart1'];
                     
     return bgImage ? `url(${bgImage})` : 'none';
+  }
+
+  /* --- Evento del Desplegable --- */
+  onMatchTypeChange(): void {
+    this.displayedMatches = this.selectedMatchType === 'past' ? this.pastMatches : this.upcomingMatches;
+    this.cdr.detectChanges();
+  }
+
+  /* --- Función para mostrar/ocultar el texto completo --- */
+  toggleHistory(): void {
+    this.showFullHistory = !this.showFullHistory;
   }
 }

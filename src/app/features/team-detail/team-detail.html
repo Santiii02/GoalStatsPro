@@ -56,9 +56,91 @@
     </div>
   </div>
 
-  <div class="description-section mt-4" *ngIf="team.strDescriptionES || team.strDescriptionEN">
-    <h3>Historia</h3>
-    <p>{{ team.strDescriptionES || team.strDescriptionEN }}</p>
+  <div class="season-stats-container mt-4">
+    <div class="season-stats-card">
+      <h3 class="mb-3 text-center"><i class="pi pi-chart-bar me-2"></i> Estadísticas LaLiga 25/26</h3>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <span class="stat-value">{{ matchStats.played }}</span>
+          <span class="stat-label">Jugados</span>
+        </div>
+        <div class="stat-box win">
+          <span class="stat-value">{{ matchStats.wins }}</span>
+          <span class="stat-label">Victorias</span>
+        </div>
+        <div class="stat-box draw">
+          <span class="stat-value">{{ matchStats.draws }}</span>
+          <span class="stat-label">Empates</span>
+        </div>
+        <div class="stat-box loss">
+          <span class="stat-value">{{ matchStats.losses }}</span>
+          <span class="stat-label">Derrotas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="matches-section mt-5">
+    <div class="matches-header mb-4">
+      <h3>Partidos</h3>
+      <p-dropdown 
+        [options]="matchFilterOptions" 
+        [(ngModel)]="selectedMatchType" 
+        (onChange)="onMatchTypeChange()"
+        styleClass="custom-dropdown">
+      </p-dropdown>
+    </div>
+
+    <div *ngIf="displayedMatches.length === 0" class="alert alert-secondary">
+      No hay partidos disponibles para esta selección.
+    </div>
+
+    <div class="matches-list">
+      <div class="match-row" *ngFor="let match of displayedMatches" (click)="goToMatch(match)">
+        
+        <div class="match-meta">
+          <span class="round-badge" *ngIf="getRoundLabel(match)">{{ getRoundLabel(match) }}</span>
+          <div class="match-date">
+            <i class="pi pi-calendar me-1"></i>
+            {{ match.eventStartTime * 1000 | date:'dd/MM/yyyy HH:mm' }}
+          </div>
+        </div>
+
+        <div class="match-teams">
+          <span class="team-name" style="text-align: right;" [class.fw-bold]="match.homeName === team.strTeam">{{ match.homeName }}</span>
+          
+          <div class="match-score">
+            <ng-container *ngIf="selectedMatchType === 'past'; else noScore">
+              <span class="score-badge">{{ match.homeScore }} - {{ match.awayScore }}</span>
+            </ng-container>
+            <ng-template #noScore>
+              <span class="vs-badge">VS</span>
+            </ng-template>
+          </div>
+
+          <span class="team-name" style="text-align: left;" [class.fw-bold]="match.awayName === team.strTeam">{{ match.awayName }}</span>          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5" *ngIf="cleanedHistoryText">
+    <h3 class="mb-3">Historia</h3>
+    
+    <div class="description-section">
+      <div class="history-content">
+        <p [class.truncated]="!showFullHistory">
+          {{ showFullHistory ? cleanedHistoryText : (cleanedHistoryText | slice:0:400) + (cleanedHistoryText.length > 400 ? '...' : '') }}
+        </p>
+        
+        <button *ngIf="cleanedHistoryText.length > 400" 
+                class="btn-read-more" 
+                (click)="toggleHistory()">
+          {{ showFullHistory ? 'Leer menos' : 'Leer más' }}
+          <i class="pi" [ngClass]="showFullHistory ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="mt-5" *ngIf="team.strEquipment">
@@ -104,7 +186,7 @@
 
           <span class="position-badge" 
               [ngClass]="getPlayerRole(player.strPosition)">
-            {{ player.strPosition }}
+            {{ translatePosition(player.strPosition) }}
           </span>
 
           <div class="nationality" *ngIf="player.strNationality">
@@ -117,8 +199,6 @@
   </div>
 
 </div>
-
-
 
 <div *ngIf="loading" class="text-center mt-5">
   <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
