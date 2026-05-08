@@ -46,9 +46,13 @@ export class HomeComponent implements OnInit {
   foundTeams: Team[] = [];  
   isSearching: boolean = false; 
 
-  // Variables para favoritos
+  // Variables para equipos favoritos
   favoriteTeamsData: Team[] = [];
   loadingFavorites: boolean = false;
+
+  // Variables para jugadores favoritos
+  favoritePlayersData: any[] = [];
+  loadingFavPlayers: boolean = false;
 
   ngOnInit(): void {
     this.loadData();
@@ -56,15 +60,22 @@ export class HomeComponent implements OnInit {
     // Si el usuario ya está logueado al entrar, cargamos sus favoritos
     if (this.authService.currentUser) {
       this.loadFavoriteTeams();
+      this.loadFavoritePlayers();
     }
 
     // Escuchamos cambios en la autenticación para recargar favoritos cuando el usuario inicie sesión o cierre sesión
     this.authService.user$.subscribe(user => {
       // Evitamos peticiones duplicadas si ya se están cargando o ya hay datos cargados
-      if (user && this.favoriteTeamsData.length === 0 && !this.loadingFavorites) {
-        this.loadFavoriteTeams();
-      } else if (!user) {
+      if (user) {
+        if (this.favoriteTeamsData.length === 0 && !this.loadingFavorites) {
+          this.loadFavoriteTeams();
+        }
+        if (this.favoritePlayersData.length === 0 && !this.loadingFavPlayers) {
+          this.loadFavoritePlayers();
+        } 
+      } else {
         this.favoriteTeamsData = []; // Limpiamos si cierra sesión
+        this.favoritePlayersData = []; 
       }
     });
   }
@@ -193,5 +204,38 @@ export class HomeComponent implements OnInit {
         state: { data: match } 
       });
     }
+  }
+
+  /* --- Carga de jugadores favoritos --- */
+  private async loadFavoritePlayers() {
+    this.loadingFavPlayers = true;
+    this.cdr.detectChanges();
+
+    try {
+      const favIds = await this.userService.getFavoritePlayers();
+      this.favoritePlayersData = []; 
+      
+      // Hacemos una petición a la API por cada ID de jugador guardado
+      for (const id of favIds) {
+        this.sportService.getPlayerById(id).subscribe({
+          next: (player) => {
+            if (player) {
+              this.favoritePlayersData.push(player);
+              this.cdr.detectChanges();
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error cargando jugadores favoritos en Home', error);
+    } finally {
+      this.loadingFavPlayers = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  /* --- Información detallada del jugador --- */
+  goToPlayerDetail(playerId: string): void {
+    this.router.navigate(['/player', playerId]);
   }
 }

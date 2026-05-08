@@ -274,6 +274,26 @@
   border: 1px solid #e2e8f0;
 }
 
+/* --- SECCIÓN JUGADORES FAVORITOS --- */
+.player-avatar-container {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: radial-gradient(circle at bottom, #eef2f3, #d9e2e6);
+    display: flex;
+    align-items: flex-end; 
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid #f1f5f9;
+}
+
+.player-avatar {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
 /* Diseño responsive */
 @media (max-width: 768px) {
   /* Ajuste del buscador y su botón */

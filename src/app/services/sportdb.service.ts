@@ -209,7 +209,7 @@ export class SportDbService {
     }
 
     // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/5032939090';
+    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090`;
 
     return this.http.get<{ teams: Team[] }>(`${theSportsDbUrl}/searchteams.php?t=${translatedName}`)
       .pipe(
@@ -247,7 +247,7 @@ export class SportDbService {
     }
 
     // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/5032939090';
+    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090`;
 
     return this.http.get<{ player: any[] }>(`${theSportsDbUrl}/searchplayers.php?p=${name}`)
       .pipe(
@@ -284,7 +284,7 @@ export class SportDbService {
     }
 
     // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/5032939090';    
+    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090`;    
     
     return this.http.get<{ player: any[] }>(`${theSportsDbUrl}/lookup_all_players.php?id=${teamId}`)
       .pipe(
@@ -335,7 +335,7 @@ export class SportDbService {
     }
 
     // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = '/api/thesportsdb/api/v1/json/5032939090';
+    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090`;
 
     return this.http.get<{ players: any[] }>(`${theSportsDbUrl}/lookupplayer.php?id=${playerId}`)
       .pipe(
@@ -492,6 +492,69 @@ export class SportDbService {
         }
       }),
       catchError(() => of([]))
+    );
+  }
+
+  /* --- Obtener Palmarés/Trofeos del Jugador --- */
+  getPlayerHonours(id: string): Observable<any[]> {
+    // Generamos una clave única para guardar esto en memoria
+    const cacheKey = `goalstats_honours_${id}`;
+
+    // Comprobamos si ya lo tenemos guardado
+    const cached = this.getFromCache<any[]>(cacheKey, this.CACHE_TTL.STATIC);
+    if (cached){ 
+      return of(cached);
+    }
+
+    // Si no está en caché llamamos a la API 
+    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090/lookuphonours.php?id=${id}`;
+    
+    return this.http.get<any>(theSportsDbUrl).pipe(
+      this.getRetryStrategy(),
+      map((res: any) => res.honours || []), 
+
+      // Guardamos el resultado en caché
+      tap(data => {
+        // Solo guardamos si hemos encontrado algo para no cachear errores
+        if (Array.isArray(data) && data.length > 0) this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
+      }),
+      catchError(err => {
+        console.error('Error fetching honours:', err);
+        return of([]);
+      })
+    );
+  }
+
+  /* --- Obtener Equipos Anteriores / Historial de Traspasos --- */
+  getPlayerFormerTeams(playerId: string): Observable<any[]> {
+    // Generamos una clave única para guardar esto en memoria
+    const cacheKey = `goalstats_former_teams_${playerId}`;
+
+    // Comprobamos si ya lo tenemos guardado
+    const cached = this.getFromCache<any[]>(cacheKey, this.CACHE_TTL.STATIC);
+
+    if (cached) {
+      return of(cached);
+    }
+
+    // Si no está en caché llamamos a la API 
+    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090/lookupformerteams.php?id=${playerId}`;
+    
+    return this.http.get<any>(theSportsDbUrl).pipe(
+      this.getRetryStrategy(),
+      map((res: any) => res.formerteams || []), 
+
+      // Guardamos el resultado en caché
+      tap(data => {
+        // Solo guardamos si hemos encontrado algo para no cachear errores
+        if (Array.isArray(data) && data.length > 0) {
+          this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
+        } 
+      }),
+      catchError(err => {
+        console.error('Error fetching former teams:', err);
+        return of([]);
+      })
     );
   }
 }

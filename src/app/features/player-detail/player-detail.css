@@ -49,11 +49,33 @@
     z-index: 2;
 }
 
+/* --- TÍTULO Y FAVORITO --- */
+.title-and-fav {
+    display: flex;
+    align-items: center;
+    gap: 15px; 
+}
+
 .hero-info h1 {
     font-size: 3rem;
     font-weight: 800;
     margin: 10px 0;
     line-height: 1.1;
+}
+
+:host ::ng-deep .fav-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+:host ::ng-deep .p-button-secondary.p-button-outlined {
+    color: white !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+:host ::ng-deep .p-button-secondary.p-button-outlined:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: white !important;
 }
 
 .team-badge-mini {
@@ -152,28 +174,128 @@
     margin-top: 5px;
 }
 
+/* --- PALMARÉS --- */
+.honours-scroll {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.honours-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+.honours-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+.honours-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.honour-item {
+    min-width: 120px;
+    background: #fffdf5;
+    border: 1px solid #ffecb3;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.honour-title { 
+    font-size: 0.85rem; 
+    font-weight: bold; 
+    color: #555; 
+}
+
+/* --- HISTORIAL DE EQUIPOS --- */
+.former-teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.former-team-card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #f1f5f9;
+    transition: transform 0.2s;
+}
+
+.former-team-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.former-team-card img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.fteam-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.fteam-info strong {
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+
 /* --- BIOGRAFÍA --- */
 .bio-section {
     background: white;
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    line-height: 1.8;
-    color: #334155;
 }
 
-.bio-section h3 {
-    color: #1e293b;
-    border-bottom: 2px solid #f1f5f9;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
+.history-content {
+    position: relative;
 }
 
 .bio-text {
-    white-space: pre-line; 
-    text-align: justify;   
+    text-align: justify;       
+    line-height: 1.8;          
+    color: #4a4a4a;            
     font-size: 1rem;
-    color: #4b5563;
+    transition: all 0.3s ease;
+    white-space: pre-line;
+}
+
+.bio-text.truncated {
+    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+
+.btn-read-more {
+    background: none;
+    border: none;
+    color: var(--primary-color, #007ad9);
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 0 0 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.btn-read-more:hover {
+    color: #0056b3;
+    text-decoration: underline;
 }
 
 /* Diseño responsive */
@@ -191,5 +313,6 @@
     
     .main-stats, .social-links {
         justify-content: center; 
+        flex-wrap: wrap;
     }
 }

@@ -4,7 +4,7 @@
  */
 
 import { Injectable, inject } from '@angular/core';
-import { Firestore, doc, setDoc, getDoc, arrayUnion, arrayRemove, collection, getDocs, deleteDoc} from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, arrayUnion, arrayRemove, collection, getDocs, deleteDoc, updateDoc} from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -28,9 +28,7 @@ export class UserService {
   /* --- Obtenemos los equipos favoritos --- */
   async getFavoriteTeams(): Promise<string[]> {
     try {
-      const user = this.authService.currentUser;
-      if (!user) return []; // Si es un usuario sin cuenta, devolvemos array vacío
-
+      // Documento del usuario en Firestore
       const docRef = this.getUserDocRef();
       const docSnap = await getDoc(docRef);
 
@@ -51,25 +49,55 @@ export class UserService {
   async toggleFavorite(teamName: string, isCurrentlyFavorite: boolean): Promise<void> {
     try {
       const docRef = this.getUserDocRef();
-      const user = this.authService.currentUser;
 
+      // Si ya era favorito, lo eliminamos de la base de datos
+      // Eliminamos solo el equipo del array, no el documento completo
       if (isCurrentlyFavorite) {
-        // Si ya era favorito, lo eliminamos de la base de datos
-        // Eliminamos solo el equipo del array, no el documento completo
-        await setDoc(docRef, {
-          email: user?.email,
-          favoriteTeams: arrayRemove(teamName)
-        }, { merge: true }); // merge:true para no borrar otros campos del documento
-        
+        await updateDoc(docRef, { favoriteTeams: arrayRemove(teamName) });
       } else {
         // Si no era favorito, lo añadimos
-        await setDoc(docRef, {
-          email: user?.email,
-          favoriteTeams: arrayUnion(teamName)
-        }, { merge: true });
+        await updateDoc(docRef, { favoriteTeams: arrayUnion(teamName) });
       }
     } catch (error) {
-      console.error('Error al actualizar el favorito:', error);
+      console.error('Error al actualizar equipo favorito:', error);
+      throw error;
+    }
+  }
+
+  /* --- Obtener IDs de Jugadores Favoritos --- */
+  async getFavoritePlayers(): Promise<string[]> {
+    try {
+      // Documento del usuario en Firestore
+      const docRef = this.getUserDocRef();
+      const docSnap = await getDoc(docRef);
+
+      // Si el documento existe, devolvemos su array de favoritos. Si no, array vacío.
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        return data['favoritePlayers'] || [];
+      }
+      return [];
+    } catch (error) {
+      console.error("Error obteniendo jugadores favoritos:", error);
+      return [];
+    }
+  }
+
+  /* --- Añadir/Quitar Jugador Favorito --- */
+  async toggleFavoritePlayer(playerId: string, isCurrentlyFavorite: boolean): Promise<void> {
+    try {
+      const docRef = this.getUserDocRef();
+
+      // Si ya era favorito, lo eliminamos de la base de datos
+      // Eliminamos solo el jugador del array, no el documento completo
+      if (isCurrentlyFavorite) {
+        await updateDoc(docRef, { favoritePlayers: arrayRemove(playerId) });
+      } else {
+        // Si no era favorito, lo añadimos
+        await updateDoc(docRef, { favoritePlayers: arrayUnion(playerId) });
+      }
+    } catch (error) {
+      console.error("Error al actualizar jugador favorito:", error);
       throw error;
     }
   }
@@ -137,6 +165,7 @@ export class UserService {
         email: email,
         role: 'user', 
         favoriteTeams: [],
+        favoritePlayers: []
       });
     } catch (error) {
       console.error('Error al crear el documento base del usuario:', error);
