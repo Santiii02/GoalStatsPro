@@ -12,11 +12,12 @@ import { SportDbService } from '../../services/sportdb.service';
 import { AiService } from '../../services/ai.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ChartModule } from 'primeng/chart';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-match-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TabViewModule, TagModule, ProgressSpinnerModule, ChartModule],
+  imports: [CommonModule, RouterModule, ButtonModule, TabViewModule, TagModule, ProgressSpinnerModule, ChartModule, TooltipModule],
   templateUrl: './match-detail.html',
   styleUrl: './match-detail.css'
 })
@@ -41,6 +42,8 @@ export class MatchDetailComponent implements OnInit {
   startingLineups: any = null;
   substitutes: any = null;
   matchStats: any[] = [];
+  groupedMatchStats: { category: string, stats: any[] }[] = [];
+  matchSummary: any[] = []; 
 
   // Variables para la IA
   aiAnalysis: string | null = null;
@@ -153,7 +156,17 @@ export class MatchDetailComponent implements OnInit {
           if (data.stats && Array.isArray(data.stats)) {
             const globalStats = data.stats.find((s: any) => s && s.period === 'Match');
             this.matchStats = globalStats ? globalStats.stats : [];
+            this.groupStats();
             this.initRadarChart();
+          }
+
+          // Procesar Resumen (Eventos del partido)
+          if (data.summary) {
+            const rawEvents = data.summary.events || data.summary.incidents || data.summary;
+            const eventsArray = Array.isArray(rawEvents) ? rawEvents : [rawEvents];
+            
+            // Limpiamos y organizamos estos datos
+            this.processSummaryEvents(eventsArray);
           }
         }
         this.loadingDetails = false;   
@@ -364,11 +377,23 @@ export class MatchDetailComponent implements OnInit {
     return !notLiveStatuses.includes(status) && !status.includes(':');
   }
 
-  /* --- Cambia valores porcentuales por barras de progreso --- */
-  getStatPercent(value: string): number {
-    if (!value) return 0;
-    const numberPart = value.split('%')[0].split('(')[0]; 
-    return parseFloat(numberPart) || 0;
+/* --- Calcula el porcentaje proporcional de la barra entre los dos equipos --- */
+  getStatPercent(homeVal: string, awayVal: string, isHome: boolean): number {
+    // Extraemos el número limpio (quitando '%' o '(...)' )
+    const extractNum = (val: string) => {
+      if (!val) return 0;
+      const numStr = val.toString().split('%')[0].split('(')[0].trim();
+      return Math.abs(parseFloat(numStr)) || 0;
+    };
+
+    const home = extractNum(homeVal);
+    const away = extractNum(awayVal);
+    const total = home + away;
+
+    // Si ambos tienen 0 (ej: 0 tarjetas rojas), dejamos la barra a cero para que no haya errores
+    if (total === 0) return 0;
+
+    return isHome ? (home / total) * 100 : (away / total) * 100;
   }
 
   /* --- Mapeo de colores para las insignias V-E-D --- */
@@ -377,5 +402,188 @@ export class MatchDetailComponent implements OnInit {
     if (result === 'E') return 'form-draw';
     if (result === 'D') return 'form-loss';
     return '';
+  }
+
+  /* --- Diccionario de Estadísticas (Inglés -> Español) --- */
+  private statDictionary: Record<string, string> = {
+    'Expected goals (xG)': 'Goles esperados (xG)',
+    'xG on target (xGOT)': 'xG a puerta (xGOT)',
+    'Ball possession': 'Posesión',
+    'Total shots': 'Remates totales',
+    'Shots on target': 'Remates a puerta',
+    'Shots off target': 'Remates fuera',
+    'Blocked shots': 'Remates rechazados',
+    'Shots inside the box': 'Remates dentro del área',
+    'Shots outside the box': 'Remates fuera del área',
+    'Hit the woodwork': 'Al palo',
+    'Big chances': 'Grandes ocasiones',
+    'Corner kicks': 'Córneres',
+    'Touches in opposition box': 'Toques en el área rival',
+    'Accurate through passes': 'Pases entre líneas completados',
+    'Offsides': 'Fueras de juego',
+    'Free kicks': 'Tiros libres',
+    'Passes': 'Pases',
+    'Long passes': 'Pases largos',
+    'Passes in final third': 'Pases en el tercio final',
+    'Crosses': 'Centros',
+    'Expected assists (xA)': 'Asistencias esperadas (xA)',
+    'Throw ins': 'Saques de banda',
+    'Fouls': 'Faltas',
+    'Tackles': 'Entradas',
+    'Duels won': 'Duelos ganados',
+    'Clearances': 'Despejes',
+    'Interceptions': 'Intercepciones',
+    'Errors leading to shot': 'Errores conducentes a remate',
+    'Errors leading to goal': 'Errores conducentes a gol',
+    'Goalkeeper saves': 'Paradas',
+    'Yellow cards': 'Tarjetas amarillas',
+    'Red cards': 'Tarjetas rojas',
+    'xGOT faced': 'xGOT enfrentados',
+    'Goals prevented': 'Goles evitados'
+  };
+
+  /* --- Categorías de Estadísticas --- */
+  private statCategoriesKeys = [
+    { name: 'Estadísticas principales', keys: ['Expected goals (xG)', 'Ball possession', 'Total shots', 'Shots on target', 'Big chances', 'Corner kicks', 'Passes', 'Yellow cards', 'Red cards'] },
+    { name: 'Remates', keys: ['Expected goals (xG)', 'xG on target (xGOT)', 'Total shots', 'Shots on target', 'Shots off target', 'Blocked shots', 'Shots inside the box', 'Shots outside the box', 'Hit the woodwork'] },
+    { name: 'Ataque', keys: ['Big chances', 'Corner kicks', 'Touches in opposition box', 'Accurate through passes', 'Offsides', 'Free kicks'] },
+    { name: 'Pases', keys: ['Passes', 'Long passes', 'Passes in final third', 'Crosses', 'Expected assists (xA)', 'Throw ins'] },
+    { name: 'Defensa', keys: ['Fouls', 'Tackles', 'Duels won', 'Clearances', 'Interceptions', 'Errors leading to shot', 'Errors leading to goal'] },
+    { name: 'Portería', keys: ['Goalkeeper saves', 'xGOT faced', 'Goals prevented'] }
+  ];
+
+  /* --- Agrupa las estadísticas en bloques --- */
+  private groupStats(): void {
+    if (!this.matchStats || this.matchStats.length === 0) return;
+
+    this.groupedMatchStats = this.statCategoriesKeys.map(cat => {
+      return {
+        category: cat.name,
+        // Busca cada estadística de la categoría en los datos de la API. Descartamos los "undefined" (si la API no manda ese dato).
+        stats: cat.keys.map(key => this.matchStats.find(s => s.statName === key)).filter(s => s !== undefined)
+      };
+    }).filter(cat => cat.stats.length > 0);
+  }
+
+  /* --- Función Traductora --- */
+  translateStat(statName: string): string {
+    if (!statName) return '';
+    return this.statDictionary[statName] || statName;
+  }
+
+  /* --- Diccionario de Explicaciones para estadísitcas --- */
+  private statExplanations: Record<string, string> = {
+    'Expected goals (xG)': 'Mide la calidad de una ocasión calculando la probabilidad de que un tiro termine en gol (basado en distancia, ángulo y tipo de pase).',
+    'xG on target (xGOT)': 'Mide la calidad del tiro una vez que va a puerta, valorando si el disparo va a la escuadra o al centro para el portero.',
+    'Expected assists (xA)': 'Mide la probabilidad de que un pase específico se convierta en una asistencia de gol.',
+    'xGOT faced': 'La suma total de la calidad de los tiros a puerta (xGOT) a los que se ha enfrentado el portero.',
+    'Goals prevented': 'Goles que ha salvado el portero. Se calcula restando los goles reales encajados al xGOT en contra. Un valor positivo es un rendimiento sobresaliente.',
+    'Big chances': 'Una situación clara donde se espera razonablemente que el jugador marque (ej. un mano a mano o un remate muy cerca de la portería).'
+  };
+
+  /* --- Función para obtener la explicación --- */
+  getStatExplanation(statName: string): string | undefined {
+    if (!statName) return undefined;
+    return this.statExplanations[statName] || undefined;
+  }
+
+  /* --- Función auxiliar para comprobar de quién es el evento --- */
+  isHomeEvent(event: any): boolean {
+    // Si la API tiene un campo team o participantTeam que coincida con el local
+    return event.incidentParticipant === 1 || event.participantTeam === 'home' || event.team === 'home'; 
+  }
+
+/* --- Procesa la lista plana de eventos de la API y la agrupa por partes --- */
+  private processSummaryEvents(rawEvents: any[]): void {
+    const firstHalf: any[] = [];
+    const secondHalf: any[] = [];
+
+    rawEvents.forEach(ev => {
+      // Extraer minuto del evento
+      const rawTime = String(ev.time || ev.incidentTime || '-');
+      const time = rawTime.replace(/'/g, '').replace(/"/g, '');
+
+      // Extraer Nombres y detectar si es Cambio
+      let mainName = '';
+      let subName = '';
+      let isSub = false;
+
+      if (Array.isArray(ev.incidentPlayerName)) {
+        isSub = true;
+        subName = ev.incidentPlayerName[0] || '';   // Sale (Texto gris)
+        mainName = ev.incidentPlayerName[1] || '';  // Entra (Negrita)
+      } else {
+        mainName = ev.incidentPlayerName || ev.playerName || '';
+      }
+
+      // Extraer el tipo de evento
+      let typeRaw = String(ev.incidentType || ev.type || ev.incidentClass || '').toLowerCase();
+      let comment = String(ev.incidentCommentary || '').toLowerCase();
+
+      let finalType = '';
+      if (typeRaw.includes('goal') || comment.includes('goal')) finalType = 'goal';
+      else if (typeRaw.includes('yellow') || comment.includes('yellow')) finalType = 'yellow';
+      else if (typeRaw.includes('red') || comment.includes('red')) finalType = 'red';
+      else if (typeRaw.includes('sub') || comment.includes('substitut') || isSub) finalType = 'sub';
+      else finalType = typeRaw;
+
+      // Detectar si el evento es para el equipo local o visitante si la API no lo especifica
+      let isHome = true;
+      if (ev.incidentParticipant !== undefined) {
+          isHome = (ev.incidentParticipant == 1);
+      } else if (ev.participant !== undefined) {
+          isHome = (ev.participant == 1);
+      } else if (ev.participantTeam) {
+          isHome = (ev.participantTeam === 'home' || ev.participantTeam == 1);
+      } else if (mainName) {
+          // Buscamos su nombre en la alineación visitante
+          const searchName = mainName.toLowerCase().split(' ')[0]; 
+          const awayLineup = this.startingLineups?.away || [];
+          const awaySubs = this.substitutes?.away || [];
+          
+          const isAwayPlayer = [...awayLineup, ...awaySubs].some((p: any) =>
+              String(p.participantName).toLowerCase().includes(searchName)
+          );
+          if (isAwayPlayer) isHome = false;
+      }
+
+      let reason = ev.incidentReason || ev.detail || '';
+
+      // Penalti y Gol en Propia Puerta
+      if (finalType === 'goal') {
+          // Si el jugador y la asistencia son el mismo, es un penalti
+          if (mainName && mainName === subName) {
+              subName = '';
+              if (!reason) reason = 'Penalti';
+          } 
+          // Por si la API manda el texto en los comentarios
+          else if (comment.includes('penalty') || comment.includes('penalti')) {
+              if (!reason) reason = 'Penalti';
+          }
+          // Goles en Propia Puerta (Own Goal)
+          else if (comment.includes('own goal') || comment.includes('propia')) {
+              if (!reason) reason = 'P.P.';
+          }
+      }
+
+      // Información normalizada del evento para mostrar en la UI
+      const normalizedEvent = {
+        time: time,
+        type: finalType,
+        mainName: mainName,
+        subName: subName,
+        homeScore: ev.homeScore,
+        awayScore: ev.awayScore,
+        isHome: isHome,
+        reason: reason
+      };
+
+      if (ev.incidentHalf == 1 || ev.incidentHalf === '1') firstHalf.push(normalizedEvent);
+      else secondHalf.push(normalizedEvent);
+    });
+
+    this.matchSummary = [];
+    if (firstHalf.length > 0) this.matchSummary.push({ stageName: '1ER TIEMPO', events: firstHalf });
+    if (secondHalf.length > 0) this.matchSummary.push({ stageName: '2º TIEMPO', events: secondHalf });
   }
 }

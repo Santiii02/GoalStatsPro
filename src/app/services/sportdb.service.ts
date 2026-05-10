@@ -74,7 +74,22 @@ export class SportDbService {
       data: data,
       expiry: Date.now() + ttl
     };
-    localStorage.setItem(key, JSON.stringify(entry));
+    try {
+      // Intentamos guardar los datos normales
+      localStorage.setItem(key, JSON.stringify(entry));
+    } catch (e) {
+      // Si QuotaExceededError
+      console.warn('⚠️ Memoria caché llena. Vaciando datos antiguos...');
+      
+      try {
+        // Borramos toda la caché para hacer hueco
+        localStorage.clear();
+        // Intentamos guardarlo de nuevo en la memoria limpia
+        localStorage.setItem(key, JSON.stringify(entry));
+      } catch (e2) {
+        console.error('No se pudo guardar en caché. Archivo demasiado grande.', e2);
+      }
+    }  
   }
 
   /*
@@ -397,29 +412,27 @@ export class SportDbService {
     // Si no está en caché llamamos a la API 
     const urlLineups = `${this.baseUrl}/api/flashscore/match/${cleanId}/lineups`;
     const urlStats   = `${this.baseUrl}/api/flashscore/match/${cleanId}/stats`;
+    const urlSummary = `${this.baseUrl}/api/flashscore/match/${cleanId}/details?with_events=true`;
 
     // Ejecución paralela
     return forkJoin({
       // Usamos catchError individual y retry strategy, si falla uno y no falla el otro que no falle toda la carga
-      lineups: this.http.get<any>(urlLineups, { headers: this.getHeaders() })
-        .pipe(
-          this.getRetryStrategy(), 
-          catchError(() => of(null))
-        ),
-        
-      stats: this.http.get<any>(urlStats, { headers: this.getHeaders() })
-        .pipe(this.getRetryStrategy(), catchError(() => of(null)))
+      lineups: this.http.get<any>(urlLineups, { headers: this.getHeaders() }).pipe(this.getRetryStrategy(), catchError(() => of(null))),
+      stats: this.http.get<any>(urlStats, { headers: this.getHeaders() }).pipe(this.getRetryStrategy(), catchError(() => of(null))),
+      summary: this.http.get<any>(urlSummary, { headers: this.getHeaders() }).pipe(this.getRetryStrategy(), catchError(() => of(null)))
     }).pipe(
       map((results: any) => {
         const lineupsData = results.lineups?.data || results.lineups || null;
         const statsData   = results.stats?.data   || results.stats   || null;
-
+        const summaryData = results.summary?.data?.events || results.summary?.events || results.summary?.data || results.summary || null;
+        
         // Si ambos endpoints fallan o están vacíos, devolvemos null
         if (!lineupsData && !statsData) return null;
 
         return {
           lineups: lineupsData,
-          stats: statsData
+          stats: statsData,
+          summary: summaryData
         };
       }),
 

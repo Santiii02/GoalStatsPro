@@ -363,26 +363,213 @@
 .form-draw { background-color: #94a3b8; } 
 .form-loss { background-color: #ef4444; } 
 
-/* Diseño responsive */
+/* --- ICONO DE INFORMACIÓN --- */
+.stat-info-icon {
+    font-size: 0.8rem;
+    color: #94a3b8; 
+    cursor: help;   
+    transition: color 0.2s;
+}
+
+.stat-info-icon:hover {
+    color: var(--primary-color, #3b82f6); 
+}
+
+/* --- PESTAÑA RESUMEN DEL PARTIDO --- */
+.summary-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding-bottom: 20px;
+}
+
+.stage-header {
+    background: #0f172a;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.timeline-axis {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px 0;
+}
+
+.timeline-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: #e2e8f0;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+.timeline-row {
+    display: flex;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    min-height: 30px;
+    align-items: center;
+}
+
+/* Mitades (Local 50% y Visitante 50%) */
+.t-half {
+    width: 50%;
+    display: flex;
+    align-items: center;
+}
+
+.t-home {
+    justify-content: flex-end;
+    padding-right: 45px; 
+    text-align: right;
+}
+
+.t-away {
+    justify-content: flex-start;
+    padding-left: 45px;
+    text-align: left;
+}
+
+.t-center {
+    width: 0%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 3;
+}
+
+.e-time {
+    position: absolute;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: #1e293b;
+    white-space: nowrap;
+}
+
+.time-left { right: 18px; }
+.time-right { left: 18px; }
+
+.e-icon-box {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: white;
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+    z-index: 3;
+}
+
+/* --- CLASES ESPECÍFICAS DE ICONOS Y TARJETAS --- */
+.card-yellow { 
+    width: 12px; 
+    height: 16px; 
+    background-color: #facc15; 
+    border-radius: 2px; 
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.3); 
+}
+
+.card-red { 
+    width: 12px; 
+    height: 16px; 
+    background-color: #ef4444; 
+    border-radius: 2px; 
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.3); 
+}
+
+.icon-goal { font-size: 1.1rem; color: #1e293b; }
+.icon-sub { font-size: 1.1rem; color: #10b981; }
+.pi-times-circle { font-size: 1.1rem; color: #ef4444; }
+
+/* --- CONTENIDO DEL EVENTO (Nombre, Marcador) --- */
+.e-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap; 
+    white-space: nowrap; 
+}
+
+.flex-row { flex-direction: row; }
+.flex-row-reverse { flex-direction: row-reverse; text-align: right; }
+
+.e-score {
+    background: #0f172a;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    min-width: 48px; 
+    text-align: center;
+    flex-shrink: 0; 
+}
+
+.e-main { color: #1e293b; font-size: 0.95rem; }
+.e-sub, .e-reason { font-size: 0.85rem; }
+
+/* Bloque de Sustituciones */
+.sub-block {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.sub-in {
+    color: #10b981; 
+    font-weight: 800;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sub-out {
+    color: #64748b; 
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sub-in i, .sub-out i {
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* --- DISEÑO RESPONSIVE --- */
 @media (max-width: 768px) {
     .match-hero {
         padding: 15px 5px; 
         gap: 0; 
     }
     
-    /* Hacemos que los escudos sean más pequeños */
     .team-badge-lg {
-        width: 45px; /* De 50 a 45 */
+        width: 45px; 
         height: 45px;
     }
     
-    /* Letra más pequeña */
     .team-name {
         font-size: 0.8rem;
         word-break: break-word;
     }
 
-    /* Flexibilidad al marcador central */
     .score-board {
         flex: 0 1 auto;
         min-width: 70px;
@@ -403,6 +590,7 @@
         flex-wrap: wrap;
         gap: 4px;
     }
+    
     .form-badge {
         width: 20px; 
         height: 20px;
@@ -417,4 +605,28 @@
 
     .stat-val { width: 15%; font-size: 0.9rem; }
     .stat-label { width: 70%; font-size: 0.65rem; }
+
+    /* Timeline de eventos */
+    .t-home { padding-right: 30px; }
+    .t-away { padding-left: 30px; }
+    
+    .time-left { right: 8px; font-size: 0.75rem; }
+    .time-right { left: 8px; font-size: 0.75rem; }
+    
+    .e-content { 
+        white-space: normal; 
+        line-height: 1.2;
+    }
+    
+    .e-main { font-size: 0.8rem; white-space: normal; }
+    .e-sub, .e-reason { font-size: 0.7rem; white-space: normal; }
+    
+    .e-score { 
+        padding: 2px 5px; 
+        font-size: 0.75rem; 
+        min-width: 40px; 
+    }
+
+    .sub-in { font-size: 0.8rem; }
+    .sub-out { font-size: 0.75rem; }
 }
