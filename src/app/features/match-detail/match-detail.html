@@ -147,8 +147,20 @@
                     </div>
                 </p-tabPanel>
 
-                <p-tabPanel header="Resumen" *ngIf="matchSummary.length > 0">
+                <p-tabPanel [header]="isLive(match.status) ? '🔴 En vivo' : 'Resumen'" *ngIf="isLive(match.status) || matchSummary.length > 0">
                     <div class="summary-container mt-3">
+                        
+                        <div class="text-end mb-4" *ngIf="isLive(match.status)">
+                            <p-button icon="pi pi-sync" label="Actualizar minuto a minuto" 
+                                    styleClass="p-button-sm p-button-danger p-button-outlined p-button-rounded" 
+                                    (onClick)="refreshLiveEvents()">
+                            </p-button>
+                        </div>
+
+                        <div *ngIf="matchSummary.length === 0" class="text-center p-5 text-muted fade-in">
+                            <i class="pi pi-clock mb-3" style="font-size: 2rem; opacity: 0.5;"></i>
+                            <p>El partido está en juego pero aún no se han registrado eventos (goles, tarjetas o cambios).</p>
+                        </div>
                         
                         <div *ngFor="let stage of matchSummary" class="match-stage mb-5">
                             <div class="stage-header">

@@ -52,53 +52,52 @@
     </div>
   </div>
 
-  <div class="search-container" style="text-align: center; margin: 30px 0;">
+  <!-- Buscador -->
+  <div class="search-section mt-4 mb-5 p-3 md:p-4 rounded bg-white shadow-sm fade-in">
+    <h3 class="mb-2" style="color: var(--primary-color); display: flex; align-items: center; gap: 8px; font-size: 1.2rem;">
+      <i class="pi pi-search text-primary"></i> Buscador
+    </h3>
+    <p class="text-muted mb-3" style="font-size: 0.85rem;">Encuentra rápidamente jugadores o equipos.</p>
+    
+    <div class="search-box-wrapper p-input-icon-left w-full">
+      <i class="pi pi-search search-icon"></i>
+      
+      <p-autoComplete 
+        [(ngModel)]="selectedItem" 
+        [suggestions]="filteredItems" 
+        (completeMethod)="search($event)" 
+        (onSelect)="onSelect($event)"
+        field="strTeam" 
+        placeholder="Ej: Real Madrid, Messi, Betis..."
+        [forceSelection]="true"
+        styleClass="w-full" 
+        inputStyleClass="w-full search-input-custom">
 
-    <!-- Buscar equipo -->
-    <span class="p-input-icon-left">
-      <i class="pi pi-search"></i>
-      <input type="text" 
-            pInputText 
-            [(ngModel)]="searchQuery" 
-            (keyup.enter)="searchTeam()"
-            placeholder="Buscar equipo (ej: Barcelona)..." 
-            style="width: 100%; max-width: 300px" />
-    </span>
+        <ng-template let-item pTemplate="item">
+          <div class="suggestion-item flex align-items-center gap-3 py-1">
+            <div class="suggestion-img-wrapper">
+                <img [src]="item.type === 'team' ? (item.strTeamBadge || item.strBadge) : (item.strThumb || item.strCutout)" 
+                    onerror="this.src='assets/images/Logo.png'" alt="logo" />
+            </div>
+            <div class="flex flex-column text-left">
+              <span class="font-bold suggestion-name" style="font-size: 0.95rem;">
+                  {{ item.type === 'team' ? item.strTeam : item.strPlayer }}
+              </span>
+              <span class="suggestion-type" [ngClass]="item.type">
+                  {{ item.type === 'team' ? 'Equipo' : 'Jugador' }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
 
-    <p-button
-            label="Buscar"
-            icon="pi pi-search"
-            (click)="searchTeam()"
-            styleClass="ml-2"
-            [loading]="isSearching">
-    </p-button>
-
-  </div>
-
-  <div *ngIf="foundTeams.length > 0" style="margin-bottom: 30px;">
-    <h3>Resultados:</h3>
-    <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-
-      <div *ngFor="let team of foundTeams"
-          (click)="goToTeamDetail(team)"
-          class="team-result-card fade-in"> 
-
-          <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
-            width="80"
-            alt="Escudo"
-            onerror="this.src='assets/images/Logo.png'">
-
-        <p style="font-weight: bold; margin-top: 10px;">{{ team.strTeam }}</p>
-        <small class="text-muted">{{ team.strLeague }}</small>
-      </div>
-
+      </p-autoComplete>
     </div>
   </div>
 
   <!-- Partidos En Vivo -->
   <section class="mt-4 dashboard-section">
     <div class="section-header">
-      <h3>🔴 En Vivo</h3>
+      <h3>🔴 Próximos Partidos</h3>
       <small class="text-muted badge-filter">{{ filterMessage }}</small>
     </div>
 

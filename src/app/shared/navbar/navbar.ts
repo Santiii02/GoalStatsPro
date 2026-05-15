@@ -9,6 +9,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
 import { SportDbService } from '../../services/sportdb.service';
 import { forkJoin } from 'rxjs';
+import { getFlashscoreName } from '../../models/team-mapper';
 
 @Component({
   selector: 'app-navbar',
@@ -54,11 +55,17 @@ export class NavbarComponent {
     const item = event.value;
     
     if (item.type === 'team') {
-      this.router.navigate(['/team', item.strTeam]);
+      // Normalizamos el nombre del equipo
+      const flashscoreName = getFlashscoreName(item.strTeam);
+      this.router.navigate(['/team', flashscoreName]);
     } else if (item.type === 'player') {
       this.router.navigate(['/player', item.idPlayer]);
     }
     
-    this.selectedItem = null; // Limpiamos el input
+    // Limpiamos el input
+    setTimeout(() => {
+      this.selectedItem = null; 
+      this.filteredItems = [];  
+    }, 10);
   }
 }

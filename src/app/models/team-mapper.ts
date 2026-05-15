@@ -6,10 +6,9 @@
 
 export const TEAM_NAME_MAPPER: Record<string, string> = {
   'Betis': 'Real Betis',
-  'Celta': 'Celta Vigo',
-  'Rayo': 'Rayo Vallecano',
-  'Alavés': 'Deportivo Alavés',
-  'Atl. Madrid': 'Atletico Madrid',
+  'Celta': 'Celta de Vigo',
+  'Alaves': 'Deportivo Alavés',
+  'Atl. Madrid': 'Atlético Madrid',
   'Ath Bilbao': 'Athletic Bilbao',
   'Oviedo': 'Real Oviedo',
 

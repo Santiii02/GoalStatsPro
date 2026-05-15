@@ -2,7 +2,7 @@
  *  INFORMACIÓN DETALLADA DEL PARTIDO.
  */
 
-import { Component, Input, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -13,6 +13,7 @@ import { AiService } from '../../services/ai.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ChartModule } from 'primeng/chart';
 import { TooltipModule } from 'primeng/tooltip';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-match-detail',
@@ -21,7 +22,7 @@ import { TooltipModule } from 'primeng/tooltip';
   templateUrl: './match-detail.html',
   styleUrl: './match-detail.css'
 })
-export class MatchDetailComponent implements OnInit {
+export class MatchDetailComponent implements OnInit, OnDestroy {
 
   // ID del partido recibido por URL
   @Input() id!: string;
@@ -58,6 +59,9 @@ export class MatchDetailComponent implements OnInit {
   homeForm: string[] = [];
   awayForm: string[] = [];
 
+  // Variable para el motor de tiempo real
+  private pollingInterval: any = null;
+
   ngOnInit(): void {
     // Intentar recuperar datos (equipos, marcador)
     const stateData = history.state?.data;
@@ -81,35 +85,35 @@ export class MatchDetailComponent implements OnInit {
     }
   }
 
+  // Cuando el usuario abandona la página, detenemos el motor de tiempo real
+  ngOnDestroy(): void {
+    this.stopPolling();
+  }
+
   /* --- Iniciar la vista con los datos disponibles --- */
   private initMatchData(data: any): void {
     this.match = this.normalizeBasicData(data);
-    // Una vez tenemos lo básico, pedimos los detalles extra
     this.loading = false;
     this.loadMatchDetails();
     this.upgradeImages();  
     this.loadTeamForms();
+
+    // Arrancamos el motor si el partido está en vivo o si faltan menos de 5 min para empezar
+    let startsSoon = false;
+    if (this.match.matchDate) {
+      const diffMins = (this.match.matchDate.getTime() - new Date().getTime()) / 60000;
+      startsSoon = diffMins >= -5 && diffMins <= 5;
+    }
+
+    if (this.isLive(this.match.status) || (this.match.status === 'Programado' && startsSoon)) {
+      this.startPolling();
+    }
   }
 
   /* --- Normaliza los datos --- */
   private normalizeBasicData(basic: any): any {
-
-    let currentStatus = basic.status || basic.eventStatus;
-
-    if (!currentStatus) {
-      currentStatus = (basic.homeScore !== undefined && basic.homeScore !== null) ? 'Finalizado' : 'Programado';
-    } else {
-      // Diccionario de traducción estado partido
-      if (currentStatus === 'FT' || currentStatus === 'Finished') currentStatus = 'Finalizado';
-      else if (currentStatus === 'Scheduled') currentStatus = 'Programado';
-      else if (currentStatus === 'AET') currentStatus = 'Final tras Prórroga';
-      else if (currentStatus === 'PEN') currentStatus = 'Final tras Penaltis';
-      else if (currentStatus === 'Postponed') currentStatus = 'Aplazado';
-      else if (currentStatus === 'Cancelled' || currentStatus === 'Canceled') currentStatus = 'Cancelado';
-    }
-
-    const realLeague = basic.tournamentName || basic.league || 'Competición Oficial';
-
+    
+    // Parseamos la fecha
     let matchDate: Date | undefined;
     if (basic.processedDate) {
       matchDate = new Date(basic.processedDate); 
@@ -119,6 +123,43 @@ export class MatchDetailComponent implements OnInit {
       matchDate = new Date(basic.startDateTimeUtc); 
     }
 
+    // Leemos lo que manda la API textualmente
+    let rawStatus = String(basic.status || basic.eventStatus || '').toUpperCase();
+    let currentStatus = 'Programado';
+
+    // Listas de estados
+    const finalStatuses = ['FT', 'FINISHED', 'FULL TIME', 'MATCH FINISHED', 'AET', 'PEN'];
+    const halfTimeStatuses = ['HT', 'HALF TIME', 'HALF-TIME', 'HALFTIME'];
+    const postponedStatuses = ['POSTPONED', 'PST', 'ABD', 'CANCELLED', 'CANCELED', 'CANC'];
+
+    if (finalStatuses.includes(rawStatus)) {
+      currentStatus = 'Finalizado'; 
+    } else if (halfTimeStatuses.includes(rawStatus)) {
+      currentStatus = 'Descanso';
+    } else if (postponedStatuses.includes(rawStatus)) {
+      currentStatus = 'Aplazado';
+    } else if (rawStatus && !['UNDEFINED', 'NULL', 'NS', 'SCHEDULED', 'NOT STARTED'].includes(rawStatus)) {
+      currentStatus = 'En vivo';
+    } else {
+      // Si la API no dice nada útil, usamos el reloj para empezar el partido a la hora prevista
+      if (matchDate) {
+        const diffMins = Math.floor((new Date().getTime() - matchDate.getTime()) / 60000);
+        
+        // Si es la hora, lo pasamos a En vivo automáticamente.
+        // No adivinamos el descanso ni el final para respetar los descuentos reales.
+        if (diffMins >= 0 && diffMins < 180) {
+          currentStatus = 'En vivo';
+        } else if (diffMins >= 180 && basic.homeScore !== undefined) {
+          // Si han pasado 3 horas, hay resultado, y la API no ha actualizado el estado, finalizamos
+          currentStatus = 'Finalizado';
+        } else {
+          currentStatus = 'Programado';
+        }
+      }
+    }
+
+    const realLeague = basic.tournamentName || basic.league || 'Competición Oficial';
+    
     return {
       homeTeam: basic.homeName || basic.homeTeam,
       awayTeam: basic.awayName || basic.awayTeam,
@@ -139,6 +180,11 @@ export class MatchDetailComponent implements OnInit {
   private loadMatchDetails(): void {
     this.loadingDetails = true;
     this.cdr.detectChanges();
+
+    // Si el partido está en vivo, forzamos a la API a darnos datos frescos eliminando el cache local
+    if (this.isLive(this.match?.status)) {
+      localStorage.removeItem('goalstats_match_details_' + this.id);
+    }
 
     this.sportService.getMatchDetails(this.id).subscribe({
       next: (data) => {
@@ -164,7 +210,7 @@ export class MatchDetailComponent implements OnInit {
           if (data.summary) {
             const rawEvents = data.summary.events || data.summary.incidents || data.summary;
             const eventsArray = Array.isArray(rawEvents) ? rawEvents : [rawEvents];
-            
+
             // Limpiamos y organizamos estos datos
             this.processSummaryEvents(eventsArray);
           }
@@ -368,13 +414,70 @@ export class MatchDetailComponent implements OnInit {
   /* --- Comprueba si el partido está en juego --- */
   isLive(status: string): boolean {
     if (!status) return false;
-    const notLiveStatuses = [
-      'Finalizado', 'Final tras Prórroga', 'Final tras Penaltis', 
-      'Programado', 'Aplazado', 'Cancelado', 
-      'FT', 'Finished', 'AET', 'PEN', 'Scheduled'
-    ];
+    return status === 'En vivo' || status === 'Descanso';
+  }
 
-    return !notLiveStatuses.includes(status) && !status.includes(':');
+/* --- MOTOR DE TIEMPO REAL (Polling) --- */
+  private startPolling(): void {
+    if (this.pollingInterval) return;
+
+    // Refresca cada 120 segundos
+    this.pollingInterval = setInterval(() => {
+      this.refreshLiveEvents();
+    }, 120000);
+  }
+
+  private stopPolling(): void {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
+    }
+  }
+
+  /* --- Recargar eventos en vivo--- */
+  refreshLiveEvents(): void {
+    localStorage.removeItem('goalstats_live');
+    localStorage.removeItem('goalstats_match_details_' + this.id);
+
+    // Actualizamos solo los datos que pueden cambiar en vivo (marcador, eventos y estadísticas)
+    forkJoin({
+      basic: this.sportService.getMatchBasicInfo(this.id),
+      details: this.sportService.getMatchDetails(this.id)
+    }).subscribe({
+      next: (res) => {
+        
+        if (res.basic) {
+          const freshBasic = this.normalizeBasicData(res.basic);
+          this.match.status = freshBasic.status;
+          this.match.gameTime = freshBasic.gameTime;
+          this.match.homeScore = freshBasic.homeScore;
+          this.match.awayScore = freshBasic.awayScore;
+
+          if (freshBasic.status === 'Finalizado') {
+            this.stopPolling();
+          }
+        }
+
+        if (res.details) {
+          const data = res.details;
+
+          if (data.summary) {
+            const rawEvents = data.summary.events || data.summary.incidents || data.summary;
+            const eventsArray = Array.isArray(rawEvents) ? rawEvents : [rawEvents];
+            this.processSummaryEvents(eventsArray);
+          }
+          
+          if (data.stats && Array.isArray(data.stats)) {
+            const globalStats = data.stats.find((s: any) => s && s.period === 'Match');
+            this.matchStats = globalStats ? globalStats.stats : [];
+            this.groupStats();
+            this.initRadarChart();
+          }
+        }
+        
+        this.cdr.detectChanges();
+      }
+    });
   }
 
 /* --- Calcula el porcentaje proporcional de la barra entre los dos equipos --- */
