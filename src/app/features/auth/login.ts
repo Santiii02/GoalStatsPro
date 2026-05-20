@@ -12,7 +12,6 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { AuthService } from '../../services/auth.service';
-import { UserService } from '../../services/user.service';
 
 @Component({
     selector: 'app-login',
@@ -24,7 +23,6 @@ import { UserService } from '../../services/user.service';
 export class LoginComponent {
     // Inyección de dependencias
     private authService = inject(AuthService);
-    private userService = inject(UserService);
     private router = inject(Router);
     private cdr = inject(ChangeDetectorRef);
 
@@ -61,14 +59,7 @@ export class LoginComponent {
                 await this.authService.login(this.email, this.password);
             } else {
                 // Modo Registro
-                const userCredential = await this.authService.register(this.email, this.password);
-                
-                // Extraemos los datos del usuario recién creado
-                const uid = userCredential.user.uid;
-                const email = userCredential.user.email;
-
-                // Le creamos su carpeta en Firestore para que el Admin pueda verlo aunque no tenga favoritos aún
-                await this.userService.createInitialUserDocument(uid, email);
+                await this.authService.register(this.email, this.password);
             }
 
             // Si todo va bien, redirigimos al inicio
@@ -76,7 +67,8 @@ export class LoginComponent {
 
         } catch (error: any) {
             // Capturamos y traducimos el error para el usuario
-            this.handleFirebaseError(error.code);
+            const errorCode = error.code || error.message;
+            this.handleFirebaseError(errorCode);
         } finally {
             this.isLoading = false;
             this.cdr.detectChanges();
@@ -86,6 +78,9 @@ export class LoginComponent {
     /* --- Traductor de Errores de Firebase --- */
     private handleFirebaseError(code: string): void {
         switch (code) {
+            case 'admin_deleted':
+                this.errorMessage = 'Tu cuenta ha sido eliminada por un administrador del sistema.';
+                break;
             case 'auth/invalid-credential':
             case 'auth/user-not-found':
             case 'auth/wrong-password':

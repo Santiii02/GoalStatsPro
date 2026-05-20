@@ -398,6 +398,43 @@
 .suggestion-type.team { color: #3b82f6; }
 .suggestion-type.player { color: #10b981; }
 
+/* --- COLORES CLASIFICACIÓN EN LA TABLA --- */
+.rank-badge {
+  display: inline-block;
+  font-weight: bold;
+  color: #7f8c8d;
+  background: #f5f5f5;
+  padding: 4px 10px;
+  border-radius: 6px;
+  min-width: 32px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+/* Puestos de Champions (Top 4) */
+.rank-badge.top-rank {
+  background: #e3f2fd;
+  color: #1565c0; 
+  border: 1px solid #bbdefb;
+}
+
+/* Puestos de Descenso (Puesto > 17) */
+.rank-badge.relegation-rank {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+/* Cursor pointer para ir al detalle desde la tabla */
+.team-row.clickable {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.team-row.clickable:hover {
+  opacity: 0.7;
+}
+
 /* Diseño responsive */
 @media (max-width: 768px) {
   /* Ajuste del buscador y su botón */

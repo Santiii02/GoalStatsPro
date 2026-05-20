@@ -3,7 +3,7 @@ export const environment = {
 
   apiBaseUrl: '', //usamos proxy.conf.json para evitar errores CORS
   apiKey: 'SPe8I2ZQPzhIWkoGOKcq9gPjJcdEamywT7uUnw69',
-  geminiApiKey: 'AIzaSyAk0k_J-S2oTiq1fWsa_W7KPphAQBQsRr0',
+  geminiApiKey: 'AIzaSyBPm7eP1Yg4s4hLCEoP-tVUmITsuRltVHU',
 
   firebaseConfig: {
     apiKey: "AIzaSyBxgE9Bxrodp9tsOsds-afKw6jMcb11lSo",

@@ -77,7 +77,16 @@ export class PlayerDetailComponent implements OnInit {
   /* --- Carga de Palmarés y Traspasos --- */
   private loadHonours(id: string): void {
     this.sportService.getPlayerHonours(id).subscribe(data => {
-      this.honours = data;
+      if (data && Array.isArray(data)) {
+        // Ordenar por temporada de más reciente a más antigua
+        this.honours = data.sort((a, b) => {
+          const yearA = parseInt(a.strSeason) || 0;
+          const yearB = parseInt(b.strSeason) || 0;
+          return yearB - yearA;
+        });
+      } else {
+        this.honours = [];
+      }
       this.cdr.detectChanges();
     });
   }
@@ -85,7 +94,16 @@ export class PlayerDetailComponent implements OnInit {
   /* --- Carga de Equipos Anteriores / Historial de Traspasos --- */
   private loadFormerTeams(id: string): void {
     this.sportService.getPlayerFormerTeams(id).subscribe(data => {
-      this.formerTeams = data;
+      if (data && Array.isArray(data)) {
+        // Ordenar por año de salida o de ingreso de más reciente a más antiguo
+        this.formerTeams = data.sort((a, b) => {
+          const yearA = parseInt(a.strDeparted || a.strJoined) || 0;
+          const yearB = parseInt(b.strDeparted || b.strJoined) || 0;
+          return yearB - yearA;
+        });
+      } else {
+        this.formerTeams = [];
+      }
       this.cdr.detectChanges();
 
       // Buscamos los escudos de los equipos anteriores si no vienen en la API

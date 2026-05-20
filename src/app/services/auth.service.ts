@@ -4,6 +4,7 @@
 
 import { Injectable, inject } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, authState, User } from '@angular/fire/auth';
+import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -12,6 +13,7 @@ import { Observable } from 'rxjs';
 export class AuthService {
   // Inyectamos el servicio Auth de Firebase
   private auth = inject(Auth);
+  private firestore = inject(Firestore);
 
   // Observable que nos dirá en tiempo real si el usuario está conectado o no
   public readonly user$: Observable<User | null> = authState(this.auth);
@@ -19,13 +21,36 @@ export class AuthService {
   constructor() {}
 
   /* --- REGISTRAR UN NUEVO USUARIO --- */
-  register(email: string, password: string): Promise<any> {
-    return createUserWithEmailAndPassword(this.auth, email, password);
+  async register(email: string, password: string): Promise<any> {
+    const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+
+    // Después de crear el usuario, creamos su documento en Firestore con datos iniciales
+    const userDocRef = doc(this.firestore, `users/${userCredential.user.uid}`);
+    await setDoc(userDocRef, {
+      email: email,
+      role: 'user',
+      favoriteTeams: [],
+      favoritePlayers: []
+    });
+
+    return userCredential;
   }
 
-  /* --- INICIAR SESIÓN --- */
-  login(email: string, password: string): Promise<any> {
-    return signInWithEmailAndPassword(this.auth, email, password);
+  /* --- INICIAR SESIÓN Y VERIFICAR BORRADO --- */
+  async login(email: string, password: string): Promise<any> {
+    const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+
+    // Comprobamos si el admin ha borrado el documento del usuario en Firestore
+    const userDocRef = doc(this.firestore, `users/${userCredential.user.uid}`);
+    const docSnap = await getDoc(userDocRef);
+
+    if (!docSnap.exists()) {
+      // Forzamos el cierre de sesión inmediatamente y bloqueamos el acceso
+      await this.logout();
+      throw new Error('admin_deleted');
+    }
+    
+    return userCredential;
   }
 
   /* --- CERRAR SESIÓN --- */

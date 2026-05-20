@@ -147,7 +147,7 @@ export class HomeComponent implements OnInit {
     this.sportService.getStandings().subscribe({
       next: (data: Standing[]) => {
         // Top 5
-        this.standings = data.slice(0, 5);
+        this.standings = data;
 
         // Buscamos las fotos de los equipos 1 por 1 para evitar saturar la API
         if (this.standings.length > 0) {
@@ -277,5 +277,15 @@ export class HomeComponent implements OnInit {
   /* --- Información detallada del jugador --- */
   goToPlayerDetail(playerId: string): void {
     this.router.navigate(['/player', playerId]);
+  }
+
+  /* --- Posición de Champions (Top 4) --- */
+  isTopRank(rank: string | number): boolean {
+    return Number(rank) <= 4;
+  }
+
+  /* --- Posición de descenso (Puesto > 17) --- */
+  isRelegationRank(rank: string | number): boolean {
+    return Number(rank) > 17;
   }
 }

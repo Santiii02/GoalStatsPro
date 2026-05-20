@@ -45,17 +45,25 @@ export class UserService {
     }
   }
 
-  /* --- Añadir o quitar equipo de favoritos, el email del usuario se guarda en el documento --- */
+  /* --- Añadir o quitar equipo de favoritos --- */
   async toggleFavorite(teamName: string, isCurrentlyFavorite: boolean): Promise<void> {
     try {
-      const docRef = this.getUserDocRef();
+      const user = this.authService.currentUser;
+      if (!user) throw new Error('No hay un usuario autenticado');
 
-      // Si ya era favorito, lo eliminamos de la base de datos
-      // Eliminamos solo el equipo del array, no el documento completo
+      const docRef = this.getUserDocRef();
+      const docSnap = await getDoc(docRef);
+
+      // Si el documento fue borrado por el admin le cerramos la sesión de golpe
+      if (!docSnap.exists()) {
+        await this.authService.logout();
+        throw new Error('Cuenta eliminada por el administrador. Sesión cerrada.');
+      }
+
+      // Añadimos o quitamos de favoritos
       if (isCurrentlyFavorite) {
         await updateDoc(docRef, { favoriteTeams: arrayRemove(teamName) });
       } else {
-        // Si no era favorito, lo añadimos
         await updateDoc(docRef, { favoriteTeams: arrayUnion(teamName) });
       }
     } catch (error) {
@@ -86,14 +94,22 @@ export class UserService {
   /* --- Añadir/Quitar Jugador Favorito --- */
   async toggleFavoritePlayer(playerId: string, isCurrentlyFavorite: boolean): Promise<void> {
     try {
-      const docRef = this.getUserDocRef();
+      const user = this.authService.currentUser;
+      if (!user) throw new Error('No hay un usuario autenticado');
 
-      // Si ya era favorito, lo eliminamos de la base de datos
-      // Eliminamos solo el jugador del array, no el documento completo
+      const docRef = this.getUserDocRef();
+      const docSnap = await getDoc(docRef);
+
+      // Si el documento fue borrado por el admin le cerramos la sesión de golpe
+      if (!docSnap.exists()) {
+        await this.authService.logout();
+        throw new Error('Cuenta eliminada por el administrador. Sesión cerrada.');
+      }
+
+      // Añadimos o quitamos de favoritos
       if (isCurrentlyFavorite) {
         await updateDoc(docRef, { favoritePlayers: arrayRemove(playerId) });
       } else {
-        // Si no era favorito, lo añadimos
         await updateDoc(docRef, { favoritePlayers: arrayUnion(playerId) });
       }
     } catch (error) {

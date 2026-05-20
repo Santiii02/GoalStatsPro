@@ -411,6 +411,13 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     this.location.back();
   }
 
+  /* --- Navegar al detalle del equipo --- */
+  goToTeamDetail(teamName: string): void {
+    if (teamName) {
+      this.router.navigate(['/team', teamName]);
+    }
+  }
+  
   /* --- Comprueba si el partido está en juego --- */
   isLive(status: string): boolean {
     if (!status) return false;

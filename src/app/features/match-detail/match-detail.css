@@ -67,6 +67,20 @@
     margin: 0 5px;
 }
 
+/* --- EFECTO CLICK EN ESCUDOS Y NOMBRES --- */
+.clickable-team {
+    cursor: pointer !important;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.clickable-team:hover {
+    opacity: 0.75;
+}
+
+img.clickable-team:hover {
+    transform: scale(1.08);
+}
+
 /* --- ESTADO DEL PARTIDO --- */
 .match-status {
     margin-top: 15px;

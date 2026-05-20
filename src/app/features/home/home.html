@@ -148,7 +148,7 @@
 
   <!-- Top 5 -->
   <section class="mt-5 dashboard-section">
-    <h3>🏆 Clasificación La Liga (Top 5)</h3>
+    <h3>🏆 Clasificación La Liga </h3>
 
     <div *ngIf="standings.length === 0 && !loading" class="alert alert-warning">
       No se pudo cargar la información de la clasificación.
@@ -166,20 +166,21 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of standings">
-            <td class="rank-cell">{{ item.rank }}</td>
+            <td class="rank-cell">
+              <span class="rank-badge" 
+                    [ngClass]="{'top-rank': isTopRank(item.rank), 'relegation-rank': isRelegationRank(item.rank)}">
+                {{ item.rank }}
+              </span>
+            </td>
+            
             <td>
-            <div class="team-row" 
-            style="display: flex; align-items: center; gap: 10px;">
-
-              <img [src]="item.teamBadge || item.teamLogo || 'assets/images/Logo.png'"
-                  width="30"
-                  height="30"
-                  alt="Escudo"
-                  style="object-fit: contain;"
+              <div class="team-row clickable" (click)="goToTeamDetail(item.teamName)"
+                  style="display: flex; align-items: center; gap: 10px;">
+                <img [src]="item.teamBadge || item.teamLogo || 'assets/images/Logo.png'"
+                  width="30" height="30" alt="Escudo" style="object-fit: contain;"
                   onerror="this.src='assets/images/Logo.png'">
-
-              <strong>{{ item.teamName }}</strong>
-            </div>
+                <strong>{{ item.teamName }}</strong>
+              </div>
             </td>
             <td class="points-cell">{{ item.points }}</td>
             <td>{{ item.matches }}</td>

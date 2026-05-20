@@ -16,7 +16,7 @@ import { UserService } from './services/user.service';
   standalone: true,
   imports: [CommonModule, RouterOutlet, RouterModule, NavbarComponent, ButtonModule, TooltipModule],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.css'
 })
 export class AppComponent implements OnInit{
   title = 'GoalStatsPro';

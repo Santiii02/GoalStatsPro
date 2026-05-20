@@ -37,7 +37,7 @@ export class AiService {
 
           REGLAS:
           1. NO repitas las estadísticas como una lista. Úsalas solo para dar peso a tus argumentos.
-          2. Escribe un análisis táctico, directo y al grano, de máximo 3 párrafos, no superando las 120 palabras. Tiene que ser breve y atractivo para que el usuario no se canse de leerlo. 
+          2. Escribe un análisis táctico, directo y al grano, de máximo 3 párrafos, no superando las 80 palabras. Tiene que ser breve y atractivo para que el usuario no se canse de leerlo. 
           3. Indica quién dominó el juego y qué estilo usó cada uno.
           4. Analiza si el resultado es justo comparando los Goles Esperados (xG) o Tiros.
           5. Usa un tono periodístico, profesional y emocionante, motivador para el fan.
@@ -53,10 +53,10 @@ export class AiService {
 
 
           REGLAS:
-          2. Escribe un pronóstico de la previa táctico, directo y al grano, de máximo 3 párrafos, no superando las 120 palabras. Tiene que ser breve y atractivo para que el usuario no se canse de leerlo. 
+          1. Escribe un pronóstico de la previa táctico, directo y al grano, de máximo 3 párrafos, no superando las 80 palabras. Tiene que ser breve y atractivo para que el usuario no se canse de leerlo. 
           2. Analiza el nivel general y el peso histórico/actual de estos dos equipos.
           3. Dinos tu opinión: Menciona qué equipo es el favorito para ganar y por qué (ten en cuenta el factor campo).
-          4. Da un pronóstico de cómo crees que se desarrollará el partido (ej. "dominio absoluto del local", "partido con mucho flujo de juego por el medio campo", "lluvia de goles").
+          4. Da un pronóstico de cómo crees que se desarrollará el partido (ej. "dominio absoluto del local", "partido con mucho flujo de juego por el medio campo", "lluvia de goles"), así como un pronóstico de resultado final (ej. "2-1 para el local").
           5. Usa un tono periodístico, profesional y emocionante, motivador para el fan.
           6. Usa formato Markdown (negrita) para remarcar los conceptos clave. Sin títulos grandes.
         `;
