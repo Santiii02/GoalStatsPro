@@ -14,8 +14,8 @@ import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
-import { forkJoin, from } from 'rxjs';
-import { concatMap, toArray, map } from 'rxjs/operators';
+import { forkJoin, from, Subject, Subscription, of } from 'rxjs';
+import { concatMap, toArray, map, debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -44,6 +44,10 @@ export class HomeComponent implements OnInit {
   // Variables para el buscador
   selectedItem: any;         
   filteredItems: any[] = [];
+
+  // Busquedas de forma reactiva para evitar saturar la API y mejorar la experiencia del usuario
+  private searchSubject = new Subject<string>();
+  private searchSubscription!: Subscription;
 
   // Mensaje dinámico para informar al usuario sobre el filtro aplicado
   filterMessage: string = '';
@@ -80,26 +84,44 @@ export class HomeComponent implements OnInit {
         this.favoritePlayersData = []; 
       }
     });
+
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(300), // Esperamos 300ms después de que el usuario deje de escribir
+      distinctUntilChanged(), // Solo busca si el texto es realmente distinto al anterior
+      switchMap(query => {
+        // Si borran el texto o escriben menos de 2 letras, no buscamos nada
+        if (!query || query.trim().length < 2) {
+          return of({ teams: [], players: [] });
+        }
+        
+        // Realizamos ambas búsquedas en paralelo y manejamos errores para cada una
+        return forkJoin({
+          teams: this.sportService.searchTeams(query).pipe(catchError(() => of([]))),
+          players: this.sportService.searchPlayers(query).pipe(catchError(() => of([])))
+        });
+      })
+    ).subscribe({
+      next: (results) => {
+        const teams = (results.teams || []).map(t => ({ ...t, type: 'team' }));
+        const players = (results.players || []).map(p => ({ ...p, type: 'player' }));
+
+        // Unimos los arrays y forzamos a que los 'team' vayan siempre antes que los 'player'
+        this.filteredItems = [...teams, ...players].sort((a, b) => {
+          if (a.type === 'team' && b.type === 'player') return -1;
+          if (a.type === 'player' && b.type === 'team') return 1;
+          return 0;
+        });
+      },
+      error: (err) => {
+        console.error('Error crítico en el buscador:', err);
+        this.filteredItems = [];
+      }
+    });
   }
 
   /* --- Buscador --- */
   search(event: any) {
-    const query = event.query;
-    
-    // Lanzamos las dos peticiones a la vez (Equipos y Jugadores)
-    forkJoin({
-      teams: this.sportService.searchTeams(query),
-      players: this.sportService.searchPlayers(query)
-    }).subscribe({
-      next: (results) => {
-        const teams = (results.teams || []).map(t => ({ ...t, type: 'team' }));
-        const players = (results.players || []).map(p => ({ ...p, type: 'player' }));
-        this.filteredItems = [...teams, ...players];
-      },
-      error: () => {
-        this.filteredItems = [];
-      }
-    });
+    this.searchSubject.next(event.query);
   }
 
   /* --- Seleccionamos una sugerencia del desplegable --- */

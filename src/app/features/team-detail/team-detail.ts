@@ -49,6 +49,11 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   showFullHistory: boolean = false;
   cleanedHistoryText: string = '';
 
+  // Saber que el equipo pertenece a La Liga
+  get isLaLigaTeam(): boolean {
+    return this.team?.strLeague === 'Spanish La Liga';
+  }
+
  /* --- Opciones para el desplegable de partidos --- */
   matchFilterOptions = [
     { label: 'Últimos Resultados', value: 'past' },

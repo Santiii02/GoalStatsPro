@@ -41,7 +41,7 @@
             <a *ngIf="team.strYoutube" [href]="formatUrl(team.strYoutube)" target="_blank" class="social-icon youtube" pTooltip="YouTube" tooltipPosition="bottom"><i class="pi pi-youtube"></i></a>
           </div>
 
-          <div class="team-form mt-3" *ngIf="teamForm.length > 0">
+          <div class="team-form mt-3" *ngIf="isLaLigaTeam && teamForm.length > 0">
             <span class="text-white-alpha-70 small text-uppercase fw-bold me-2" style="font-size: 0.8rem;">Racha:</span>
             <span *ngFor="let result of teamForm" 
               class="form-badge" 
@@ -56,7 +56,7 @@
     </div>
   </div>
 
-  <div class="season-stats-container mt-4">
+  <div class="season-stats-container mt-4" *ngIf="isLaLigaTeam">
     <div class="season-stats-card">
       <h3 class="mb-3 text-center"><i class="pi pi-chart-bar me-2"></i> Estadísticas LaLiga 25/26</h3>
       <div class="stats-grid">
@@ -80,7 +80,7 @@
     </div>
   </div>
 
-  <div class="matches-section mt-5">
+  <div class="matches-section mt-5" *ngIf="isLaLigaTeam">
     <div class="matches-header mb-4">
       <h3>Partidos</h3>
       <p-dropdown 

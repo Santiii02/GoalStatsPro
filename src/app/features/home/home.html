@@ -68,8 +68,10 @@
         (completeMethod)="search($event)" 
         (onSelect)="onSelect($event)"
         field="strTeam" 
-        placeholder="Ej: Real Madrid, Messi, Betis..."
+        placeholder="Ej: Real Madrid, Mbappé..."
         [forceSelection]="true"
+        scrollHeight="350px"
+        minLength="2"
         styleClass="w-full" 
         inputStyleClass="w-full search-input-custom">
 
@@ -87,6 +89,16 @@
                   {{ item.type === 'team' ? 'Equipo' : 'Jugador' }}
               </span>
             </div>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="empty">
+          <div class="empty-search-msg">
+            <i class="pi pi-search-minus mb-2"></i>
+            <p class="font-bold m-0" style="color: #475569;">No se encontraron resultados</p>
+            <small class="text-muted mt-2 block" style="line-height: 1.4;">
+              💡 <strong>Tip:</strong> Para equipos internacionales, prueba a buscar su nombre en inglés (ej: <em>Bayern Munich</em> o <em>Red Star</em>).
+            </small>
           </div>
         </ng-template>
 
