@@ -1,7 +1,7 @@
 <div class="container fade-in" *ngIf="team">
 
   <div class="mb-3">
-    <p-button label="Volver" icon="pi pi-arrow-left" routerLink="/" styleClass="p-button-text"></p-button>
+    <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()" styleClass="p-button-text text-secondary"></p-button>
   </div>
 
   <div class="hero-team" 
@@ -188,6 +188,7 @@
               [ngClass]="getPlayerRole(player.strPosition)">
             {{ translatePosition(player.strPosition) }}
           </span>
+          <span class="number-badge" *ngIf="player.strNumber">#{{ player.strNumber }}</span>
 
           <div class="nationality" *ngIf="player.strNationality">
             <small>📍 {{ player.strNationality }}</small>

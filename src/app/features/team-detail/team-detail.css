@@ -177,16 +177,29 @@
     color: #2c3e50;
 }
 
+.meta-tags {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+
 .position-badge {
     display: inline-block;
     padding: 2px 8px;
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: bold;
-    margin-top: 5px;
     text-transform: uppercase;
     background-color: #eee;
     color: #555;
+}
+
+.number-badge {
+    color: #64748b;
+    font-weight: bold;
+    font-size: 0.8rem;
+    align-self: center;
 }
 
 /* COLORES POR POSICIÓN */

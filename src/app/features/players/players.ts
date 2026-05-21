@@ -150,4 +150,37 @@ export class PlayersComponent implements OnInit {
 
     return '';
   }
+
+  /* --- Traductor de Posiciones (Inglés a Español) --- */
+  translatePosition(position: string): string {
+    if (!position) return 'Desconocido';
+    const pos = position.toLowerCase();
+
+    // Porteros
+    if (pos.includes('goalkeeper')) return 'Portero';
+
+    // Defensas
+    if (pos.includes('left-back') || pos === 'left back') return 'Lat. Izquierdo';
+    if (pos.includes('right-back') || pos === 'right back') return 'Lat. Derecho';
+    if (pos.includes('centre-back') || pos.includes('center back')) return 'Def. Central';
+    if (pos.includes('defender') || pos.includes('back')) return 'Defensa';
+
+    // Centrocampistas
+    if (pos.includes('defensive midfield')) return 'Pivote';
+    if (pos.includes('attacking midfield')) return 'Mediapunta';
+    if (pos.includes('central midfield')) return 'Centrocampista';
+    if (pos.includes('left midfield') || pos.includes('left midfielder')) return 'Int. Izquierdo';
+    if (pos.includes('right midfield') || pos.includes('right midfielder')) return 'Int. Derecho';
+    if (pos.includes('midfield')) return 'Centrocampista';
+
+    // Delanteros
+    if (pos.includes('left wing')) return 'Ext. Izquierdo';
+    if (pos.includes('right wing')) return 'Ext. Derecho';
+    if (pos.includes('centre-forward') || pos.includes('center forward') || pos.includes('striker')) return 'Delantero Centro';
+    if (pos === 'winger') return 'Extremo'; 
+    if (pos.includes('forward') || pos.includes('wing') || pos.includes('attacker')) return 'Delantero';
+
+    // Si es una posición desconocida, devolvemos el original
+    return position;
+  }
 }

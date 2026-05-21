@@ -41,11 +41,13 @@ export class PlayerDetailComponent implements OnInit {
   cleanedBioText: string = '';
 
   ngOnInit(): void {
-    const playerId = this.route.snapshot.paramMap.get('id');
-    
-    if (playerId) {
-      this.loadPlayer(playerId);
-    }
+    this.route.paramMap.subscribe(params => {
+      const playerId = params.get('id');
+      
+      if (playerId) {
+        this.loadPlayer(playerId);
+      }
+    });
   }
 
   /* --- Carga de datos del jugador --- */

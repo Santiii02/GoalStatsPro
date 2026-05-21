@@ -87,7 +87,7 @@
 
           <div class="meta-tags">
             <span class="position-badge" [ngClass]="getPlayerRole(p.strPosition)">
-              {{ p.strPosition }}
+              {{ translatePosition(p.strPosition) }}
             </span>
             <span class="number-badge" *ngIf="p.strNumber">#{{ p.strNumber }}</span>
           </div>

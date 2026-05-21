@@ -2,8 +2,8 @@
  *  INFORMACIÓN DEL EQUIPO.
  */
 
-import { Component, Input, OnInit, inject, ChangeDetectorRef} from '@angular/core';
-import { CommonModule } from '@angular/common'; 
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef} from '@angular/core';
+import { CommonModule, Location } from '@angular/common'; 
 import { RouterModule, Router } from '@angular/router'; 
 import { ButtonModule } from 'primeng/button';  
 import { CardModule } from 'primeng/card';      
@@ -23,7 +23,7 @@ import { getFlashscoreName } from '../../models/team-mapper';
   templateUrl: './team-detail.html',
   styleUrl: './team-detail.css'     
 })
-export class TeamDetailComponent implements OnInit {
+export class TeamDetailComponent implements OnInit, OnChanges {
 
   /* --- Recibimos el nombre de la URL automáticamente  para saber el equipo que busca el usuario --- */
   @Input() name!: string;
@@ -34,6 +34,7 @@ export class TeamDetailComponent implements OnInit {
   public authService = inject(AuthService); 
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
+  private location = inject(Location);
 
   /* --- Variables de datos --- */
   team: Team | null = null;
@@ -60,6 +61,12 @@ export class TeamDetailComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.name) {
+      this.loadData();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['name'] && !changes['name'].isFirstChange()) {
       this.loadData();
     }
   }
@@ -334,5 +341,10 @@ export class TeamDetailComponent implements OnInit {
   /* --- Función para mostrar/ocultar el texto completo --- */
   toggleHistory(): void {
     this.showFullHistory = !this.showFullHistory;
+  }
+
+  /* --- Botón Volver  --- */
+  goBack(): void {
+    this.location.back();
   }
 }
