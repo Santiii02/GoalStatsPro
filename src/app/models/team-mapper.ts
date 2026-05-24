@@ -15,7 +15,11 @@ export const TEAM_NAME_MAPPER: Record<string, string> = {
   'Man City': 'Manchester City',
   'Man United': 'Manchester United',
   'PSG': 'Paris SG',
-  'Bayern': 'Bayern Munich'
+  'Bayern': 'Bayern Munich',
+
+  'Bosnia & Herzegovina': 'Bosnia-Herzegovina',
+  'Curacao': 'Curaçao',
+  'D.R. Congo': 'DR Congo',
 };
 
 /*
@@ -49,3 +53,53 @@ export function getFlashscoreName(sportsDbName: string): string {
   // Devolvemos la clave o el original si no está en el diccionario
   return flashscoreKey || cleanName;
 }
+
+/* --- Traducción de nombres de países --- */
+export function translateTeamName(englishName: string): string {
+  if (!englishName) return '';
+  const cleanName = englishName.trim();
+  return COUNTRY_TRANSLATIONS[cleanName] || cleanName;
+}
+
+const COUNTRY_TRANSLATIONS: Record<string, string> = {
+  'Algeria': 'Argelia',
+  'Belgium': 'Bélgica',
+  'Bosnia & Herzegovina': 'Bosnia y Herzegovina',
+  'Bosnia-Herzegovin': 'Bosnia y Herzegovina',
+  'Brazil': 'Brasil',
+  'Canada': 'Canadá',
+  'Cape Verde': 'Cabo Verde',
+  'Croatia': 'Croacia',
+  'Curacao': 'Curazao',
+  'Curaçao': 'Curazao',
+  'Czech Republic': 'República Checa',
+  'D.R. Congo': 'RD Congo',
+  'DR Congo': 'RD Congo',
+  'Egypt': 'Egipto',
+  'England': 'Inglaterra',
+  'France': 'Francia',
+  'Germany': 'Alemania',
+  'Haiti': 'Haití',
+  'Iran': 'Irán',
+  'Iraq': 'Irak',
+  'Ivory Coast': 'Costa de Marfil',
+  'Japan': 'Japón',
+  'Jordan': 'Jordania',
+  'Mexico': 'México',
+  'Morocco': 'Marruecos',
+  'Netherlands': 'Países Bajos',
+  'New Zealand': 'Nueva Zelanda',
+  'Norway': 'Noruega',
+  'Panama': 'Panamá',
+  'Saudi Arabia': 'Arabia Saudita',
+  'Scotland': 'Escocia',
+  'South Africa': 'Sudáfrica',
+  'South Korea': 'Corea del Sur',
+  'Spain': 'España',
+  'Sweden': 'Suecia',
+  'Switzerland': 'Suiza',
+  'Tunisia': 'Túnez',
+  'Turkey': 'Turquía',
+  'USA': 'Estados Unidos',
+  'United States': 'Estados Unidos'
+};

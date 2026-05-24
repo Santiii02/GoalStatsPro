@@ -18,7 +18,7 @@
 
         <div class="team-info">
           <div class="title-and-fav">
-            <h1>{{ team.strTeam }}</h1>
+            <h1>{{ translateName(team.strTeam) }}</h1>
 
             <p-button *ngIf="authService.user$ | async" [icon]="isFavorite ? 'pi pi-star-fill' : 'pi pi-star'"
               (onClick)="toggleFavorite()" [loading]="isFavLoading"
@@ -33,15 +33,14 @@
             {{ team.strStadium || 'Estadio no disponible' }}
             <span *ngIf="team.intFormedYear">({{ team.intFormedYear }})</span>
           </p>
-          <span class="league-tag">{{ team.strLeague }}</span>
-
+          <span class="league-tag">{{ getLeagueLabel(team) }}</span>
           <div class="social-links mt-3" *ngIf="team.strTwitter || team.strInstagram || team.strYoutube">
             <a *ngIf="team.strTwitter" [href]="formatUrl(team.strTwitter)" target="_blank" class="social-icon twitter" pTooltip="Twitter" tooltipPosition="bottom"><i class="pi pi-twitter"></i></a>
             <a *ngIf="team.strInstagram" [href]="formatUrl(team.strInstagram)" target="_blank" class="social-icon instagram" pTooltip="Instagram" tooltipPosition="bottom"><i class="pi pi-instagram"></i></a>
             <a *ngIf="team.strYoutube" [href]="formatUrl(team.strYoutube)" target="_blank" class="social-icon youtube" pTooltip="YouTube" tooltipPosition="bottom"><i class="pi pi-youtube"></i></a>
           </div>
 
-          <div class="team-form mt-3" *ngIf="isLaLigaTeam && teamForm.length > 0">
+          <div class="team-form mt-3" *ngIf="(isLaLigaTeam || isWorldCupTeam) && teamForm.length > 0">
             <span class="text-white-alpha-70 small text-uppercase fw-bold me-2" style="font-size: 0.8rem;">Racha:</span>
             <span *ngFor="let result of teamForm" 
               class="form-badge" 
@@ -56,9 +55,9 @@
     </div>
   </div>
 
-  <div class="season-stats-container mt-4" *ngIf="isLaLigaTeam">
+  <div class="season-stats-container mt-4" *ngIf="isLaLigaTeam || isWorldCupTeam">
     <div class="season-stats-card">
-      <h3 class="mb-3 text-center"><i class="pi pi-chart-bar me-2"></i> Estadísticas LaLiga 25/26</h3>
+      <h3 class="mb-3 text-center"><i class="pi pi-chart-bar me-2"></i> Estadísticas {{ isLaLigaTeam ? 'LaLiga 25/26' : 'Mundial 2026' }}</h3>
       <div class="stats-grid">
         <div class="stat-box">
           <span class="stat-value">{{ matchStats.played }}</span>
@@ -80,7 +79,7 @@
     </div>
   </div>
 
-  <div class="matches-section mt-5" *ngIf="isLaLigaTeam">
+  <div class="matches-section mt-5" *ngIf="isLaLigaTeam || isWorldCupTeam">
     <div class="matches-header mb-4">
       <h3>Partidos</h3>
       <p-dropdown 
@@ -102,12 +101,12 @@
           <span class="round-badge" *ngIf="getRoundLabel(match)">{{ getRoundLabel(match) }}</span>
           <div class="match-date">
             <i class="pi pi-calendar me-1"></i>
-            {{ match.eventStartTime * 1000 | date:'dd/MM/yyyy HH:mm' }}
+            {{ getMatchDate(match) | date:'dd/MM/yyyy HH:mm' }}
           </div>
         </div>
 
         <div class="match-teams">
-          <span class="team-name" style="text-align: right;" [class.fw-bold]="match.homeName === team.strTeam">{{ match.homeName }}</span>
+          <span class="team-name" style="text-align: right;" [class.fw-bold]="match.homeName === team.strTeam">{{ translateName(match.homeName) }}</span>
           
           <div class="match-score">
             <ng-container *ngIf="selectedMatchType === 'past'; else noScore">
@@ -118,7 +117,7 @@
             </ng-template>
           </div>
 
-          <span class="team-name" style="text-align: left;" [class.fw-bold]="match.awayName === team.strTeam">{{ match.awayName }}</span>          
+          <span class="team-name" style="text-align: left;" [class.fw-bold]="match.awayName === team.strTeam">{{ translateName(match.awayName) }}</span>          
         </div>
       </div>
     </div>
@@ -204,4 +203,15 @@
 <div *ngIf="loading" class="text-center mt-5">
   <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
   <p>Cargando ficha del equipo...</p>
+</div>
+
+<div *ngIf="errorFetchingTeam && !loading" class="container mt-5 fade-in">
+  <div class="alert alert-warning text-center p-5 border-round shadow-sm" style="background-color: #fff8e1; border: 1px solid #ffe082;">
+    <i class="pi pi-exclamation-triangle mb-3" style="font-size: 3rem; color: #ffb300;"></i>
+    <h3 style="color: #ff8f00;">Equipo no disponible</h3>
+    <p class="text-secondary mt-2 mb-4" style="max-width: 500px; margin: 0 auto; line-height: 1.5;">
+      No hemos podido localizar información sobre <strong>"{{ name }}"</strong> en nuestra base de datos.
+    </p>
+    <p-button label="Volver atrás" icon="pi pi-arrow-left" (onClick)="goBack()" styleClass="p-button-warning p-button-outlined"></p-button>
+  </div>
 </div>

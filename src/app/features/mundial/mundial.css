@@ -1,0 +1,349 @@
+/* --- CABECERA (HERO) --- */
+.hero-section {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    text-align: center;
+    border-radius: 12px;
+    padding: 30px 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.wc-logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 4px 6px rgba(255,255,255,0.2));
+}
+
+.wc-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0 0 5px 0;
+    letter-spacing: 1px;
+}
+
+.subtitle {
+    color: #cbd5e1;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.section-header h3 {
+    color: var(--primary-color, #1e293b);
+    font-weight: 700;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 10px;
+}
+
+/* --- GRID DE GRUPOS --- */
+.groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.group-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    overflow: hidden;
+    border: 1px solid #f1f5f9;
+}
+
+.group-header {
+    background-color: #f8fafc;
+    padding: 12px 15px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+}
+
+.country-flag {
+    border-radius: 4px;
+    object-fit: cover;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* --- TABLAS --- */
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.table-custom th {
+    color: #64748b;
+    font-weight: 600;
+    padding: 8px 15px;
+    background: white;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table-custom td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #f8fafc;
+    vertical-align: middle;
+}
+
+.table-custom th.text-center, 
+.table-custom td.text-center {
+    white-space: nowrap !important;
+    width: 1%; 
+}
+
+.team-row strong {
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.3;
+}
+
+.rank-badge {
+    display: inline-block;
+    font-weight: bold;
+    color: #94a3b8;
+    background: #f1f5f9;
+    padding: 3px 8px;
+    border-radius: 6px;
+    min-width: 28px;
+    text-align: center;
+}
+
+.rank-badge.qualified {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.team-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.clickable {
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.clickable:hover {
+    opacity: 0.7;
+}
+
+.points-cell {
+    font-weight: 800;
+    color: var(--primary-color, #2563eb);
+}
+
+/* --- TARJETAS DE PARTIDO --- */
+.matches-grid {
+    display: flex; 
+    flex-direction: column;
+    gap: 12px;
+}
+
+.match-card {
+    display: flex;
+    flex-direction: column; 
+    background: #ffffff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.match-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    background-color: #fafafa;
+}
+
+.match-card-header {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.tournament-name {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block; 
+}
+
+.match-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.team {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 10px;
+}
+
+.team-home {
+    justify-content: flex-end; 
+    text-align: right;
+}
+
+.team-away {
+    justify-content: flex-start; 
+    text-align: left;
+}
+
+.team-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.team-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.score-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 15px;
+    min-width: 80px;
+}
+
+.score-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8fafc;
+    padding: 6px 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.score-number {
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: #1e293b;
+}
+
+.score-separator {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.vs-badge {
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 800;
+    padding: 6px 16px;
+    border-radius: 12px;
+    letter-spacing: 1px;
+}
+
+/* --- ESTADOS VACÍOS --- */
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: #94a3b8;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
+}
+
+/* --- PESTAÑAS PRIMENG --- */
+:host ::ng-deep .custom-tabs .p-tabview-nav {
+    border-bottom: 2px solid #f1f5f9;
+    justify-content: center;
+}
+
+:host ::ng-deep .custom-tabs .p-tabview-nav li .p-tabview-nav-link {
+    font-weight: 700;
+    color: #64748b;
+    padding: 1rem 1.5rem;
+    border: none;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+:host ::ng-deep .custom-tabs .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: var(--primary-color, #2563eb);
+    border-bottom: 3px solid var(--primary-color, #2563eb);
+}
+
+/* Diseño responsive */
+@media (max-width: 768px) {
+    /* Cabecera */
+    .hero-section { padding: 20px 15px; }
+    .wc-title { font-size: 1.7rem; }
+    .wc-logo { width: 60px; margin-bottom: 10px; }
+
+    /* Grid */
+    .groups-grid { grid-template-columns: 1fr; }
+    
+    /* Tablas */
+    .table-custom th, .table-custom td {
+        padding: 8px 5px; /* Reducimos el espaciado lateral */
+        font-size: 0.8rem; /* Letra un pelín más pequeña */
+    }
+    
+    .rank-badge {
+        min-width: 22px;
+        padding: 2px 5px;
+        font-size: 0.75rem;
+    }
+    
+    .country-flag {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Tarjetas de Partido */
+    .match-card { padding: 12px 10px; }
+    
+    .team-name {
+        font-size: 0.75rem; 
+        word-break: break-word; 
+    }
+    
+    .team-logo {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .score-box { 
+        padding: 4px 8px; 
+        gap: 6px; 
+    }
+    
+    .score-number { 
+        font-size: 1rem; 
+    }
+    
+    .vs-badge { 
+        padding: 4px 8px; 
+        font-size: 0.7rem; 
+    }
+    
+    .score-board {
+        min-width: 50px; 
+        margin: 0 5px;
+    }
+
+    /* Pestañas de PrimeNG */
+    :host ::ng-deep .custom-tabs .p-tabview-nav li .p-tabview-nav-link {
+        padding: 0.8rem 0.5rem; /* Menos padding lateral */
+        font-size: 0.75rem;     /* Letra más compacta */
+        white-space: nowrap;    /* Evita que el texto salte de línea */
+    }
+}

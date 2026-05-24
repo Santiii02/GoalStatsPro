@@ -19,6 +19,11 @@ export class SportDbService {
   /* --- URL base --- */
   private baseUrl = environment.apiBaseUrl;
 
+  /* --- Prefijo de rutas API --- */
+  private readonly LALIGA_PREFIX = `/api/flashscore/football/spain:176/laliga:QVmLl54o/${this.CURRENT_SEASON}`;
+  private readonly WORLD_CUP_PREFIX = '/api/flashscore/football/world:8/world-cup:lvUBR5F8/2026';
+  private readonly SPORTSDB_PREFIX = '/api/thesportsdb/api/v1/json/5032939090';
+
   /* --- Constantes de caché --- */
   private readonly CACHE_KEYS = {
     LIVE: 'goalstats_live',
@@ -26,7 +31,10 @@ export class SportDbService {
     FIXTURES: `goalstats_fixtures_${this.CURRENT_SEASON}`,
     RESULTS: `goalstats_results_${this.CURRENT_SEASON}`,
     MATCH_DETAIL_PREFIX: 'goalstats_match_details_',
-    TEAM_FORM_PREFIX: 'goalstats_team_form_'
+    TEAM_FORM_PREFIX: 'goalstats_team_form_',
+    WC_STANDINGS: 'goalstats_wc_standings',
+    WC_FIXTURES: 'goalstats_wc_fixtures',
+    WC_RESULTS: 'goalstats_wc_results'
   };
 
   /* --- Tiempos de vida para la caché en milisegundos --- */
@@ -110,7 +118,7 @@ export class SportDbService {
   }
 
   /*
-   * MÉTODOS PÚBLICOS (API INTERFACE)
+   * MÉTODOS PÚBLICOS LALIGA (API INTERFACE)
    */
 
   /* --- Obtiene los partidos que se están jugando en este momento --- */
@@ -135,7 +143,7 @@ export class SportDbService {
     const cached = this.getFromCache<Standing[]>(this.CACHE_KEYS.STANDINGS, this.CACHE_TTL.STATIC);
     if (cached) return of(cached);
 
-    const url = `${this.baseUrl}/api/flashscore/football/spain:176/laliga:QVmLl54o/${this.CURRENT_SEASON}/standings`;
+    const url = `${this.baseUrl}${this.LALIGA_PREFIX}/standings`;
 
     return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
       this.getRetryStrategy(),
@@ -156,7 +164,7 @@ export class SportDbService {
     if (cached) return of(cached);
 
     // Endpoint de Flashscore via SportDB
-    const url = `${this.baseUrl}/api/flashscore/football/spain:176/laliga:QVmLl54o/${this.CURRENT_SEASON}/fixtures?page=1`;
+    const url = `${this.baseUrl}${this.LALIGA_PREFIX}/fixtures?page=1`;
     return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
         this.getRetryStrategy(),
         map((res: any) => {
@@ -188,7 +196,7 @@ export class SportDbService {
     return from(pages).pipe(
       // concatMap espera a que termine la petición de una página antes de lanzar la siguiente
       concatMap(page => {
-        const url = `${this.baseUrl}/api/flashscore/football/spain:176/laliga:QVmLl54o/${this.CURRENT_SEASON}/results?page=${page}`;
+        const url = `${this.baseUrl}${this.LALIGA_PREFIX}/results?page=${page}`;
         
         return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
           this.getRetryStrategy(),
@@ -203,6 +211,78 @@ export class SportDbService {
       tap(data => {
         if (data && data.length > 0) {
           this.saveToCache(this.CACHE_KEYS.RESULTS, data, this.CACHE_TTL.STATIC);
+        }
+      })
+    );
+  }
+
+  /*
+   * MUNDIAL 2026 
+   */
+
+  /* --- Obtiene la tabla de clasificación del Mundial --- */
+  getWorldCupStandings(): Observable<any[]> {
+    const cached = this.getFromCache<any[]>(this.CACHE_KEYS.WC_STANDINGS, this.CACHE_TTL.STATIC);
+    if (cached) return of(cached);
+
+    const url = `${this.baseUrl}${this.WORLD_CUP_PREFIX}/standings`;
+
+    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
+      this.getRetryStrategy(),
+      map((res: any) => Array.isArray(res) ? res : res.data || []),
+      tap(data => {
+        if (data.length > 0) this.saveToCache(this.CACHE_KEYS.WC_STANDINGS, data, this.CACHE_TTL.STATIC);
+      }),
+      catchError(err => {
+        console.error('Error fetching World Cup standings:', err);
+        return of([]);
+      })
+    );
+  }
+
+  /* --- Obtiene el calendario de partidos futuros --- */
+  getWorldCupFixtures(): Observable<Match[]> {
+    const cached = this.getFromCache<Match[]>(this.CACHE_KEYS.WC_FIXTURES, this.CACHE_TTL.STATIC);
+    if (cached) return of(cached);
+
+    const url = `${this.baseUrl}${this.WORLD_CUP_PREFIX}/fixtures?page=1`;
+    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
+      this.getRetryStrategy(),
+      map((res: any) => res?.data || (Array.isArray(res) ? res : [])),
+      tap(data => {
+        if (data && data.length > 0) {
+          this.saveToCache(this.CACHE_KEYS.WC_FIXTURES, data, this.CACHE_TTL.STATIC);
+        }
+      }),
+      catchError(err => {
+        console.error('Error fetching World Cup fixtures:', err);
+        return of([]);
+      })
+    );
+  }
+
+  /* --- Obtiene el calendario pasado en fila india para evitar el Error 429 (Too Many Requests) --- */
+  getWorldCupResults(): Observable<Match[]> {
+    const cached = this.getFromCache<Match[]>(this.CACHE_KEYS.WC_RESULTS, this.CACHE_TTL.STATIC);
+    if (cached) return of(cached);
+
+    const pages = [1, 2, 3, 4]; 
+    
+    return from(pages).pipe(
+      concatMap(page => {
+        const url = `${this.baseUrl}${this.WORLD_CUP_PREFIX}/results?page=${page}`;
+        return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
+          this.getRetryStrategy(),
+          delay(500), 
+          map((res: any) => res?.data || (Array.isArray(res) ? res : [])),
+          catchError(() => of([]))
+        );
+      }),
+      toArray(),
+      map(resultsArray => resultsArray.flat()),
+      tap(data => {
+        if (data && data.length > 0) {
+          this.saveToCache(this.CACHE_KEYS.WC_RESULTS, data, this.CACHE_TTL.STATIC);
         }
       })
     );
@@ -224,9 +304,7 @@ export class SportDbService {
     }
 
     // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090`;
-
-    return this.http.get<{ teams: Team[] }>(`${theSportsDbUrl}/searchteams.php?t=${translatedName}`)
+    return this.http.get<{ teams: Team[] }>(`${this.SPORTSDB_PREFIX}/searchteams.php?t=${translatedName}`)
       .pipe(
         this.getRetryStrategy(),
         map((response: any) => {
@@ -262,9 +340,7 @@ export class SportDbService {
     }
 
     // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090`;
-
-    return this.http.get<{ player: any[] }>(`${theSportsDbUrl}/searchplayers.php?p=${name}`)
+    return this.http.get<{ player: any[] }>(`${this.SPORTSDB_PREFIX}/searchplayers.php?p=${name}`)
       .pipe(
         this.getRetryStrategy(),
         map((response: any) => {
@@ -296,12 +372,10 @@ export class SportDbService {
     const cached = this.getFromCache<any[]>(cacheKey, this.CACHE_TTL.STATIC);
     if (cached) {
       return of(cached);
-    }
-
-    // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090`;    
+    }   
     
-    return this.http.get<{ player: any[] }>(`${theSportsDbUrl}/lookup_all_players.php?id=${teamId}`)
+    // Si no está en caché llamamos a la API 
+    return this.http.get<{ player: any[] }>(`${this.SPORTSDB_PREFIX}/lookup_all_players.php?id=${teamId}`)
       .pipe(
         this.getRetryStrategy(),
         map((response: any) => {
@@ -350,9 +424,7 @@ export class SportDbService {
     }
 
     // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090`;
-
-    return this.http.get<{ players: any[] }>(`${theSportsDbUrl}/lookupplayer.php?id=${playerId}`)
+    return this.http.get<{ players: any[] }>(`${this.SPORTSDB_PREFIX}/lookupplayer.php?id=${playerId}`)
       .pipe(
         this.getRetryStrategy(),
         map((res: any) => {
@@ -382,11 +454,13 @@ export class SportDbService {
     // Buscamos en getFixtures y getLiveMatches
     return forkJoin({
       fixtures: this.getFixtures(), 
-      live: this.getLiveMatches()   
+      live: this.getLiveMatches(),
+      wcFixtures: this.getWorldCupFixtures(),
+      wcResults: this.getWorldCupResults()   
     }).pipe(
       map(results => {
         // Unificamos las listas
-        const allMatches = [...(results.fixtures || []), ...(results.live || [])];
+        const allMatches = [...(results.fixtures || []), ...(results.live || []), ...(results.wcFixtures || []), ...(results.wcResults || [])];
         
         // Buscamos el partido por ID (con o sin prefijo)
         return allMatches.find(m => m.eventId === cleanId || m.eventId === `g_1_${cleanId}`);
@@ -508,6 +582,48 @@ export class SportDbService {
     );
   }
 
+  /* --- Calcula la Racha (Últimos 5 partidos: V-E-D) de una Selección del Mundial --- */
+  getWorldCupTeamForm(teamName: string, limit: number = 5): Observable<string[]> {
+    if (!teamName) return of([]);
+
+    const cacheKey = `${this.CACHE_KEYS.TEAM_FORM_PREFIX}WC_${teamName.replace(/\s/g, '_')}`;
+    const cached = this.getFromCache<string[]>(cacheKey, this.CACHE_TTL.STATIC);
+    if (cached) return of(cached);
+
+    return this.getWorldCupResults().pipe(
+      map(matches => {
+        const teamMatches = matches.filter(m => 
+          (m.homeName === teamName || m.awayName === teamName) && 
+          m.homeScore !== undefined && m.awayScore !== undefined
+        );
+
+        teamMatches.sort((a, b) => {
+          const dateA = a.startUtime || a.startTime || a.eventStartTime ? Number(a.startUtime || a.startTime || a.eventStartTime) : 0;
+          const dateB = b.startUtime || b.startTime || b.eventStartTime ? Number(b.startUtime || b.startTime || b.eventStartTime) : 0;
+          return dateB - dateA;
+        });
+
+        const lastMatches = teamMatches.slice(0, limit);
+
+        const form: string[] = lastMatches.map(m => {
+          const homeScore = Number(m.homeScore);
+          const awayScore = Number(m.awayScore);
+          if (homeScore === awayScore) return 'E';
+          const isHome = m.homeName === teamName;
+          return isHome ? (homeScore > awayScore ? 'V' : 'D') : (awayScore > homeScore ? 'V' : 'D');
+        });
+
+        return form; 
+      }),
+      tap(form => {
+        if (form.length > 0) {
+          this.saveToCache(cacheKey, form, this.CACHE_TTL.STATIC);
+        }      
+      }),
+      catchError(() => of([]))
+    );
+  }
+  
   /* --- Obtener Palmarés/Trofeos del Jugador --- */
   getPlayerHonours(id: string): Observable<any[]> {
     // Generamos una clave única para guardar esto en memoria
@@ -519,10 +635,8 @@ export class SportDbService {
       return of(cached);
     }
 
-    // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090/lookuphonours.php?id=${id}`;
-    
-    return this.http.get<any>(theSportsDbUrl).pipe(
+    // Si no está en caché llamamos a la API     
+    return this.http.get<any>(`${this.SPORTSDB_PREFIX}/lookuphonours.php?id=${id}`).pipe(
       this.getRetryStrategy(),
       map((res: any) => res.honours || []), 
 
@@ -550,10 +664,8 @@ export class SportDbService {
       return of(cached);
     }
 
-    // Si no está en caché llamamos a la API 
-    const theSportsDbUrl = `/api/thesportsdb/api/v1/json/5032939090/lookupformerteams.php?id=${playerId}`;
-    
-    return this.http.get<any>(theSportsDbUrl).pipe(
+    // Si no está en caché llamamos a la API     
+    return this.http.get<any>(`${this.SPORTSDB_PREFIX}/lookupformerteams.php?id=${playerId}`).pipe(
       this.getRetryStrategy(),
       map((res: any) => res.formerteams || []), 
 

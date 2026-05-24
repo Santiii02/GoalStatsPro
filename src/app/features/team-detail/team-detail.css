@@ -51,13 +51,19 @@
 }
 
 .league-tag {
-    background-color: var(--primary-color, #007ad9);
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: bold;
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #f8fafc;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 /* --- REDES SOCIALES --- */

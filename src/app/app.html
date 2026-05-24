@@ -22,6 +22,9 @@
         <a routerLink="/players" routerLinkActive="active">Jugadores</a>
       </li>
       <li>
+        <a routerLink="/mundial" routerLinkActive="active">Mundial 2026</a>
+      </li>
+      <li>
         <div class="auth-widget">
           <ng-container *ngIf="authService.user$ | async as user; else loggedOut">
             <div class="user-info" style="display: flex; align-items: center; gap: 8px;">

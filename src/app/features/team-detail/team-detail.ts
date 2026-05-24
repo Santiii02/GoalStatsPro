@@ -11,10 +11,10 @@ import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { SportDbService } from '../../services/sportdb.service';
-import { Team } from '../../models/sport.model';
+import { Match, Team } from '../../models/sport.model';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { getFlashscoreName } from '../../models/team-mapper';
+import { getFlashscoreName, translateTeamName } from '../../models/team-mapper';
 
 @Component({
   selector: 'app-team-detail',
@@ -48,6 +48,8 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   displayedMatches: any[] = [];
   showFullHistory: boolean = false;
   cleanedHistoryText: string = '';
+  isWorldCupTeam: boolean = false;
+  errorFetchingTeam: boolean = false;
 
   // Saber que el equipo pertenece a La Liga
   get isLaLigaTeam(): boolean {
@@ -81,6 +83,8 @@ export class TeamDetailComponent implements OnInit, OnChanges {
    */
   private loadData(): void {
     this.loading = true;
+    this.errorFetchingTeam = false;
+    this.isWorldCupTeam = false;
 
     this.sportService.searchTeams(this.name).subscribe({
       next: (teams) => {
@@ -105,36 +109,71 @@ export class TeamDetailComponent implements OnInit, OnChanges {
             // Pasamos el nombre de TheSportsDB a Flashscore
             const flashscoreName = getFlashscoreName(this.team.strTeam);
 
-            this.sportService.getTeamForm(flashscoreName).subscribe({
-              next: (form) => {
-                this.teamForm = form;
-              },
-              error: (err) => {
-                console.warn("No se pudo cargar la racha del equipo", err);
-                this.teamForm = []; 
-              }
-            });
+            // Si el equipo es de La Liga
+            if (this.isLaLigaTeam) {
 
-            // Cargamos los partidos pasados para la tabla y estadísticas
-            this.sportService.getResults().subscribe(matches => {
-              this.pastMatches = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
-              this.pastMatches.sort((a, b) => (b.eventStartTime || 0) - (a.eventStartTime || 0));
-              this.calculateStats(flashscoreName);
-              this.onMatchTypeChange(); 
-              this.cdr.detectChanges();
-            });
+              this.sportService.getTeamForm(flashscoreName).subscribe({
+                next: (form) => {
+                  this.teamForm = form;
+                }
+              });
 
-            // Cargamos los partidos futuros
-            this.sportService.getFixtures().subscribe(matches => {
-              this.upcomingMatches = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
-              this.upcomingMatches.sort((a, b) => (a.eventStartTime || 0) - (b.eventStartTime || 0));
-              this.onMatchTypeChange();
-              this.cdr.detectChanges();
-            });
+              // Cargamos los partidos pasados para la tabla y estadísticas
+              this.sportService.getResults().subscribe(matches => {
+                let filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
+                
+                this.pastMatches = this.filterUniqueMatches(filtered);
+                this.pastMatches.sort((a, b) => (b.eventStartTime || 0) - (a.eventStartTime || 0));
+                this.calculateStats(flashscoreName);
+                this.onMatchTypeChange(); 
+                this.cdr.detectChanges();
+              });
+
+              // Cargamos los partidos futuros
+              this.sportService.getFixtures().subscribe(matches => {
+                let filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
+
+                this.upcomingMatches = this.filterUniqueMatches(filtered);
+                this.upcomingMatches.sort((a, b) => (a.eventStartTime || 0) - (b.eventStartTime || 0));
+                this.onMatchTypeChange();
+                this.cdr.detectChanges();
+              });
+
+            } else {
+              // Intentamos cargar la forma del equipo en el Mundial
+              this.sportService.getWorldCupTeamForm(flashscoreName).subscribe(form => this.teamForm = form);
+
+              // Cargamos los partidos pasados y futuros del equipo en el Mundial
+              this.sportService.getWorldCupResults().subscribe(matches => {
+                let filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
+                
+                if (filtered.length === 0) console.warn(`⚠️ Equipo no encontrado en historial Mundial: ${flashscoreName}`);
+
+                this.pastMatches = this.filterUniqueMatches(filtered);
+                if (this.pastMatches.length > 0) this.isWorldCupTeam = true; 
+                
+                this.pastMatches.sort((a, b) => this.getMatchDate(b) - this.getMatchDate(a));
+                this.calculateStats(flashscoreName);
+                this.onMatchTypeChange(); 
+                this.cdr.detectChanges();
+              });
+
+              // Cargamos los partidos futuros
+              this.sportService.getWorldCupFixtures().subscribe(matches => {
+                let filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
+                
+                this.upcomingMatches = this.filterUniqueMatches(filtered);
+                if (this.upcomingMatches.length > 0) this.isWorldCupTeam = true; 
+                
+                this.upcomingMatches.sort((a, b) => this.getMatchDate(a) - this.getMatchDate(b));
+                this.onMatchTypeChange();
+                this.cdr.detectChanges();
+              });
+            }
           }
-
         } else {
-          this.loading = false; 
+            this.loading = false;
+            this.errorFetchingTeam = true;
         }
       },
       error: (err) => {
@@ -142,6 +181,13 @@ export class TeamDetailComponent implements OnInit, OnChanges {
         this.loading = false;
       }
     });
+  }
+
+  /*
+   * FILTRAMOS LOS PARTIDOS PARA ELIMINAR DUPLICADOS
+   */
+  private filterUniqueMatches(matches: Match[]): Match[] {
+    return Array.from(new Map(matches.map(m => [m.eventId, m])).values());
   }
 
   /*
@@ -239,6 +285,16 @@ export class TeamDetailComponent implements OnInit, OnChanges {
 
   /* --- Extraer la jornada del partido para mostrar --- */
   getRoundLabel(match: any): string {
+
+    // Obtenemos el nombre del torneo para descartar partidos de clasificación
+    const tournamentName = match.tournamentName || match.tournament?.name || '';
+
+    // Partido de clasificación
+    if (tournamentName.toLowerCase().includes('qualification')) {
+      return 'Clasificación';
+    }
+    
+    // Numeramos las jornadas
     const roundInfo = match.roundInfo?.round || match.round || match.stage;
     if (!roundInfo) return '';
     
@@ -351,5 +407,41 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   /* --- Botón Volver  --- */
   goBack(): void {
     this.location.back();
+  }
+
+  /* --- Obtener la fecha del partido --- */
+  getMatchDate(match: any): number {
+    const timestamp = match.startUtime || match.startTime || match.eventStartTime || 0;
+    return Number(timestamp) * 1000;
+  }
+
+  /* --- Traductor de nombres --- */
+  translateName(name: string | undefined | null): string {
+    if (!name) return '';
+    // Solo traduce si es un equipo internacional
+    return this.isWorldCupTeam ? translateTeamName(name) : name;
+  }
+
+  /* --- Etiquetas de Liga --- */
+  getLeagueLabel(team: any): string {
+    if (!team) return 'Desconocido';
+    
+    // Si nuestros endpoints ya han detectado partidos oficiales
+    if (this.isWorldCupTeam) return 'Selección Nacional';
+    if (this.isLaLigaTeam) return 'LaLiga';
+    
+    // Intentamos detectar por el nombre de la liga
+    if (!team.strLeague) return 'Desconocido';
+    const league = team.strLeague.toLowerCase();
+    
+    if (league === 'spanish la liga') return 'LaLiga';
+    if (league.includes('world cup') || league.includes('qualifying') || 
+        league.includes('nations league') || league.includes('friendlies') || 
+        league.includes('euro ') || league.includes('copa america')) {
+      return 'Selección Nacional';
+    }
+    
+    // Resto de ligas
+    return team.strLeague;
   }
 }

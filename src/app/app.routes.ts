@@ -13,6 +13,7 @@ import { MatchDetailComponent } from './features/match-detail/match-detail';
 import { LoginComponent } from './features/auth/login';
 import { AdminPanelComponent } from './features/admin-panel/admin-panel';
 import { adminGuard } from './guards/admin-guard';
+import { MundialComponent } from './features/mundial/mundial';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, title: 'Inicio - GoalStatsPro' },
@@ -23,6 +24,7 @@ export const routes: Routes = [
   { path: 'player/:id', component: PlayerDetailComponent, title: 'Jugador - GoalStatsPro' },
   { path: 'match/:id', component: MatchDetailComponent, title: 'Partido - GoalStatsPro' },
   { path: 'login', component: LoginComponent, title: 'Login - GoalStatsPro' },
+  { path: 'mundial', component: MundialComponent, title: 'Mundial 2026 - GoalStatsPro' },
   // Ruta protegida para administradores
   { path: 'admin', component: AdminPanelComponent, title: 'Panel de Administración - GoalStatsPro', canActivate: [adminGuard] },
   // Cualquier ruta desconocida redirige al Home

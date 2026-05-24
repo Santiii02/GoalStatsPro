@@ -16,6 +16,7 @@ import { UserService } from '../../services/user.service';
 import { AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
 import { forkJoin, from, Subject, Subscription, of } from 'rxjs';
 import { concatMap, toArray, map, debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
+import { translateTeamName } from '../../models/team-mapper';
 
 @Component({
   selector: 'app-home',
@@ -218,7 +219,7 @@ export class HomeComponent implements OnInit {
     if (laLigaMatches.length > 0) {
       // Prioridad 1: Partidos de La Liga.
       this.liveMatches = laLigaMatches;
-      this.filterMessage = 'Mostrando partidos de La Liga en vivo 🇪🇸';
+      this.filterMessage = 'Mostrando partidos de La Liga 🇪🇸';
     } else {
       // Prioridad 2: Top 5 de partidos mundiales
       this.liveMatches = allMatches.slice(0, 5);
@@ -309,5 +310,33 @@ export class HomeComponent implements OnInit {
   /* --- Posición de descenso (Puesto > 17) --- */
   isRelegationRank(rank: string | number): boolean {
     return Number(rank) > 17;
+  }
+
+  /* --- Traductor de nombres --- */
+  translateName(name: string | undefined | null): string {
+    if (!name) return '';
+    return translateTeamName(name);
+  }
+
+  /* --- Etiquetas de Liga --- */
+  getLeagueLabel(team: any): string {
+    if (!team || !team.strLeague) return 'Desconocido';
+    
+    const league = team.strLeague.toLowerCase();
+    
+    // LaLiga
+    if (league === 'spanish la liga') {
+      return 'LaLiga';
+    }
+    
+    // Selecciones
+    if (league.includes('world cup') || league.includes('qualifying') || 
+        league.includes('nations league') || league.includes('friendlies') || 
+        league.includes('euro ') || league.includes('copa america')) {
+      return 'Selección Nacional';
+    }
+    
+    // Resto de ligas (Premier, Serie A, etc.)
+    return team.strLeague;
   }
 }

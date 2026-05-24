@@ -22,8 +22,8 @@
           alt="Escudo"
           onerror="this.src='assets/images/Logo.png'">
 
-        <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px;">{{ team.strTeam }}</p>
-        <span class="league-tag-small">{{ team.strLeague }}</span>
+        <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px;">{{ translateName(team.strTeam) }}</p>
+        <span class="league-tag-small">{{ getLeagueLabel(team) }}</span>
       </div>
     </div>
   </div>
@@ -47,7 +47,7 @@
         </div>
 
         <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ player.strPlayer }}</p>
-        <span class="league-tag-small">{{ player.strTeam || 'Sin Equipo' }}</span>
+        <span class="league-tag-small">{{ translateName(player.strTeam) || 'Sin Equipo' }}</span>
       </div>
     </div>
   </div>

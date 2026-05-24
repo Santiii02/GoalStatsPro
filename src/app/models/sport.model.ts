@@ -18,6 +18,8 @@ export interface Match {
 
   /* --- Fecha y hora de inicio (ej: "2025-05-12T14:00:00") --- */
   startDateTimeUtc?: string;
+  startUtime?: string | number;
+  startTime?: string | number;
 
   /* --- Timestamp UNIX (en segundos) del inicio del partido. --- */
   eventStartTime?: number | string;
