@@ -7,9 +7,10 @@
   <div class="player-hero">
     
     <div class="hero-image-container">
-      <img [src]="player.strCutout || player.strThumb || 'https://www.thesportsdb.com/images/media/player/cutout/default.png'" 
+      <img [src]="player.strCutout || player.strThumb || 'assets/images/Avatar.png'" 
           alt="{{ player.strPlayer }}"
-          class="hero-img">
+          class="hero-img"
+          onerror="this.onerror=null; this.src='assets/images/Avatar.png';">
     </div>
 
     <div class="hero-info">
@@ -97,7 +98,7 @@
     </div>
   </div>
 
-  <div class="mt-5 mb-5" *ngIf="cleanedBioText">
+<div class="mt-5 mb-5" *ngIf="cleanedBioText">
     <h3 class="mb-3">Biografía</h3>
     
     <div class="bio-section">
@@ -105,30 +106,28 @@
         <p [class.truncated]="!showFullBio" class="bio-text">
           {{ showFullBio ? cleanedBioText : (cleanedBioText | slice:0:400) + (cleanedBioText.length > 400 ? '...' : '') }}
         </p>
-        
-        <button *ngIf="cleanedBioText.length > 400" 
-                class="btn-read-more" 
-                (click)="toggleBio()">
+      
+        <button *ngIf="cleanedBioText && cleanedBioText.length > 400" class="btn-read-more" (click)="toggleBio()">
           {{ showFullBio ? 'Leer menos' : 'Leer más' }}
           <i class="pi" [ngClass]="showFullBio ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
         </button>
       </div>
       
-      <small class="text-muted mt-3 d-block" *ngIf="!player.strDescriptionES && player.strDescriptionEN">
-        * La información detallada solo está disponible en inglés en la base de datos oficial.
+      <small class="text-muted mt-3 d-block" *ngIf="isBioEnglishOnly" style="font-style: italic;">
+        <i class="pi pi-info-circle mr-1"></i> La información detallada solo está disponible en inglés en la base de datos oficial.
       </small>
-    </div>
-  </div>
-</div>
-
-
-<div *ngIf="loading" class="text-center mt-5 p-5">
+    </div> </div> </div> <div *ngIf="loading" class="text-center mt-5 p-5">
   <i class="pi pi-spin pi-spinner text-primary" style="font-size: 3rem"></i>
   <p class="mt-3 text-muted">Cargando perfil del jugador...</p>
 </div>
 
-<div *ngIf="!loading && !player" class="text-center mt-5">
-  <h2>Jugador no encontrado</h2>
-  <p>No se pudo recuperar la información solicitada.</p>
-  <p-button label="Volver" (onClick)="goBack()"></p-button>
+<div *ngIf="errorFetchingPlayer && !loading" class="container mt-5 fade-in">
+  <div class="alert alert-warning text-center p-5 border-round shadow-sm" style="background-color: #fff8e1; border: 1px solid #ffe082;">
+    <i class="pi pi-exclamation-triangle mb-3" style="font-size: 3rem; color: #ffb300;"></i>
+    <h3 style="color: #ff8f00;">Jugador no disponible</h3>
+    <p class="text-secondary mt-2 mb-4" style="max-width: 500px; margin: 0 auto; line-height: 1.5;">
+      No hemos podido localizar la información de este jugador en nuestra base de datos. Es posible que el enlace esté roto o que el jugador haya sido eliminado del sistema.
+    </p>
+    <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()" styleClass="p-button-warning p-button-outlined"></p-button>
+  </div>
 </div>

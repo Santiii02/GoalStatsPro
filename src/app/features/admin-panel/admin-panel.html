@@ -10,7 +10,8 @@
             <tr>
                 <th>Email</th>
                 <th>Rol</th>
-                <th>Equipos Favoritos</th>
+                <th>Equipos</th>
+                <th>Jugadores</th>
                 <th style="width: 100px">Acciones</th>
             </tr>
         </ng-template>
@@ -24,7 +25,12 @@
                 </td>
                 <td>
                     <span class="text-sm">
-                        {{ user.favoriteTeams?.length || 0 }} equipos guardados
+                        {{ user.favoriteTeams?.length || 0 }} equipos
+                    </span>
+                </td>
+                <td>
+                    <span class="text-sm">
+                        {{ user.favoritePlayers?.length || 0 }} jugadores
                     </span>
                 </td>
                 <td>

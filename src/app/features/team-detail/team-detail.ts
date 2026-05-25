@@ -50,6 +50,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   cleanedHistoryText: string = '';
   isWorldCupTeam: boolean = false;
   errorFetchingTeam: boolean = false;
+  isHistoryEnglishOnly: boolean = false;
 
   // Saber que el equipo pertenece a La Liga
   get isLaLigaTeam(): boolean {
@@ -94,6 +95,11 @@ export class TeamDetailComponent implements OnInit, OnChanges {
           // Limpiamos el texto de historia para eliminar la basura de Wikipedia usando regex
           const rawHistory = this.team.strDescriptionES || this.team.strDescriptionEN || '';
           this.cleanedHistoryText = this.cleanWikipediaText(rawHistory);
+
+          // Determinamos si la historia es solo en inglés para mostrar un aviso al usuario
+          const hasSpanish = !!this.team.strDescriptionES && this.team.strDescriptionES.trim().length > 0;
+          const hasEnglish = !!this.team.strDescriptionEN && this.team.strDescriptionEN.trim().length > 0;
+          this.isHistoryEnglishOnly = !hasSpanish && hasEnglish;
 
           this.checkIfFavorite();
 

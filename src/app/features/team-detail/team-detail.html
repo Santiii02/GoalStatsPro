@@ -139,6 +139,10 @@
           <i class="pi" [ngClass]="showFullHistory ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
         </button>
       </div>
+
+      <small class="text-muted mt-3 d-block" *ngIf="isHistoryEnglishOnly" style="font-style: italic;">
+        <i class="pi pi-info-circle mr-1"></i> La historia del equipo no está disponible en español.
+      </small>  
     </div>
   </div>
 
@@ -174,10 +178,10 @@
       <div class="player-card fade-in" *ngFor="let player of players" (click)="goToPlayer(player.idPlayer)">
 
         <div class="player-img-container">
-          <img [src]="player.strCutout || player.strThumb || 'assets/images/player-placeholder.png'"
+          <img [src]="player.strCutout || player.strThumb || 'assets/images/Avatar.png'"
             alt="{{ player.strPlayer }}" 
             loading="lazy"
-            onerror="this.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'">
+            onerror="this.onerror=null; this.src='assets/images/Avatar.png';">
         </div>
 
         <div class="player-info">
@@ -212,6 +216,6 @@
     <p class="text-secondary mt-2 mb-4" style="max-width: 500px; margin: 0 auto; line-height: 1.5;">
       No hemos podido localizar información sobre <strong>"{{ name }}"</strong> en nuestra base de datos.
     </p>
-    <p-button label="Volver atrás" icon="pi pi-arrow-left" (onClick)="goBack()" styleClass="p-button-warning p-button-outlined"></p-button>
+    <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()" styleClass="p-button-warning p-button-outlined"></p-button>
   </div>
 </div>

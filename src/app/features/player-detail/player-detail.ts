@@ -39,6 +39,8 @@ export class PlayerDetailComponent implements OnInit {
   formerTeams: any[] = [];
   showFullBio: boolean = false;
   cleanedBioText: string = '';
+  isBioEnglishOnly: boolean = false;
+  errorFetchingPlayer: boolean = false;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -53,25 +55,40 @@ export class PlayerDetailComponent implements OnInit {
   /* --- Carga de datos del jugador --- */
   private loadPlayer(id: string): void {
     this.loading = true;
+    this.errorFetchingPlayer = false;
+
     this.sportService.getPlayerById(id).subscribe({
       next: (data) => {
-        this.player = data;
-        if (this.player && this.player.dateBorn) {
-            this.age = this.calculateAge(this.player.dateBorn);
+        if (data && data.idPlayer) {
+          this.player = data;
           
+          if (this.player.dateBorn) {
+            this.age = this.calculateAge(this.player.dateBorn);
+          }
+            
           // Limpiamos la biografía usando Regex
           const rawBio = this.player.strDescriptionES || this.player.strDescriptionEN || '';
           this.cleanedBioText = this.cleanWikipediaText(rawBio);
 
+          // Determinamos si la historia es solo en inglés para mostrar un aviso al usuario
+          const hasSpanish = !!this.player.strDescriptionES && this.player.strDescriptionES.trim().length > 0;
+          const hasEnglish = !!this.player.strDescriptionEN && this.player.strDescriptionEN.trim().length > 0;
+          this.isBioEnglishOnly = !hasSpanish && hasEnglish;
+
           this.checkIfFavorite();
           this.loadHonours(id);
           this.loadFormerTeams(id);
+          
+          this.loading = false;
+        } else {
+          this.loading = false;
+          this.errorFetchingPlayer = true;
         }
-        this.loading = false;
       },
       error: (err) => {
-        console.error(err);
+        console.error('Error al buscar el jugador:', err);
         this.loading = false;
+        this.errorFetchingPlayer = true;
       }
     });
   }
