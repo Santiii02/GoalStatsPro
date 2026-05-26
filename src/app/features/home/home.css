@@ -444,7 +444,47 @@
   border: 1px solid transparent;
 }
 
-/* Puestos de Champions (Top 4) */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.rank-legend {
+  display: flex;
+  gap: 15px;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  cursor: help;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.top-rank-color { background: #e3f2fd; border: 1px solid #bbdefb; }
+.europa-rank-color { background: #fff3e0; border: 1px solid #ffe0b2; }
+.conference-rank-color { background: #e8f5e9; border: 1px solid #c8e6c9; }
+.relegation-rank-color { background: #ffebee; border: 1px solid #ffcdd2; }
+
+/* Puestos de Champions (Top 5) */
 .rank-badge.top-rank {
   background: #e3f2fd;
   color: #1565c0; 
@@ -457,6 +497,22 @@
   color: #c62828;
   border: 1px solid #ffcdd2;
 }
+
+/* Europa League */
+.rank-badge.europa-rank {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffe0b2;
+}
+
+/* Conference League */
+.rank-badge.conference-rank {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+
 
 /* Cursor pointer para ir al detalle desde la tabla */
 .team-row.clickable {

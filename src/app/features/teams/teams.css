@@ -43,18 +43,77 @@ font-size: 1.1rem;
   text-align: center;
 }
 
-  /* Puestos de Champions (Top 4) */
-  .rank.top-rank {
-    background: #e3f2fd;
-    color: #1565c0; 
-    border: 1px solid #bbdefb;
-  }
+.rank-legend {
+  display: flex;
+  gap: 15px;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  font-size: 0.85rem;
+  color: #555;
+}
 
-    /* Puestos de descenso */
-  .rank.relegation-rank {
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  cursor: help;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.top-rank-color {
+  background: #e3f2fd;
+  border: 1px solid #bbdefb;
+}
+
+.relegation-rank-color {
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+}
+
+/* Puestos de Champions (Top 5) */
+.rank.top-rank {
+  background: #e3f2fd;
+  color: #1565c0; 
+  border: 1px solid #bbdefb;
+}
+
+/* Puestos de descenso */
+.rank.relegation-rank {
   background: #ffebee;
   color: #c62828;
   border: 1px solid #ffcdd2;
+}
+
+/* Europa League */
+.rank.europa-rank {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffe0b2;
+}
+.europa-rank-color {
+  background: #fff3e0;
+  border: 1px solid #ffe0b2;
+}
+
+/* Conference League */
+.rank.conference-rank {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+.conference-rank-color {
+  background: #e8f5e9;
+  border: 1px solid #c8e6c9;
 }
 
 /* Contenedor Identidad (Escudo + Texto) */
@@ -130,4 +189,11 @@ text-align: center;
   border-top: 1px solid #f5f5f5;
   color: #666;
   font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

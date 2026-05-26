@@ -4,7 +4,7 @@
 
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common'; // Location para volver atrás
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
@@ -23,6 +23,7 @@ export class PlayerDetailComponent implements OnInit {
 
   // Inyección de dependencias
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private sportService = inject(SportDbService);
   public authService = inject(AuthService);
   private userService = inject(UserService);
@@ -252,5 +253,12 @@ export class PlayerDetailComponent implements OnInit {
 
     // Si es una posición desconocida, devolvemos el original
     return position;
+  }
+
+  /* --- Información detallada del equipo --- */
+  goToTeamDetail(teamName: string): void {
+    if (teamName) {
+      this.router.navigate(['/team', teamName]);
+    }
   }
 }

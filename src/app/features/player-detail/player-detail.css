@@ -237,6 +237,15 @@
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
+.former-team-card.clickable {
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.former-team-card.clickable:hover {
+    opacity: 0.8;
+}
+
 .former-team-card img {
     width: 40px;
     height: 40px;

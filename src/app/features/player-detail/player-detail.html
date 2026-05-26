@@ -86,7 +86,7 @@
   <div class="mt-5" *ngIf="formerTeams.length > 0">
     <h3 class="mb-3"><i class="pi pi-history text-primary me-2"></i> Historial de Traspasos</h3>
     <div class="former-teams-grid">
-      <div class="former-team-card" *ngFor="let fTeam of formerTeams">
+      <div class="former-team-card clickable" *ngFor="let fTeam of formerTeams" (click)="goToTeamDetail(fTeam.strFormerTeam)">
         <img [src]="fTeam.strTeamBadge || 'assets/images/Logo.png'" 
             alt="{{ fTeam.strFormerTeam }}"
             onerror="this.src='assets/images/Logo.png'">

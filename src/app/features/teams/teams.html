@@ -1,5 +1,23 @@
 <div class="container fade-in">
-  <h2 class="mb-4">Equipos de La Liga</h2>
+
+  <div class="page-header mb-4">
+    <h2 class="m-0">Equipos de LaLiga</h2>
+    
+    <div class="rank-legend">
+      <div class="legend-item" pTooltip="Puestos 1 al 5" tooltipPosition="top">
+        <span class="legend-color top-rank-color"></span> Champions
+      </div>
+      <div class="legend-item" pTooltip="Europa League" tooltipPosition="top">
+        <span class="legend-color europa-rank-color"></span> Europa League
+      </div>
+      <div class="legend-item" pTooltip="Conference League" tooltipPosition="top">
+        <span class="legend-color conference-rank-color"></span> Conference League
+      </div>
+      <div class="legend-item" pTooltip="Puestos 18 al 20" tooltipPosition="top">
+        <span class="legend-color relegation-rank-color"></span> Descenso
+      </div>
+    </div>
+  </div>
 
   <div *ngIf="loading" class="text-center p-5">
     <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
@@ -13,21 +31,26 @@
   <div class="teams-grid" *ngIf="!loading && !error">
     
     <div *ngFor="let team of teams" 
-         class="team-card" 
-         (click)="goToTeamDetail(team)">
+        class="team-card" 
+        (click)="goToTeamDetail(team)">
 
       <div class="card-header">
-        <span class="rank" [ngClass]="{'top-rank': isTopRank(team.rank), 'relegation-rank': isRelegationRank(team.rank)}">
+        <span class="rank" [ngClass]="{
+          'top-rank': isTopRank(team.rank), 
+          'europa-rank': isEuropaLeague(team),
+          'conference-rank': isConference(team),
+          'relegation-rank': isRelegationRank(team.rank)
+        }">
           #{{ team.rank }}
         </span>
         
         <div class="team-identity">
-           <img [src]="team.teamBadge || team.teamLogo || 'assets/images/Logo.png'" 
+          <img [src]="team.teamBadge || team.teamLogo || 'assets/images/Logo.png'" 
                 alt="Escudo"
                 class="team-mini-badge"
                 onerror="this.src='assets/images/Logo.png'">
-           
-           <h3 class="team-name">{{ team.teamName }}</h3>
+          
+          <h3 class="team-name">{{ team.teamName }}</h3>
         </div>
       </div>
 

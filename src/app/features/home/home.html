@@ -162,6 +162,21 @@
   <section class="mt-5 dashboard-section">
     <h3>🏆 Clasificación La Liga </h3>
 
+    <div class="rank-legend">
+        <div class="legend-item" pTooltip="Puestos 1 al 5" tooltipPosition="top">
+          <span class="legend-color top-rank-color"></span> Champions
+        </div>
+        <div class="legend-item" pTooltip="Europa League" tooltipPosition="top">
+          <span class="legend-color europa-rank-color"></span> Europa League
+        </div>
+        <div class="legend-item" pTooltip="Conference League" tooltipPosition="top">
+          <span class="legend-color conference-rank-color"></span> Conference League
+        </div>
+        <div class="legend-item" pTooltip="Puestos 18 al 20" tooltipPosition="top">
+          <span class="legend-color relegation-rank-color"></span> Descenso
+        </div>
+      </div>
+
     <div *ngIf="standings.length === 0 && !loading" class="alert alert-warning">
       No se pudo cargar la información de la clasificación.
     </div>
@@ -180,7 +195,12 @@
           <tr *ngFor="let item of standings">
             <td class="rank-cell">
               <span class="rank-badge" 
-                    [ngClass]="{'top-rank': isTopRank(item.rank), 'relegation-rank': isRelegationRank(item.rank)}">
+                    [ngClass]="{
+                      'top-rank': isTopRank(item.rank), 
+                      'europa-rank': isEuropaLeague(item),
+                      'conference-rank': isConference(item),
+                      'relegation-rank': isRelegationRank(item.rank)
+                    }">
                 {{ item.rank }}
               </span>
             </td>

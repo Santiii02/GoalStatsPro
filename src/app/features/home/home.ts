@@ -61,6 +61,8 @@ export class HomeComponent implements OnInit {
   favoritePlayersData: any[] = [];
   loadingFavPlayers: boolean = false;
 
+  readonly COPA_WINNER = 'Real Sociedad'; 
+
   ngOnInit(): void {
     this.loadData();
     
@@ -302,14 +304,62 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/player', playerId]);
   }
 
-  /* --- Posición de Champions (Top 4) --- */
+  /* --- Posición de Champions (Top 5) --- */
   isTopRank(rank: string | number): boolean {
-    return Number(rank) <= 4;
+    return Number(rank) <= 5;
   }
 
   /* --- Posición de descenso (Puesto > 17) --- */
   isRelegationRank(rank: string | number): boolean {
     return Number(rank) > 17;
+  }
+
+  /* --- Busca en qué posición ha quedado el ganador de Copa del Rey --- */
+  private getCopaWinnerRank(): number {
+    // Si no tenemos datos de los equipos, asumimos que el ganador de Copa no se clasificó para competiciones europeas
+    if (!this.standings || this.standings.length === 0) return 999;
+    const winner = this.standings.find(t => t.teamName === this.COPA_WINNER);
+    return winner ? Number(winner.rank) : 999;
+  }
+
+  // Verifica si un equipo participará en la Europa League
+  isEuropaLeague(team: Standing): boolean {
+    const rank = Number(team.rank);
+    const copaRank = this.getCopaWinnerRank();
+
+    // 1. Si está en Champions, la Champions tiene prioridad sobre Europa League
+    if (this.isTopRank(rank)) return false;
+
+    // 2. El ganador de Copa siempre va a Europa League si no está en Champions
+    if (team.teamName === this.COPA_WINNER) return true;
+
+    // 3. El 6º de LaLiga siempre va a Europa League
+    if (rank === 6) return true;
+
+    // 4. Si el ganador de Copa está en el Top 5 o en el puesto 6, el 7º hereda la plaza
+    if ((copaRank <= 5 || copaRank === 6) && rank === 7) return true;
+    
+    // 5. Si está el 7º
+    if (copaRank === 7 && rank === 7) return true;
+
+    return false;
+  }
+
+  // Verifica si un equipo participará en la Conference League
+  isConference(team: Standing): boolean {
+    const rank = Number(team.rank);
+    const copaRank = this.getCopaWinnerRank();
+
+    // 1. Descartamos a los que están clasificados para Champions o Europa League
+    if (this.isTopRank(rank) || this.isEuropaLeague(team)) return false;
+
+    // 2. Si el ganador de Copa quedó entre los 7 primeros, la Conference salta al 8º
+    if (copaRank <= 7 && rank === 8) return true;
+
+    // 3. Si el campeón de Copa quedó por debajo del 7º, el 7º va a Conference
+    if (copaRank > 7 && rank === 7) return true;
+
+    return false;
   }
 
   /* --- Traductor de nombres --- */
