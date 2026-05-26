@@ -286,19 +286,29 @@ img.clickable-team:hover {
 }
 
 /* --- ESTADO VACÍO --- */
-.empty-tab {
+.empty-state {
     text-align: center;
-    padding: 60px 20px;
-    color: #cbd5e1;
+    padding: 40px 20px;
+    background-color: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
-.empty-tab i { 
+
+.empty-state i { 
     font-size: 3rem; 
-    margin-bottom: 15px; 
+    color: #94a3b8;
     display: block; 
 }
-.empty-tab p {
-    font-size: 1.1rem;
-    margin: 0;
+
+.empty-state p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 /* --- SECCIÓN IA --- */

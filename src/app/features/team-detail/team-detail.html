@@ -170,8 +170,23 @@
   <div class="mt-5">
     <h3 class="mb-3">Plantilla Principal</h3>
 
-    <div *ngIf="players.length === 0" class="alert alert-info">
-      No se encontraron jugadores disponibles para este equipo.
+    <div *ngIf="players.length === 0" class="alert alert-info text-center p-4 border-round">
+      
+      <ng-container *ngIf="isWorldCupTeam; else defaultEmpty">
+        <i class="pi pi-id-card mb-3" style="font-size: 2.5rem; color: #0ea5e9;"></i>
+        <h4 style="color: #1e3a8a;">Plantilla no disponible</h4>
+        <p class="m-0 text-secondary" style="line-height: 1.5;">
+          Las convocatorias de las selecciones nacionales varían en cada torneo y nuestro proveedor no mantiene un listado de jugadores para <strong>{{ translateName(team.strTeam) }}</strong>. 
+          <br><br>
+          💡 <strong>Tip:</strong> Para ver qué jugadores están participando, consulta las <strong>alineaciones</strong> directamente en la pestaña del partido.
+        </p>
+      </ng-container>
+
+      <ng-template #defaultEmpty>
+        <i class="pi pi-users mb-3" style="font-size: 2.5rem; color: #64748b;"></i>
+        <p class="m-0 text-secondary">No se ha podido cargar la plantilla de este equipo en este momento.</p>
+      </ng-template>
+
     </div>
 
     <div class="players-grid">
