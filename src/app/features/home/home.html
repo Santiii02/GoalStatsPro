@@ -15,6 +15,8 @@
     <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;">
       <div *ngFor="let team of favoriteTeamsData" 
         (click)="goToTeamDetail(team)"
+        (keydown.enter)="goToTeamDetail(team)"
+        tabindex="0"
         class="team-result-card fade-in" style="min-width: 150px;">
 
         <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'" 
@@ -37,6 +39,8 @@
     <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;">
       <div *ngFor="let player of favoritePlayersData" 
         (click)="goToPlayerDetail(player.idPlayer)"
+        (keydown.enter)="goToPlayerDetail(player.idPlayer)"
+        tabindex="0"
         class="team-result-card fade-in" style="min-width: 150px; max-width: 150px;">
 
         <div class="player-avatar-container">
@@ -114,7 +118,10 @@
     </div>
 
     <div class="matches-grid" *ngIf="liveMatches.length > 0">
-      <div *ngFor="let match of liveMatches" class="match-card live-border clickable" (click)="goToMatch(match)">
+      <div *ngFor="let match of liveMatches" class="match-card live-border clickable" 
+          (click)="goToMatch(match)" 
+          (keydown.enter)="goToMatch(match)" 
+          tabindex="0">
     
         <div class="match-card-header">
           <span class="tournament-name">{{ match.tournamentName || 'Competición' }}</span>
@@ -206,7 +213,10 @@
             </td>
             
             <td>
-              <div class="team-row clickable" (click)="goToTeamDetail(item.teamName)"
+              <div class="team-row clickable" 
+                  (click)="goToTeamDetail(item.teamName)"
+                  (keydown.enter)="goToTeamDetail(item.teamName)"
+                  tabindex="0"
                   style="display: flex; align-items: center; gap: 10px;">
                 <img [src]="item.teamBadge || item.teamLogo || 'assets/images/Logo.png'"
                   width="30" height="30" alt="Escudo" style="object-fit: contain;"

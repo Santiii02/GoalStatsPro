@@ -41,7 +41,10 @@
   </div>
 
   <div *ngIf="!loading && !error" class="matches-grid">
-    <article *ngFor="let match of matches" class="match-card" (click)="goToMatch(match)">
+    <article *ngFor="let match of matches" class="match-card" 
+              (click)="goToMatch(match)"
+              (keydown.enter)="goToMatch(match)"
+              tabindex="0">
       <div class="match-header" *ngIf="match.round">
         <span class="badge-round">{{ match.round }}</span>
       </div>

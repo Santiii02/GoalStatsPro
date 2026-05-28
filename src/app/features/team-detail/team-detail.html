@@ -11,10 +11,10 @@
     <div class="overlay">
       <div class="team-header-content">
 
-        <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'" 
-          alt="Escudo" 
+        <img #teamBadge [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'" 
+          alt="Escudo de {{ translateName(team.strTeam) }}" 
           class="big-badge"
-          onerror="this.src='assets/images/Logo.png'">
+          (error)="teamBadge.src='assets/images/Logo.png'">
 
         <div class="team-info">
           <div class="title-and-fav">
@@ -95,7 +95,10 @@
     </div>
 
     <div class="matches-list">
-      <div class="match-row" *ngFor="let match of displayedMatches" (click)="goToMatch(match)">
+      <div class="match-row" *ngFor="let match of displayedMatches" 
+          (click)="goToMatch(match)"
+          (keydown.enter)="goToMatch(match)"
+          tabindex="0">
         
         <div class="match-meta">
           <span class="round-badge" *ngIf="getRoundLabel(match)">{{ getRoundLabel(match) }}</span>
@@ -190,13 +193,16 @@
     </div>
 
     <div class="players-grid">
-      <div class="player-card fade-in" *ngFor="let player of players" (click)="goToPlayer(player.idPlayer)">
+      <div class="player-card fade-in" *ngFor="let player of players" 
+          (click)="goToPlayer(player.idPlayer)"
+          (keydown)="$event.key === 'Enter' && goToPlayer(player.idPlayer)"
+          tabindex="0">
 
         <div class="player-img-container">
-          <img [src]="player.strCutout || player.strThumb || 'assets/images/Avatar.png'"
-            alt="{{ player.strPlayer }}" 
+          <img #playerImg [src]="player.strCutout || player.strThumb || 'assets/images/Avatar.png'"
+            alt="Foto de {{ player.strPlayer }}" 
             loading="lazy"
-            onerror="this.onerror=null; this.src='assets/images/Avatar.png';">
+            (error)="playerImg.src='assets/images/Avatar.png'">
         </div>
 
         <div class="player-info">

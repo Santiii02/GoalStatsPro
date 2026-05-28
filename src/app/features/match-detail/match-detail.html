@@ -19,8 +19,12 @@
 
         <div class="match-hero">
             <div class="team-col home">
-                <img [src]="match.homeLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team" alt="Local" (click)="goToTeamDetail(match.homeTeam)" title="Ver perfil del equipo">
-                <h2 class="team-name clickable-team" (click)="goToTeamDetail(match.homeTeam)" title="Ver perfil del equipo">{{ match.homeTeam }}</h2>
+                <img [src]="match.homeLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team" alt="Local" 
+                    (click)="goToTeamDetail(match.homeTeam)" 
+                    (keydown.enter)="goToTeamDetail(match.homeTeam)" 
+                    tabindex="0" 
+                    title="Ver perfil del equipo">
+                <h2 class="team-name clickable-team" (click)="goToTeamDetail(match.homeTeam)" (keydown.enter)="goToTeamDetail(match.homeTeam)" tabindex="0" title="Ver perfil del equipo">{{ match.homeTeam }}</h2>
 
                 <div class="team-form mt-2" *ngIf="homeForm.length > 0">
                    <span *ngFor="let result of homeForm" 
@@ -52,8 +56,12 @@
             </div>
 
             <div class="team-col away">
-                <img [src]="match.awayLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team" alt="Visitante" (click)="goToTeamDetail(match.awayTeam)" title="Ver perfil del equipo">
-                <h2 class="team-name clickable-team" (click)="goToTeamDetail(match.awayTeam)" title="Ver perfil del equipo">{{ match.awayTeam }}</h2>
+                <img [src]="match.awayLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team" alt="Visitante" 
+                    (click)="goToTeamDetail(match.awayTeam)" 
+                    (keydown.enter)="goToTeamDetail(match.awayTeam)" 
+                    tabindex="0" 
+                    title="Ver perfil del equipo">
+                <h2 class="team-name clickable-team" (click)="goToTeamDetail(match.awayTeam)" (keydown.enter)="goToTeamDetail(match.awayTeam)" tabindex="0" title="Ver perfil del equipo">{{ match.awayTeam }}</h2>
 
                 <div class="team-form mt-2" *ngIf="awayForm.length > 0">
                    <span *ngFor="let result of awayForm" 

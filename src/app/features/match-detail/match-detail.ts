@@ -283,8 +283,8 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     // Busca si al menos un valor de todo el array es mayor que 0
     return this.matchStats.some(s => {
       // Limpiamos los posibles '%' para convertir a número
-      const home = parseFloat(s.homeValue?.toString().replace('%', '')) || 0;
-      const away = parseFloat(s.awayValue?.toString().replace('%', '')) || 0;
+      const home = Number.parseFloat(s.homeValue?.toString().replaceAll('%', '')) || 0;
+      const away = Number.parseFloat(s.awayValue?.toString().replaceAll('%', '')) || 0;
       return home > 0 || away > 0;
     });
   }
@@ -293,7 +293,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   private formatAiText(text: string): string {
     if (!text) return '';
     // Reemplaza **texto** por <strong>texto</strong>
-    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    return text.replaceAll(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   }
 
 /* --- Configurar Gráfico de Radar (Escala Proporcional de Dominio) --- */
@@ -326,8 +326,8 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
       realAwayValues.push(awayRaw);
 
       // Limpiamos los strings, eliminamos los símbolos de porcentaje y los paréntesis
-      const homeNum = parseFloat(homeRaw.split('%')[0].split('(')[0]) || 0;
-      const awayNum = parseFloat(awayRaw.split('%')[0].split('(')[0]) || 0;
+      const homeNum = Number.parseFloat(homeRaw.split('%')[0].split('(')[0]) || 0;
+      const awayNum = Number.parseFloat(awayRaw.split('%')[0].split('(')[0]) || 0;
 
       // Calculamos el dominio de cada estadística como un porcentaje del total (home + away)
       const total = homeNum + awayNum;
@@ -493,7 +493,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     const extractNum = (val: string) => {
       if (!val) return 0;
       const numStr = val.toString().split('%')[0].split('(')[0].trim();
-      return Math.abs(parseFloat(numStr)) || 0;
+      return Math.abs(Number.parseFloat(numStr)) || 0;
     };
 
     const home = extractNum(homeVal);
@@ -611,7 +611,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     rawEvents.forEach(ev => {
       // Extraer minuto del evento
       const rawTime = String(ev.time || ev.incidentTime || '-');
-      const time = rawTime.replace(/'/g, '').replace(/"/g, '');
+      const time = rawTime.replaceAll("'", "").replaceAll('"', "");
 
       // Extraer Nombres y detectar si es Cambio
       let mainName = '';

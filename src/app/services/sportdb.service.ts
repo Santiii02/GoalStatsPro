@@ -11,13 +11,13 @@ import { normalizeTeamName } from '../models/team-mapper';
 })
 export class SportDbService {
   /* --- Inyección de dependencias --- */
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
   /* --- Temporada actual --- */
   private readonly CURRENT_SEASON = '2025-2026';
 
   /* --- URL base --- */
-  private baseUrl = environment.apiBaseUrl;
+  private readonly baseUrl = environment.apiBaseUrl;
 
   /* --- Prefijo de rutas API --- */
   private readonly LALIGA_PREFIX = `/api/flashscore/football/spain:176/laliga:QVmLl54o/${this.CURRENT_SEASON}`;
@@ -94,8 +94,8 @@ export class SportDbService {
         localStorage.clear();
         // Intentamos guardarlo de nuevo en la memoria limpia
         localStorage.setItem(key, JSON.stringify(entry));
-      } catch (e2) {
-        console.error('No se pudo guardar en caché. Archivo demasiado grande.', e2);
+      } catch (error) {
+        console.error('No se pudo guardar en caché. Archivo demasiado grande.', error);
       }
     }  
   }
@@ -115,6 +115,32 @@ export class SportDbService {
         return throwError(() => error); // Otros errores
       }
     });
+  }
+
+  /*
+   * MÉTODO AUXILIAR PARA PAGINACIÓN
+   */
+  private fetchPaginatedResults(urlPrefix: string, cacheKey: string): Observable<Match[]> {
+    const pages = [1, 2, 3, 4]; 
+    
+    return from(pages).pipe(
+      concatMap(page => {
+        const url = `${this.baseUrl}${urlPrefix}/results?page=${page}`;
+        return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
+          this.getRetryStrategy(),
+          delay(500), 
+          map((res: any) => res?.data || (Array.isArray(res) ? res : [])),
+          catchError(() => of([]))
+        );
+      }),
+      toArray(),
+      map(resultsArray => resultsArray.flat()),
+      tap(data => {
+        if (data && data.length > 0) {
+          this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
+        }
+      })
+    );
   }
 
   /*
@@ -185,35 +211,11 @@ export class SportDbService {
     );
   }
 
-/* --- Obtiene el calendario pasado en fila india para evitar el Error 429 (Too Many Requests) --- */
+  /* --- Obtiene el calendario pasado en fila india para evitar el Error 429 (Too Many Requests) --- */
   getResults(): Observable<Match[]> {
     const cached = this.getFromCache<Match[]>(this.CACHE_KEYS.RESULTS, this.CACHE_TTL.STATIC);
     if (cached) return of(cached);
-
-    const pages = [1, 2, 3, 4]; // La API no devuelve todos los resultados en una sola página, así que tenemos que paginar. 
-    
-    // Convertimos el array en un flujo que emite 1, luego 2, luego 3...
-    return from(pages).pipe(
-      // concatMap espera a que termine la petición de una página antes de lanzar la siguiente
-      concatMap(page => {
-        const url = `${this.baseUrl}${this.LALIGA_PREFIX}/results?page=${page}`;
-        
-        return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
-          this.getRetryStrategy(),
-          delay(500), // Esperamos medio segundo entre página y página para evitar bloqueos por parte de la API
-          map((res: any) => res?.data || (Array.isArray(res) ? res : [])),
-          catchError(() => of([]))
-        );
-      }),
-      // Una vez terminan las 4 peticiones, junta los 4 arrays en uno solo
-      toArray(),
-      map(resultsArray => resultsArray.flat()),
-      tap(data => {
-        if (data && data.length > 0) {
-          this.saveToCache(this.CACHE_KEYS.RESULTS, data, this.CACHE_TTL.STATIC);
-        }
-      })
-    );
+    return this.fetchPaginatedResults(this.LALIGA_PREFIX, this.CACHE_KEYS.RESULTS);
   }
 
   /*
@@ -265,27 +267,7 @@ export class SportDbService {
   getWorldCupResults(): Observable<Match[]> {
     const cached = this.getFromCache<Match[]>(this.CACHE_KEYS.WC_RESULTS, this.CACHE_TTL.STATIC);
     if (cached) return of(cached);
-
-    const pages = [1, 2, 3, 4]; 
-    
-    return from(pages).pipe(
-      concatMap(page => {
-        const url = `${this.baseUrl}${this.WORLD_CUP_PREFIX}/results?page=${page}`;
-        return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
-          this.getRetryStrategy(),
-          delay(500), 
-          map((res: any) => res?.data || (Array.isArray(res) ? res : [])),
-          catchError(() => of([]))
-        );
-      }),
-      toArray(),
-      map(resultsArray => resultsArray.flat()),
-      tap(data => {
-        if (data && data.length > 0) {
-          this.saveToCache(this.CACHE_KEYS.WC_RESULTS, data, this.CACHE_TTL.STATIC);
-        }
-      })
-    );
+    return this.fetchPaginatedResults(this.WORLD_CUP_PREFIX, this.CACHE_KEYS.WC_RESULTS);
   }
 
   /* --- Buscar equipo por nombre (utilizando la cache) --- */
@@ -533,7 +515,7 @@ export class SportDbService {
     const cached = this.getFromCache<string[]>(cacheKey, this.CACHE_TTL.STATIC);
     if (cached) return of(cached);
 
-    // Obtenemos todo el historial de resultados de la temporada
+    // Obtenemos el historial de resultados de la temporada
     return this.getResults().pipe(
       map(matches => {
         // Filtramos solo los partidos que haya jugado este equipo y que tengan resultado

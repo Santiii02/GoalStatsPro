@@ -21,11 +21,11 @@ import { getFlashscoreName } from '../../models/team-mapper';
 })
 export class NavbarComponent implements OnInit, OnDestroy{
   
-  private sportService = inject(SportDbService);
-  private router = inject(Router);
+  private readonly sportService = inject(SportDbService);
+  private readonly router = inject(Router);
 
   // Busquedas de forma reactiva para evitar saturar la API y mejorar la experiencia del usuario
-  private searchSubject = new Subject<string>();
+  private readonly searchSubject = new Subject<string>();
   private searchSubscription!: Subscription;
 
   /* --- Variables --- */

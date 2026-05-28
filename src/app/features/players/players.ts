@@ -12,7 +12,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SportDbService } from '../../services/sportdb.service';
 import { Standing } from '../../models/sport.model';
-
+import { getPlayerRoleMapping, translatePositionMapping } from '../../models/team-mapper';
 @Component({
   selector: 'app-players',
   standalone: true,
@@ -23,8 +23,8 @@ import { Standing } from '../../models/sport.model';
 
 export class PlayersComponent implements OnInit {
   // Inyección de dependencias
-  private sportService = inject(SportDbService);
-  private router = inject(Router);
+  private readonly sportService = inject(SportDbService);
+  private readonly router = inject(Router);
 
   // Datos
   teamsList: any[] = [];      
@@ -140,47 +140,11 @@ export class PlayersComponent implements OnInit {
 
   /* --- Posición del jugador --- */
   getPlayerRole(position: string): string {
-    if (!position) return '';
-    const pos = position.toLowerCase();
-
-    if (pos.includes('goalkeeper')) return 'gk';
-    if (pos.includes('back') || pos.includes('defender')) return 'df';
-    if (pos.includes('midfield')) return 'mf';
-    if (pos.includes('wing') || pos.includes('forward') || pos.includes('striker')) return 'fw';
-
-    return '';
+    return getPlayerRoleMapping(position);
   }
 
   /* --- Traductor de Posiciones (Inglés a Español) --- */
   translatePosition(position: string): string {
-    if (!position) return 'Desconocido';
-    const pos = position.toLowerCase();
-
-    // Porteros
-    if (pos.includes('goalkeeper')) return 'Portero';
-
-    // Defensas
-    if (pos.includes('left-back') || pos === 'left back') return 'Lat. Izquierdo';
-    if (pos.includes('right-back') || pos === 'right back') return 'Lat. Derecho';
-    if (pos.includes('centre-back') || pos.includes('center back')) return 'Def. Central';
-    if (pos.includes('defender') || pos.includes('back')) return 'Defensa';
-
-    // Centrocampistas
-    if (pos.includes('defensive midfield')) return 'Pivote';
-    if (pos.includes('attacking midfield')) return 'Mediapunta';
-    if (pos.includes('central midfield')) return 'Centrocampista';
-    if (pos.includes('left midfield') || pos.includes('left midfielder')) return 'Int. Izquierdo';
-    if (pos.includes('right midfield') || pos.includes('right midfielder')) return 'Int. Derecho';
-    if (pos.includes('midfield')) return 'Centrocampista';
-
-    // Delanteros
-    if (pos.includes('left wing')) return 'Ext. Izquierdo';
-    if (pos.includes('right wing')) return 'Ext. Derecho';
-    if (pos.includes('centre-forward') || pos.includes('center forward') || pos.includes('striker')) return 'Delantero Centro';
-    if (pos === 'winger') return 'Extremo'; 
-    if (pos.includes('forward') || pos.includes('wing') || pos.includes('attacker')) return 'Delantero';
-
-    // Si es una posición desconocida, devolvemos el original
-    return position;
+    return translatePositionMapping(position);
   }
 }

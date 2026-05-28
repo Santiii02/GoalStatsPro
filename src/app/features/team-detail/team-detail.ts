@@ -14,7 +14,7 @@ import { SportDbService } from '../../services/sportdb.service';
 import { Match, Team } from '../../models/sport.model';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { getFlashscoreName, translateTeamName } from '../../models/team-mapper';
+import { getFlashscoreName, translateTeamName, getPlayerRoleMapping, translatePositionMapping } from '../../models/team-mapper';
 
 @Component({
   selector: 'app-team-detail',
@@ -29,12 +29,12 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   @Input() name!: string;
 
   /* --- Inyección del servicio --- */
-  private sportService = inject(SportDbService);
-  private router = inject(Router);
-  public authService = inject(AuthService); 
-  private userService = inject(UserService);
-  private cdr = inject(ChangeDetectorRef);
-  private location = inject(Location);
+  private readonly sportService = inject(SportDbService);
+  private readonly router = inject(Router);
+  public readonly authService = inject(AuthService); 
+  private readonly userService = inject(UserService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly location = inject(Location);
 
   /* --- Variables de datos --- */
   team: Team | null = null;
@@ -89,103 +89,92 @@ export class TeamDetailComponent implements OnInit, OnChanges {
 
     this.sportService.searchTeams(this.name).subscribe({
       next: (teams) => {
-        if (teams && teams.length > 0) {
-          this.team = teams[0];
-
-          // Limpiamos el texto de historia para eliminar la basura de Wikipedia usando regex
-          const rawHistory = this.team.strDescriptionES || this.team.strDescriptionEN || '';
-          this.cleanedHistoryText = this.cleanWikipediaText(rawHistory);
-
-          // Determinamos si la historia es solo en inglés para mostrar un aviso al usuario
-          const hasSpanish = !!this.team.strDescriptionES && this.team.strDescriptionES.trim().length > 0;
-          const hasEnglish = !!this.team.strDescriptionEN && this.team.strDescriptionEN.trim().length > 0;
-          this.isHistoryEnglishOnly = !hasSpanish && hasEnglish;
-
-          this.checkIfFavorite();
-
-          // Cargamos los jugadores 
-          if (this.team.idTeam) {
-            this.loadPlayers(this.team.idTeam);
-          } else {
-            this.loading = false;
-          }
-          
-          // Cargamos la racha V-E-D del equipo
-          if (this.team?.strTeam) {
-            // Pasamos el nombre de TheSportsDB a Flashscore
-            const flashscoreName = getFlashscoreName(this.team.strTeam);
-
-            // Si el equipo es de La Liga
-            if (this.isLaLigaTeam) {
-
-              this.sportService.getTeamForm(flashscoreName).subscribe({
-                next: (form) => {
-                  this.teamForm = form;
-                }
-              });
-
-              // Cargamos los partidos pasados para la tabla y estadísticas
-              this.sportService.getResults().subscribe(matches => {
-                let filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
-                
-                this.pastMatches = this.filterUniqueMatches(filtered);
-                this.pastMatches.sort((a, b) => (b.eventStartTime || 0) - (a.eventStartTime || 0));
-                this.calculateStats(flashscoreName);
-                this.onMatchTypeChange(); 
-                this.cdr.detectChanges();
-              });
-
-              // Cargamos los partidos futuros
-              this.sportService.getFixtures().subscribe(matches => {
-                let filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
-
-                this.upcomingMatches = this.filterUniqueMatches(filtered);
-                this.upcomingMatches.sort((a, b) => (a.eventStartTime || 0) - (b.eventStartTime || 0));
-                this.onMatchTypeChange();
-                this.cdr.detectChanges();
-              });
-
-            } else {
-              // Intentamos cargar la forma del equipo en el Mundial
-              this.sportService.getWorldCupTeamForm(flashscoreName).subscribe(form => this.teamForm = form);
-
-              // Cargamos los partidos pasados y futuros del equipo en el Mundial
-              this.sportService.getWorldCupResults().subscribe(matches => {
-                let filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
-                
-                if (filtered.length === 0) console.warn(`⚠️ Equipo no encontrado en historial Mundial: ${flashscoreName}`);
-
-                this.pastMatches = this.filterUniqueMatches(filtered);
-                if (this.pastMatches.length > 0) this.isWorldCupTeam = true; 
-                
-                this.pastMatches.sort((a, b) => this.getMatchDate(b) - this.getMatchDate(a));
-                this.calculateStats(flashscoreName);
-                this.onMatchTypeChange(); 
-                this.cdr.detectChanges();
-              });
-
-              // Cargamos los partidos futuros
-              this.sportService.getWorldCupFixtures().subscribe(matches => {
-                let filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
-                
-                this.upcomingMatches = this.filterUniqueMatches(filtered);
-                if (this.upcomingMatches.length > 0) this.isWorldCupTeam = true; 
-                
-                this.upcomingMatches.sort((a, b) => this.getMatchDate(a) - this.getMatchDate(b));
-                this.onMatchTypeChange();
-                this.cdr.detectChanges();
-              });
-            }
-          }
+        if (teams?.length > 0) {
+          this.processTeamData(teams[0]);
         } else {
-            this.loading = false;
-            this.errorFetchingTeam = true;
+          this.loading = false;
+          this.errorFetchingTeam = true;
         }
       },
       error: (err) => {
         console.error(err);
         this.loading = false;
       }
+    });
+  }
+
+  private processTeamData(fetchedTeam: Team): void {
+    this.team = fetchedTeam;
+    const rawHistory = this.team.strDescriptionES || this.team.strDescriptionEN || '';
+    this.cleanedHistoryText = this.cleanWikipediaText(rawHistory);
+
+    const hasSpanish = (this.team.strDescriptionES?.trim().length ?? 0) > 0;
+    const hasEnglish = (this.team.strDescriptionEN?.trim().length ?? 0) > 0;
+    this.isHistoryEnglishOnly = !hasSpanish && hasEnglish;
+
+    this.checkIfFavorite();
+
+    if (this.team.idTeam) {
+      this.loadPlayers(this.team.idTeam);
+    } else {
+      this.loading = false;
+    }
+
+    if (this.team?.strTeam) {
+      const flashscoreName = getFlashscoreName(this.team.strTeam);
+      if (this.isLaLigaTeam) {
+        this.loadLaLigaMatches(flashscoreName);
+      } else {
+        this.loadWorldCupMatches(flashscoreName);
+      }
+    }
+  }
+
+  private loadLaLigaMatches(flashscoreName: string): void {
+    this.sportService.getTeamForm(flashscoreName).subscribe(form => this.teamForm = form);
+
+    this.sportService.getResults().subscribe(matches => {
+      const filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
+      this.pastMatches = this.filterUniqueMatches(filtered);
+      this.pastMatches.sort((a, b) => (b.eventStartTime || 0) - (a.eventStartTime || 0));
+      this.calculateStats(flashscoreName);
+      this.onMatchTypeChange(); 
+      this.cdr.detectChanges();
+    });
+
+    this.sportService.getFixtures().subscribe(matches => {
+      const filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
+      this.upcomingMatches = this.filterUniqueMatches(filtered);
+      this.upcomingMatches.sort((a, b) => (a.eventStartTime || 0) - (b.eventStartTime || 0));
+      this.onMatchTypeChange();
+      this.cdr.detectChanges();
+    });
+  }
+
+  private loadWorldCupMatches(flashscoreName: string): void {
+    this.sportService.getWorldCupTeamForm(flashscoreName).subscribe(form => this.teamForm = form);
+
+    this.sportService.getWorldCupResults().subscribe(matches => {
+      const filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
+      if (filtered.length === 0) console.warn(`⚠️ Equipo no encontrado en historial Mundial: ${flashscoreName}`);
+
+      this.pastMatches = this.filterUniqueMatches(filtered);
+      if (this.pastMatches.length > 0) this.isWorldCupTeam = true; 
+      
+      this.pastMatches.sort((a, b) => this.getMatchDate(b) - this.getMatchDate(a));
+      this.calculateStats(flashscoreName);
+      this.onMatchTypeChange(); 
+      this.cdr.detectChanges();
+    });
+
+    this.sportService.getWorldCupFixtures().subscribe(matches => {
+      const filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
+      this.upcomingMatches = this.filterUniqueMatches(filtered);
+      if (this.upcomingMatches.length > 0) this.isWorldCupTeam = true; 
+      
+      this.upcomingMatches.sort((a, b) => this.getMatchDate(a) - this.getMatchDate(b));
+      this.onMatchTypeChange();
+      this.cdr.detectChanges();
     });
   }
 
@@ -305,57 +294,21 @@ export class TeamDetailComponent implements OnInit, OnChanges {
     if (!roundInfo) return '';
     
     // Si ya es un número puro
-    if (!isNaN(Number(roundInfo))) return `J${roundInfo}`;
+    if (!Number.isNaN(Number(roundInfo))) return `J${roundInfo}`;
     
     // Si trae texto ("Round X" o "Jornada X"), extraemos solo el número
     const num = String(roundInfo).replace(/\D/g, ''); 
     return num ? `J${num}` : roundInfo;
   }
 
-  /* --- Posición del jugador --- */
+   /* --- Posición del jugador --- */
   getPlayerRole(position: string): string {
-    if (!position) return '';
-    const pos = position.toLowerCase();
-
-    if (pos.includes('goalkeeper')) return 'gk';
-    if (pos.includes('back') || pos.includes('defender')) return 'df';
-    if (pos.includes('midfield')) return 'mf'; 
-    if (pos.includes('wing') || pos.includes('forward') || pos.includes('striker') || pos.includes('attacker')) return 'fw';
-
-    return '';
+    return getPlayerRoleMapping(position);
   }
 
   /* --- Traductor de Posiciones (Inglés a Español) --- */
   translatePosition(position: string): string {
-    if (!position) return 'Desconocido';
-    const pos = position.toLowerCase();
-
-    // Porteros
-    if (pos.includes('goalkeeper')) return 'Portero';
-
-    // Defensas
-    if (pos.includes('left-back') || pos === 'left back') return 'Lat. Izquierdo';
-    if (pos.includes('right-back') || pos === 'right back') return 'Lat. Derecho';
-    if (pos.includes('centre-back') || pos.includes('center back')) return 'Def. Central';
-    if (pos.includes('defender') || pos.includes('back')) return 'Defensa';
-
-    // Centrocampistas
-    if (pos.includes('defensive midfield')) return 'Pivote';
-    if (pos.includes('attacking midfield')) return 'Mediapunta';
-    if (pos.includes('central midfield')) return 'Centrocampista';
-    if (pos.includes('left midfield') || pos.includes('left midfielder')) return 'Int. Izquierdo';
-    if (pos.includes('right midfield') || pos.includes('right midfielder')) return 'Int. Derecho';
-    if (pos.includes('midfield')) return 'Centrocampista';
-
-    // Delanteros
-    if (pos.includes('left wing')) return 'Ext. Izquierdo';
-    if (pos.includes('right wing')) return 'Ext. Derecho';
-    if (pos.includes('centre-forward') || pos.includes('center forward') || pos.includes('striker')) return 'Delantero Centro';
-    if (pos === 'winger') return 'Extremo'; 
-    if (pos.includes('forward') || pos.includes('wing') || pos.includes('attacker')) return 'Delantero';
-
-    // Si es una posición desconocida, devolvemos el original
-    return position;
+    return translatePositionMapping(position);
   }
 
   /* --- Ver el jugador --- */

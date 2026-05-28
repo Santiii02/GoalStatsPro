@@ -21,6 +21,7 @@
           <div class="flex align-items-center gap-2" *ngIf="selectedTeam">
             <img
               [src]="selectedTeam.badge"
+              alt="Escudo de {{ selectedTeam.name }}"
               style="width: 20px; margin-right: 5px; vertical-align: middle"
             />
             <span>{{ selectedTeam.name }}</span>
@@ -31,6 +32,7 @@
           <div class="flex align-items-center gap-2">
             <img
               [src]="team.badge"
+              alt="Escudo de {{ team.name }}"
               style="width: 20px; margin-right: 8px; vertical-align: middle"
             />
             <span>{{ team.name }}</span>
@@ -41,7 +43,12 @@
       <span class="divider-text">O</span>
 
       <div class="p-input-icon-right search-box">
-        <i class="pi pi-search clickable" (click)="searchPlayerGlobal()"></i>
+        <i class="pi pi-search clickable" 
+          (click)="searchPlayerGlobal()"
+          (keydown.enter)="searchPlayerGlobal()"
+          tabindex="0"
+          aria-label="Buscar jugador"
+          role="button"></i>
         <input
           type="text"
           pInputText
@@ -70,7 +77,10 @@
     </div>
 
     <div class="players-grid">
-      <div class="player-card fade-in" *ngFor="let p of players" (click)="goToPlayer(p)">
+      <div class="player-card fade-in" *ngFor="let p of players" 
+          (click)="goToPlayer(p)"
+          (keydown.enter)="goToPlayer(p)"
+          tabindex="0">
         <div class="player-img-container">
           <img
             [src]="p.strCutout || p.strThumb || 'assets/images/player-placeholder.png'"

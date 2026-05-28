@@ -48,7 +48,10 @@
                   </span>
                 </td>
                 <td>
-                  <div class="team-row clickable" (click)="goToTeamDetail(team.teamName)">
+                  <div class="team-row clickable" 
+                      (click)="goToTeamDetail(team.teamName)"
+                      (keydown.enter)="goToTeamDetail(team.teamName)"
+                      tabindex="0">
                     <img [src]="team.teamBadge || 'assets/images/Logo.png'"
                       width="24" height="24" alt="Bandera" class="country-flag"
                       onerror="this.src='assets/images/Logo.png'">
@@ -80,7 +83,10 @@
             </div>
 
             <div class="matches-grid" *ngIf="knockouts[round].length > 0">
-              <div *ngFor="let match of knockouts[round]" class="match-card clickable fade-in" (click)="goToMatch(match)">
+              <div *ngFor="let match of knockouts[round]" class="match-card clickable fade-in" 
+                  (click)="goToMatch(match)"
+                  (keydown.enter)="goToMatch(match)"
+                  tabindex="0">
                 
                 <div class="match-card-header">
                   <span class="tournament-name">
@@ -125,7 +131,10 @@
       </div>
 
       <div class="matches-grid">
-        <div *ngFor="let match of upcomingMatches" class="match-card clickable" (click)="goToMatch(match)">
+        <div *ngFor="let match of upcomingMatches" class="match-card clickable" 
+            (click)="goToMatch(match)"
+            (keydown.enter)="goToMatch(match)"
+            tabindex="0">
           
           <div class="match-card-header">
               <span class="tournament-name">{{ match.round || $any(match).tournamentStage?.name || 'Fase de Grupos' }}</span>            <span class="ms-2 text-muted" style="font-size: 0.75rem;">

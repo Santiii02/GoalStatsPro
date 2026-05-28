@@ -15,8 +15,10 @@
       <ng-template let-item pTemplate="item">
         <div class="suggestion-item flex align-items-center gap-3 py-1">
           <div class="suggestion-img-wrapper">
-              <img [src]="item.type === 'team' ? (item.strTeamBadge || item.strBadge) : (item.strThumb || item.strCutout)" 
-                  onerror="this.src='assets/images/Logo.png'" alt="logo" />
+              <img #img 
+                  [src]="item.type === 'team' ? (item.strTeamBadge || item.strBadge) : (item.strThumb || item.strCutout)" 
+                  (error)="img.src='assets/images/Logo.png'" 
+                  alt="Escudo o foto de {{ item.type === 'team' ? item.strTeam : item.strPlayer }}" />
           </div>
           <div class="flex flex-column text-left">
             <span class="font-bold suggestion-name" style="font-size: 0.95rem; color: #334155;">

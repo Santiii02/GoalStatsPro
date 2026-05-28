@@ -86,8 +86,8 @@ export class MatchesComponent implements OnInit {
 
         // Ordenamos las jornadas numéricamente
         this.rounds = Array.from(uniqueRounds).sort((a, b) => {
-          const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
-          const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+          const numA = Number.parseInt(a.replace(/\D/g, ''), 10) || 0;
+          const numB = Number.parseInt(b.replace(/\D/g, ''), 10) || 0;
           return numA - numB;
         });
 
