@@ -97,8 +97,9 @@
     <div class="matches-list">
       <div class="match-row" *ngFor="let match of displayedMatches" 
           (click)="goToMatch(match)"
-          (keydown.enter)="goToMatch(match)"
-          tabindex="0">
+          (keydown)="$event.key === 'Enter' && goToMatch(match)"
+          tabindex="0"
+          role="button">
         
         <div class="match-meta">
           <span class="round-badge" *ngIf="getRoundLabel(match)">{{ getRoundLabel(match) }}</span>
@@ -196,7 +197,8 @@
       <div class="player-card fade-in" *ngFor="let player of players" 
           (click)="goToPlayer(player.idPlayer)"
           (keydown)="$event.key === 'Enter' && goToPlayer(player.idPlayer)"
-          tabindex="0">
+          tabindex="0"
+          role="button">
 
         <div class="player-img-container">
           <img #playerImg [src]="player.strCutout || player.strThumb || 'assets/images/Avatar.png'"

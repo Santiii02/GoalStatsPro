@@ -79,16 +79,15 @@
     <div class="players-grid">
       <div class="player-card fade-in" *ngFor="let p of players" 
           (click)="goToPlayer(p)"
-          (keydown.enter)="goToPlayer(p)"
-          tabindex="0">
+          (keydown)="$event.key === 'Enter' && goToPlayer(p)"
+          tabindex="0"
+          role="button">
         <div class="player-img-container">
-          <img
+          <img #playerImg
             [src]="p.strCutout || p.strThumb || 'assets/images/player-placeholder.png'"
             alt="{{ p.strPlayer }}"
             loading="lazy"
-            onerror="
-              this.src = 'https://www.thesportsdb.com/images/media/player/cutout/default.png'
-            "
+            (error)="playerImg.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'"
           />
         </div>
 

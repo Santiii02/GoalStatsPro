@@ -10,8 +10,8 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class AiService {
-  private genAI: GoogleGenerativeAI;
-  private model: any;
+  private readonly genAI: GoogleGenerativeAI;
+  private readonly model: any;
 
   constructor() {
     this.genAI = new GoogleGenerativeAI(environment.geminiApiKey);

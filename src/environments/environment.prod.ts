@@ -1,12 +1,14 @@
+import { SPORT_API_KEY, GEMINI_API_KEY, FIREBASE_KEY } from '../app/keys/keys';
+
 export const environment = {
   production: true,
 
-  apiBaseUrl: '',
-  apiKey: 'SPe8I2ZQPzhIWkoGOKcq9gPjJcdEamywT7uUnw69',
-  geminiApiKey: 'AIzaSyBPm7eP1Yg4s4hLCEoP-tVUmITsuRltVHU',
+  apiBaseUrl: '', 
+  apiKey: SPORT_API_KEY,
+  geminiApiKey: GEMINI_API_KEY,
 
   firebaseConfig: {
-    apiKey: "AIzaSyBxgE9Bxrodp9tsOsds-afKw6jMcb11lSo",
+    apiKey: FIREBASE_KEY,
     authDomain: "goalstatspro.firebaseapp.com",
     projectId: "goalstatspro",
     storageBucket: "goalstatspro.firebasestorage.app",
@@ -14,6 +16,5 @@ export const environment = {
     appId: "1:434574194758:web:250f9568b858979d8c3247",
     measurementId: "G-7BSXW3NRW8"
   }
-
-
 };
+

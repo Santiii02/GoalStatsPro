@@ -17,8 +17,8 @@ import { UserService } from '../../services/user.service';
 })
 export class AdminPanelComponent implements OnInit {
   // Inyección de dependencias
-  private userService = inject(UserService);
-  private cdr = inject(ChangeDetectorRef);
+  private readonly userService = inject(UserService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // Variables para la tabla de usuarios
   users: any[] = [];
@@ -44,7 +44,7 @@ export class AdminPanelComponent implements OnInit {
   /* --- Borrar usuario --- */
   async deleteUser(uid: string) {
     // Pedimos confirmación al administrador para evitar accidentes
-    const confirmed = window.confirm('¿Estás seguro de que quieres eliminar los datos de este usuario? Esta acción no se puede deshacer.');
+    const confirmed = globalThis.confirm('¿Estás seguro de que quieres eliminar los datos de este usuario? Esta acción no se puede deshacer.');
     
     if (confirmed) {
       try {

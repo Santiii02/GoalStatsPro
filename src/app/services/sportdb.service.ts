@@ -70,8 +70,9 @@ export class SportDbService {
       } else {
         localStorage.removeItem(key); 
       }
-    } catch (e) {
-      localStorage.removeItem(key); 
+    } catch (error) {
+      console.warn(`Error leyendo la caché para ${key}:`, error);
+      localStorage.removeItem(key);
     }
     return null;
   }
@@ -85,7 +86,7 @@ export class SportDbService {
     try {
       // Intentamos guardar los datos normales
       localStorage.setItem(key, JSON.stringify(entry));
-    } catch (e) {
+    } catch (error) {
       // Si QuotaExceededError
       console.warn('⚠️ Memoria caché llena. Vaciando datos antiguos...');
       

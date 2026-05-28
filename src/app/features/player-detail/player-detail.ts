@@ -23,13 +23,13 @@ import { translatePositionMapping } from '../../models/team-mapper';
 export class PlayerDetailComponent implements OnInit {
 
   // Inyección de dependencias
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private sportService = inject(SportDbService);
-  public authService = inject(AuthService);
-  private userService = inject(UserService);
-  private location = inject(Location);
-  private cdr = inject(ChangeDetectorRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly sportService = inject(SportDbService);
+  public readonly authService = inject(AuthService);
+  private readonly userService = inject(UserService);
+  private readonly location = inject(Location);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // Estado del componente
   player: any = null;

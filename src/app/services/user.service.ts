@@ -13,8 +13,8 @@ import { AuthService } from './auth.service';
 export class UserService {
 
   // Inyección de dependencias
-  private firestore = inject(Firestore);
-  private authService = inject(AuthService);
+  private readonly firestore = inject(Firestore);
+  private readonly authService = inject(AuthService);
 
   /* --- Obtenemos una referencia al documento del usuario en Firestore --- */
   private getUserDocRef() {

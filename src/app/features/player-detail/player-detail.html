@@ -7,10 +7,10 @@
   <div class="player-hero">
     
     <div class="hero-image-container">
-      <img [src]="player.strCutout || player.strThumb || 'assets/images/Avatar.png'" 
-          alt="{{ player.strPlayer }}"
+      <img #heroImg [src]="player.strCutout || player.strThumb || 'assets/images/Avatar.png'" 
+          alt="Foto de {{ player.strPlayer }}"
           class="hero-img"
-          onerror="this.onerror=null; this.src='assets/images/Avatar.png';">
+          (error)="heroImg.src='assets/images/Avatar.png'">
     </div>
 
     <div class="hero-info">
@@ -88,11 +88,12 @@
     <div class="former-teams-grid">
       <div class="former-team-card clickable" *ngFor="let fTeam of formerTeams" 
           (click)="goToTeamDetail(fTeam.strFormerTeam)"
-          (keydown.enter)="goToTeamDetail(fTeam.strFormerTeam)"
-          tabindex="0">
-        <img [src]="fTeam.strTeamBadge || 'assets/images/Logo.png'" 
-            alt="{{ fTeam.strFormerTeam }}"
-            onerror="this.src='assets/images/Logo.png'">
+          (keydown)="$event.key === 'Enter' && goToTeamDetail(fTeam.strFormerTeam)"
+          tabindex="0"
+          role="button">
+        <img #formerTeamImg [src]="fTeam.strTeamBadge || 'assets/images/Logo.png'" 
+            alt="Escudo de {{ fTeam.strFormerTeam }}"
+            (error)="formerTeamImg.src='assets/images/Logo.png'">
         <div class="fteam-info">
           <strong>{{ fTeam.strFormerTeam }}</strong>
           <small class="text-muted">{{ fTeam.strJoined }} - {{ fTeam.strDeparted || 'Presente' }}</small>

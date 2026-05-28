@@ -28,11 +28,11 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   @Input() id!: string;
 
   // Inyección de dependencias
-  private sportService = inject(SportDbService);
-  private location = inject(Location);
-  private router = inject(Router);
-  private aiService = inject(AiService);
-  private cdr = inject(ChangeDetectorRef);
+  private readonly sportService = inject(SportDbService);
+  private readonly location = inject(Location);
+  private readonly router = inject(Router);
+  private readonly aiService = inject(AiService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // Estado del componente
   match: any = null;
@@ -101,7 +101,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     // Arrancamos el motor si el partido está en vivo o si faltan menos de 5 min para empezar
     let startsSoon = false;
     if (this.match.matchDate) {
-      const diffMins = (this.match.matchDate.getTime() - new Date().getTime()) / 60000;
+      const diffMins = (this.match.matchDate.getTime() - Date.now()) / 60000;
       startsSoon = diffMins >= -5 && diffMins <= 5;
     }
 
@@ -110,54 +110,10 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  /* --- Normaliza los datos --- */
+/* --- Normaliza los datos principales del partido --- */
   private normalizeBasicData(basic: any): any {
-    
-    // Parseamos la fecha
-    let matchDate: Date | undefined;
-    if (basic.processedDate) {
-      matchDate = new Date(basic.processedDate); 
-    } else if (basic.eventStartTime) {
-      matchDate = new Date(Number(basic.eventStartTime) * 1000); 
-    } else if (basic.startDateTimeUtc) {
-      matchDate = new Date(basic.startDateTimeUtc); 
-    }
-
-    // Leemos lo que manda la API textualmente
-    let rawStatus = String(basic.status || basic.eventStatus || '').toUpperCase();
-    let currentStatus = 'Programado';
-
-    // Listas de estados
-    const finalStatuses = ['FT', 'FINISHED', 'FULL TIME', 'MATCH FINISHED', 'AET', 'PEN'];
-    const halfTimeStatuses = ['HT', 'HALF TIME', 'HALF-TIME', 'HALFTIME'];
-    const postponedStatuses = ['POSTPONED', 'PST', 'ABD', 'CANCELLED', 'CANCELED', 'CANC'];
-
-    if (finalStatuses.includes(rawStatus)) {
-      currentStatus = 'Finalizado'; 
-    } else if (halfTimeStatuses.includes(rawStatus)) {
-      currentStatus = 'Descanso';
-    } else if (postponedStatuses.includes(rawStatus)) {
-      currentStatus = 'Aplazado';
-    } else if (rawStatus && !['UNDEFINED', 'NULL', 'NS', 'SCHEDULED', 'NOT STARTED'].includes(rawStatus)) {
-      currentStatus = 'En vivo';
-    } else {
-      // Si la API no dice nada útil, usamos el reloj para empezar el partido a la hora prevista
-      if (matchDate) {
-        const diffMins = Math.floor((new Date().getTime() - matchDate.getTime()) / 60000);
-        
-        // Si es la hora, lo pasamos a En vivo automáticamente.
-        // No adivinamos el descanso ni el final para respetar los descuentos reales.
-        if (diffMins >= 0 && diffMins < 180) {
-          currentStatus = 'En vivo';
-        } else if (diffMins >= 180 && basic.homeScore !== undefined) {
-          // Si han pasado 3 horas, hay resultado, y la API no ha actualizado el estado, finalizamos
-          currentStatus = 'Finalizado';
-        } else {
-          currentStatus = 'Programado';
-        }
-      }
-    }
-
+    const matchDate = this.parseMatchDate(basic);
+    const currentStatus = this.determineMatchStatus(basic.status || basic.eventStatus, matchDate, basic.homeScore);
     const realLeague = basic.tournamentName || basic.league || 'Competición Oficial';
     
     return {
@@ -176,54 +132,110 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     };
   }
 
+  /* --- Extrae y formatea la fecha del partido --- */
+  private parseMatchDate(basic: any): Date | undefined {
+    if (basic.processedDate) return new Date(basic.processedDate);
+    if (basic.eventStartTime) return new Date(Number(basic.eventStartTime) * 1000);
+    if (basic.startDateTimeUtc) return new Date(basic.startDateTimeUtc);
+    return undefined;
+  }
+
+  /* --- Determina el estado exacto del partido --- */
+  private determineMatchStatus(rawStatus: string, matchDate: Date | undefined, homeScore: any): string {
+    const status = String(rawStatus || '').toUpperCase();
+    
+    const finalStatuses = ['FT', 'FINISHED', 'FULL TIME', 'MATCH FINISHED', 'AET', 'PEN'];
+    if (finalStatuses.includes(status)) return 'Finalizado';
+    
+    const halfTimeStatuses = ['HT', 'HALF TIME', 'HALF-TIME', 'HALFTIME'];
+    if (halfTimeStatuses.includes(status)) return 'Descanso';
+    
+    const postponedStatuses = ['POSTPONED', 'PST', 'ABD', 'CANCELLED', 'CANCELED', 'CANC'];
+    if (postponedStatuses.includes(status)) return 'Aplazado';
+    
+    if (status && !['UNDEFINED', 'NULL', 'NS', 'SCHEDULED', 'NOT STARTED'].includes(status)) {
+      return 'En vivo';
+    }
+
+    // Si la API no devuelve estado, lo calculamos por tiempo
+    return this.guessStatusFromTime(matchDate, homeScore);
+  }
+
+  /* --- Calcula el estado si la API no manda datos válidos --- */
+  private guessStatusFromTime(matchDate: Date | undefined, homeScore: any): string {
+    if (!matchDate) return 'Programado';
+
+    const diffMins = Math.floor((Date.now() - matchDate.getTime()) / 60000);
+    
+    if (diffMins >= 0 && diffMins < 180) {
+      return 'En vivo';
+    } 
+    
+    if (diffMins >= 180 && homeScore !== undefined) {
+      return 'Finalizado';
+    }
+
+    return 'Programado';
+  }
+
+
   /* --- Cargar Alineaciones y Estadisticas --- */
   private loadMatchDetails(): void {
     this.loadingDetails = true;
     this.cdr.detectChanges();
 
-    // Si el partido está en vivo, forzamos a la API a darnos datos frescos eliminando el cache local
     if (this.isLive(this.match?.status)) {
       localStorage.removeItem('goalstats_match_details_' + this.id);
     }
 
     this.sportService.getMatchDetails(this.id).subscribe({
-      next: (data) => {
-        if (data) {
-          // Fusionamos nuevos datos con los existentes
-          this.match = this.match ? { ...this.match, ...data } : data;
-          
-          // Procesar alineaciones
-          if (data.lineups && Array.isArray(data.lineups)) {
-            this.startingLineups = data.lineups.find((g: any) => g.group === 'Starting Lineups');
-            this.substitutes = data.lineups.find((g: any) => g.group === 'Substitutes');
-          }
-
-          // Procesar estadisticas
-          if (data.stats && Array.isArray(data.stats)) {
-            const globalStats = data.stats.find((s: any) => s && s.period === 'Match');
-            this.matchStats = globalStats ? globalStats.stats : [];
-            this.groupStats();
-            this.initRadarChart();
-          }
-
-          // Procesar Resumen (Eventos del partido)
-          if (data.summary) {
-            const rawEvents = data.summary.events || data.summary.incidents || data.summary;
-            const eventsArray = Array.isArray(rawEvents) ? rawEvents : [rawEvents];
-
-            // Limpiamos y organizamos estos datos
-            this.processSummaryEvents(eventsArray);
-          }
-        }
-        this.loadingDetails = false;   
-        this.cdr.detectChanges();
-      },
-      // Si no hay detalles se muestra solo la cabecera
-      error: () => {
-        this.loadingDetails = false;
-        this.cdr.detectChanges();
-      }
+      next: (data) => this.handleMatchDetailsSuccess(data),
+      error: () => this.handleMatchDetailsError()
     });
+  }
+  
+  private handleMatchDetailsSuccess(data: any): void {
+    if (!data) {
+      this.handleMatchDetailsError();
+      return;
+    }
+
+    this.match = this.match ? { ...this.match, ...data } : data;
+    this.processLineups(data.lineups);
+    this.processStats(data.stats);
+    this.extractAndProcessEvents(data.summary);
+
+    this.loadingDetails = false;   
+    this.cdr.detectChanges();
+  }
+
+  private handleMatchDetailsError(): void {
+    this.loadingDetails = false;
+    this.cdr.detectChanges();
+  }
+
+  private processLineups(lineups: any): void {
+    if (lineups && Array.isArray(lineups)) {
+      this.startingLineups = lineups.find((g: any) => g.group === 'Starting Lineups');
+      this.substitutes = lineups.find((g: any) => g.group === 'Substitutes');
+    }
+  }
+
+  private processStats(stats: any): void {
+    if (stats && Array.isArray(stats)) {
+      const globalStats = stats.find((s: any) => s && s.period === 'Match');
+      this.matchStats = globalStats ? globalStats.stats : [];
+      this.groupStats();
+      this.initRadarChart();
+    }
+  }
+
+  private extractAndProcessEvents(summary: any): void {
+    if (summary) {
+      const rawEvents = summary.events || summary.incidents || summary;
+      const eventsArray = Array.isArray(rawEvents) ? rawEvents : [rawEvents];
+      this.processSummaryEvents(eventsArray);
+    }
   }
 
   /* --- Mejora la calidad de los escudos usando TheSportsDB --- */
@@ -515,7 +527,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   }
 
   /* --- Diccionario de Estadísticas (Inglés -> Español) --- */
-  private statDictionary: Record<string, string> = {
+  private readonly statDictionary: Record<string, string> = {
     'Expected goals (xG)': 'Goles esperados (xG)',
     'xG on target (xGOT)': 'xG a puerta (xGOT)',
     'Ball possession': 'Posesión',
@@ -553,7 +565,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   };
 
   /* --- Categorías de Estadísticas --- */
-  private statCategoriesKeys = [
+  private readonly statCategoriesKeys = [
     { name: 'Estadísticas principales', keys: ['Expected goals (xG)', 'Ball possession', 'Total shots', 'Shots on target', 'Big chances', 'Corner kicks', 'Passes', 'Yellow cards', 'Red cards'] },
     { name: 'Remates', keys: ['Expected goals (xG)', 'xG on target (xGOT)', 'Total shots', 'Shots on target', 'Shots off target', 'Blocked shots', 'Shots inside the box', 'Shots outside the box', 'Hit the woodwork'] },
     { name: 'Ataque', keys: ['Big chances', 'Corner kicks', 'Touches in opposition box', 'Accurate through passes', 'Offsides', 'Free kicks'] },
@@ -582,7 +594,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   }
 
   /* --- Diccionario de Explicaciones para estadísitcas --- */
-  private statExplanations: Record<string, string> = {
+  private readonly statExplanations: Record<string, string> = {
     'Expected goals (xG)': 'Mide la calidad de una ocasión calculando la probabilidad de que un tiro termine en gol (basado en distancia, ángulo y tipo de pase).',
     'xG on target (xGOT)': 'Mide la calidad del tiro una vez que va a puerta, valorando si el disparo va a la escuadra o al centro para el portero.',
     'Expected assists (xA)': 'Mide la probabilidad de que un pase específico se convierta en una asistencia de gol.',
@@ -609,91 +621,108 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     const secondHalf: any[] = [];
 
     rawEvents.forEach(ev => {
-      // Extraer minuto del evento
-      const rawTime = String(ev.time || ev.incidentTime || '-');
-      const time = rawTime.replaceAll("'", "").replaceAll('"', "");
-
-      // Extraer Nombres y detectar si es Cambio
-      let mainName = '';
-      let subName = '';
-      let isSub = false;
-
-      if (Array.isArray(ev.incidentPlayerName)) {
-        isSub = true;
-        subName = ev.incidentPlayerName[0] || '';   // Sale (Texto gris)
-        mainName = ev.incidentPlayerName[1] || '';  // Entra (Negrita)
+      const normalizedEvent = this.normalizeSingleEvent(ev);
+      
+      if (ev.incidentHalf == 1 || ev.incidentHalf === '1') {
+        firstHalf.push(normalizedEvent);
       } else {
-        mainName = ev.incidentPlayerName || ev.playerName || '';
+        secondHalf.push(normalizedEvent);
       }
-
-      // Extraer el tipo de evento
-      let typeRaw = String(ev.incidentType || ev.type || ev.incidentClass || '').toLowerCase();
-      let comment = String(ev.incidentCommentary || '').toLowerCase();
-
-      let finalType = '';
-      if (typeRaw.includes('goal') || comment.includes('goal')) finalType = 'goal';
-      else if (typeRaw.includes('yellow') || comment.includes('yellow')) finalType = 'yellow';
-      else if (typeRaw.includes('red') || comment.includes('red')) finalType = 'red';
-      else if (typeRaw.includes('sub') || comment.includes('substitut') || isSub) finalType = 'sub';
-      else finalType = typeRaw;
-
-      // Detectar si el evento es para el equipo local o visitante si la API no lo especifica
-      let isHome = true;
-      if (ev.incidentParticipant !== undefined) {
-          isHome = (ev.incidentParticipant == 1);
-      } else if (ev.participant !== undefined) {
-          isHome = (ev.participant == 1);
-      } else if (ev.participantTeam) {
-          isHome = (ev.participantTeam === 'home' || ev.participantTeam == 1);
-      } else if (mainName) {
-          // Buscamos su nombre en la alineación visitante
-          const searchName = mainName.toLowerCase().split(' ')[0]; 
-          const awayLineup = this.startingLineups?.away || [];
-          const awaySubs = this.substitutes?.away || [];
-          
-          const isAwayPlayer = [...awayLineup, ...awaySubs].some((p: any) =>
-              String(p.participantName).toLowerCase().includes(searchName)
-          );
-          if (isAwayPlayer) isHome = false;
-      }
-
-      let reason = ev.incidentReason || ev.detail || '';
-
-      // Penalti y Gol en Propia Puerta
-      if (finalType === 'goal') {
-          // Si el jugador y la asistencia son el mismo, es un penalti
-          if (mainName && mainName === subName) {
-              subName = '';
-              if (!reason) reason = 'Penalti';
-          } 
-          // Por si la API manda el texto en los comentarios
-          else if (comment.includes('penalty') || comment.includes('penalti')) {
-              if (!reason) reason = 'Penalti';
-          }
-          // Goles en Propia Puerta (Own Goal)
-          else if (comment.includes('own goal') || comment.includes('propia')) {
-              if (!reason) reason = 'P.P.';
-          }
-      }
-
-      // Información normalizada del evento para mostrar en la UI
-      const normalizedEvent = {
-        time: time,
-        type: finalType,
-        mainName: mainName,
-        subName: subName,
-        homeScore: ev.homeScore,
-        awayScore: ev.awayScore,
-        isHome: isHome,
-        reason: reason
-      };
-
-      if (ev.incidentHalf == 1 || ev.incidentHalf === '1') firstHalf.push(normalizedEvent);
-      else secondHalf.push(normalizedEvent);
     });
 
     this.matchSummary = [];
     if (firstHalf.length > 0) this.matchSummary.push({ stageName: '1ER TIEMPO', events: firstHalf });
     if (secondHalf.length > 0) this.matchSummary.push({ stageName: '2º TIEMPO', events: secondHalf });
+  }
+
+  /* --- Normaliza un único evento --- */
+  private normalizeSingleEvent(ev: any): any {
+    const rawTime = String(ev.time || ev.incidentTime || '-');
+    const time = rawTime.replaceAll("'", "").replaceAll('"', "");
+
+    const names = this.extractEventNames(ev);
+    const finalType = this.extractEventType(ev, names.isSub);
+    const isHome = this.determineIfHomeEvent(ev, names.mainName);
+    const goalDetails = this.parseGoalDetails(ev, finalType, names.mainName, names.subName);
+
+    return {
+      time: time,
+      type: finalType,
+      mainName: names.mainName,
+      subName: goalDetails.finalSubName,
+      homeScore: ev.homeScore,
+      awayScore: ev.awayScore,
+      isHome: isHome,
+      reason: goalDetails.reason
+    };
+  }
+
+  /* --- Extrae nombres principales y secundarios --- */
+  private extractEventNames(ev: any): { mainName: string, subName: string, isSub: boolean } {
+    if (Array.isArray(ev.incidentPlayerName)) {
+      return {
+        isSub: true,
+        subName: ev.incidentPlayerName[0] || '',
+        mainName: ev.incidentPlayerName[1] || ''
+      };
+    }
+    return {
+      isSub: false,
+      subName: '',
+      mainName: ev.incidentPlayerName || ev.playerName || ''
+    };
+  }
+
+  /* --- Detecta el tipo de evento (Gol, Tarjeta, Cambio) --- */
+  private extractEventType(ev: any, isSub: boolean): string {
+    const typeRaw = String(ev.incidentType || ev.type || ev.incidentClass || '').toLowerCase();
+    const comment = String(ev.incidentCommentary || '').toLowerCase();
+
+    if (typeRaw.includes('goal') || comment.includes('goal')) return 'goal';
+    if (typeRaw.includes('yellow') || comment.includes('yellow')) return 'yellow';
+    if (typeRaw.includes('red') || comment.includes('red')) return 'red';
+    if (typeRaw.includes('sub') || comment.includes('substitut') || isSub) return 'sub';
+    
+    return typeRaw;
+  }
+
+  /* --- Detecta si el evento es del equipo local --- */
+  private determineIfHomeEvent(ev: any, mainName: string): boolean {
+    if (ev.incidentParticipant !== undefined) return ev.incidentParticipant == 1;
+    if (ev.participant !== undefined) return ev.participant == 1;
+    if (ev.participantTeam) return ev.participantTeam === 'home' || ev.participantTeam == 1;
+    
+    if (mainName) {
+      const searchName = mainName.toLowerCase().split(' ')[0]; 
+      const awayLineup = this.startingLineups?.away || [];
+      const awaySubs = this.substitutes?.away || [];
+      
+      const isAwayPlayer = [...awayLineup, ...awaySubs].some((p: any) =>
+          String(p.participantName).toLowerCase().includes(searchName)
+      );
+      if (isAwayPlayer) return false;
+    }
+    
+    return true; // Por defecto asumimos local si no hay datos
+  }
+
+  /* --- Analiza detalles del gol (Gol, Penalti, Propia Puerta) --- */
+  private parseGoalDetails(ev: any, finalType: string, mainName: string, subName: string): { reason: string, finalSubName: string } {
+    let reason = ev.incidentReason || ev.detail || '';
+    let finalSubName = subName;
+    const comment = String(ev.incidentCommentary || '').toLowerCase();
+
+    if (finalType === 'goal') {
+      if (mainName && mainName === subName) {
+        finalSubName = '';
+        if (!reason) reason = 'Penalti';
+      } else if (comment.includes('penalty') || comment.includes('penalti')) {
+        if (!reason) reason = 'Penalti';
+      } else if (comment.includes('own goal') || comment.includes('propia')) {
+        if (!reason) reason = 'P.P.';
+      }
+    }
+
+    return { reason, finalSubName };
   }
 }

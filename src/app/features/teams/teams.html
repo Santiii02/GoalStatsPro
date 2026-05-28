@@ -33,8 +33,9 @@
     <div *ngFor="let team of teams" 
         class="team-card" 
         (click)="goToTeamDetail(team)"
-        (keydown.enter)="goToTeamDetail(team)"
-        tabindex="0">
+        (keydown)="$event.key === 'Enter' && goToTeamDetail(team)"
+        tabindex="0"
+        role="button">
 
       <div class="card-header">
         <span class="rank" [ngClass]="{
@@ -47,10 +48,10 @@
         </span>
         
         <div class="team-identity">
-          <img [src]="team.teamBadge || team.teamLogo || 'assets/images/Logo.png'" 
-                alt="Escudo"
+          <img #teamImg [src]="team.teamBadge || team.teamLogo || 'assets/images/Logo.png'" 
+                alt="Escudo de {{ team.teamName }}"
                 class="team-mini-badge"
-                onerror="this.src='assets/images/Logo.png'">
+                (error)="teamImg.src='assets/images/Logo.png'">
           
           <h3 class="team-name">{{ team.teamName }}</h3>
         </div>

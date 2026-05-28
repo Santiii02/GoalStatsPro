@@ -19,8 +19,8 @@ import { concatMap, catchError, tap } from 'rxjs/operators';
 })
 export class TeamsComponent implements OnInit {
   // Inyección de dependencias
-  private sportService = inject(SportDbService);
-  private router = inject(Router);
+  private readonly sportService = inject(SportDbService);
+  private readonly router = inject(Router);
 
   // Estado del componente
   teams: Standing[] = [];

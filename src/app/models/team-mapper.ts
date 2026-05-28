@@ -104,52 +104,58 @@ const COUNTRY_TRANSLATIONS: Record<string, string> = {
   'United States': 'Estados Unidos'
 };
 
-  /*
-   * TRADUCTOR DE POSICIONES (Inglés a Español)
-   */
-  export function translatePositionMapping(position: string): string {
-    if (!position) return 'Desconocido';
-    const pos = position.toLowerCase();
+/*
+  * TRADUCTOR DE POSICIONES (Inglés a Español)
+  */
+export function translatePositionMapping(position: string): string {
+  if (!position) return 'Desconocido';
+  const pos = position.toLowerCase();
 
-    // Porteros
-    if (pos.includes('goalkeeper')) return 'Portero';
+  // Buscamos la primera regla donde alguna de sus "keys" esté incluida en la posición
+  const match = POSITION_TRANSLATIONS.find(entry => 
+    entry.keys.some(key => pos.includes(key))
+  );
 
-    // Defensas
-    if (pos.includes('left-back') || pos === 'left back') return 'Lat. Izquierdo';
-    if (pos.includes('right-back') || pos === 'right back') return 'Lat. Derecho';
-    if (pos.includes('centre-back') || pos.includes('center back')) return 'Def. Central';
-    if (pos.includes('defender') || pos.includes('back')) return 'Defensa';
+  return match ? match.label : position;
+}
 
-    // Centrocampistas
-    if (pos.includes('defensive midfield')) return 'Pivote';
-    if (pos.includes('attacking midfield')) return 'Mediapunta';
-    if (pos.includes('central midfield')) return 'Centrocampista';
-    if (pos.includes('left midfield') || pos.includes('left midfielder')) return 'Int. Izquierdo';
-    if (pos.includes('right midfield') || pos.includes('right midfielder')) return 'Int. Derecho';
-    if (pos.includes('midfield')) return 'Centrocampista';
+const POSITION_TRANSLATIONS = [
+  { keys: ['goalkeeper'], label: 'Portero' },
+  { keys: ['left-back', 'left back'], label: 'Lat. Izquierdo' },
+  { keys: ['right-back', 'right back'], label: 'Lat. Derecho' },
+  { keys: ['centre-back', 'center back'], label: 'Def. Central' },
+  { keys: ['defender', 'back'], label: 'Defensa' },
+  { keys: ['defensive midfield'], label: 'Pivote' },
+  { keys: ['attacking midfield'], label: 'Mediapunta' },
+  { keys: ['central midfield'], label: 'Centrocampista' },
+  { keys: ['left midfield', 'left midfielder'], label: 'Int. Izquierdo' },
+  { keys: ['right midfield', 'right midfielder'], label: 'Int. Derecho' },
+  { keys: ['midfield'], label: 'Centrocampista' },
+  { keys: ['left wing'], label: 'Ext. Izquierdo' },
+  { keys: ['right wing'], label: 'Ext. Derecho' },
+  { keys: ['centre-forward', 'center forward', 'striker'], label: 'Delantero Centro' },
+  { keys: ['winger'], label: 'Extremo' },
+  { keys: ['forward', 'wing', 'attacker'], label: 'Delantero' }
+];
 
-    // Delanteros
-    if (pos.includes('left wing')) return 'Ext. Izquierdo';
-    if (pos.includes('right wing')) return 'Ext. Derecho';
-    if (pos.includes('centre-forward') || pos.includes('center forward') || pos.includes('striker')) return 'Delantero Centro';
-    if (pos === 'winger') return 'Extremo'; 
-    if (pos.includes('forward') || pos.includes('wing') || pos.includes('attacker')) return 'Delantero';
+/*
+  * POSICIÓN DEL JUGADOR
+  */
+export function getPlayerRoleMapping(position: string): string {
+  if (!position) return '';
+  const pos = position.toLowerCase();
 
-    // Si es una posición desconocida, devolvemos el original
-    return position;
-  }
+  // Misma lógica de búsqueda
+  const match = ROLE_MAPPINGS.find(entry => 
+    entry.keys.some(key => pos.includes(key))
+  );
 
-  /*
-   * POSICIÓN DEL JUGADOR
-   */
-  export function getPlayerRoleMapping(position: string): string {
-    if (!position) return '';
-    const pos = position.toLowerCase();
+  return match ? match.role : '';
+}
 
-    if (pos.includes('goalkeeper')) return 'gk';
-    if (pos.includes('back') || pos.includes('defender')) return 'df';
-    if (pos.includes('midfield')) return 'mf'; 
-    if (pos.includes('wing') || pos.includes('forward') || pos.includes('striker') || pos.includes('attacker')) return 'fw';
-
-    return '';
-  }
+const ROLE_MAPPINGS = [
+  { keys: ['goalkeeper'], role: 'gk' },
+  { keys: ['back', 'defender'], role: 'df' },
+  { keys: ['midfield'], role: 'mf' },
+  { keys: ['wing', 'forward', 'striker', 'attacker'], role: 'fw' }
+];

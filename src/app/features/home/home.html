@@ -17,12 +17,13 @@
         (click)="goToTeamDetail(team)"
         (keydown.enter)="goToTeamDetail(team)"
         tabindex="0"
+        role="button"
         class="team-result-card fade-in" style="min-width: 150px;">
 
-        <img [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'" 
+        <img #favTeamImg [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'" 
           width="80" 
-          alt="Escudo"
-          onerror="this.src='assets/images/Logo.png'">
+          alt="Escudo de {{ translateName(team.strTeam) }}"
+          (error)="favTeamImg.src='assets/images/Logo.png'">
 
         <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px;">{{ translateName(team.strTeam) }}</p>
         <span class="league-tag-small">{{ getLeagueLabel(team) }}</span>
@@ -41,13 +42,14 @@
         (click)="goToPlayerDetail(player.idPlayer)"
         (keydown.enter)="goToPlayerDetail(player.idPlayer)"
         tabindex="0"
+        role="button"
         class="team-result-card fade-in" style="min-width: 150px; max-width: 150px;">
 
         <div class="player-avatar-container">
-          <img [src]="player.strCutout || player.strThumb || 'https://www.thesportsdb.com/images/media/player/cutout/default.png'" 
-            alt="Foto {{ player.strPlayer }}"
+          <img #favPlayerImg [src]="player.strCutout || player.strThumb || 'https://www.thesportsdb.com/images/media/player/cutout/default.png'" 
+            alt="Foto de {{ player.strPlayer }}"
             class="player-avatar"
-            onerror="this.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'">
+            (error)="favPlayerImg.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'">
         </div>
 
         <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ player.strPlayer }}</p>
@@ -82,8 +84,9 @@
         <ng-template let-item pTemplate="item">
           <div class="suggestion-item flex align-items-center gap-3 py-1">
             <div class="suggestion-img-wrapper">
-                <img [src]="item.type === 'team' ? (item.strTeamBadge || item.strBadge) : (item.strThumb || item.strCutout)" 
-                    onerror="this.src='assets/images/Logo.png'" alt="logo" />
+                <img #searchImg 
+                    [src]="item.type === 'team' ? (item.strTeamBadge || item.strBadge) : (item.strThumb || item.strCutout)" 
+                    (error)="searchImg.src='assets/images/Logo.png'" alt="logo" />
             </div>
             <div class="flex flex-column text-left">
               <span class="font-bold suggestion-name" style="font-size: 0.95rem;">
@@ -121,7 +124,8 @@
       <div *ngFor="let match of liveMatches" class="match-card live-border clickable" 
           (click)="goToMatch(match)" 
           (keydown.enter)="goToMatch(match)" 
-          tabindex="0">
+          tabindex="0"
+          role="button">
     
         <div class="match-card-header">
           <span class="tournament-name">{{ match.tournamentName || 'Competición' }}</span>
@@ -130,7 +134,7 @@
         <div class="match-content">
           <div class="team team-home">
             <span class="team-name">{{ match.homeName }}</span>
-            <img [src]="match.homeLogo" alt="Escudo local" class="team-logo" onerror="this.src='assets/placeholder.png'">
+            <img #homeLogoImg [src]="match.homeLogo" alt="Escudo local" class="team-logo" (error)="homeLogoImg.src='assets/placeholder.png'">
           </div>
     
           <div class="score-board">
@@ -151,14 +155,14 @@
           </div>
     
           <div class="team team-away">
-            <img [src]="match.awayLogo" alt="Escudo visitante" class="team-logo"
-              onerror="this.src='assets/placeholder.png'">
+            <img #awayLogoImg [src]="match.awayLogo" alt="Escudo visitante" class="team-logo" (error)="awayLogoImg.src='assets/placeholder.png'">
             <span class="team-name">{{ match.awayName }}</span>
           </div>
         </div>
     
       </div>
     </div>
+    
 
     <div *ngIf="liveMatches.length === 0" class="empty-state">
       <p>No hay partidos en juego en este momento.</p>
@@ -217,10 +221,11 @@
                   (click)="goToTeamDetail(item.teamName)"
                   (keydown.enter)="goToTeamDetail(item.teamName)"
                   tabindex="0"
+                  role="button"
                   style="display: flex; align-items: center; gap: 10px;">
-                <img [src]="item.teamBadge || item.teamLogo || 'assets/images/Logo.png'"
+                <img #standingsImg [src]="item.teamBadge || item.teamLogo || 'assets/images/Logo.png'"
                   width="30" height="30" alt="Escudo" style="object-fit: contain;"
-                  onerror="this.src='assets/images/Logo.png'">
+                  (error)="standingsImg.src='assets/images/Logo.png'">
                 <strong>{{ item.teamName }}</strong>
               </div>
             </td>

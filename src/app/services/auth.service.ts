@@ -12,8 +12,8 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
   // Inyectamos el servicio Auth de Firebase
-  private auth = inject(Auth);
-  private firestore = inject(Firestore);
+  private readonly auth = inject(Auth);
+  private readonly firestore = inject(Firestore);
 
   // Observable que nos dirá en tiempo real si el usuario está conectado o no
   public readonly user$: Observable<User | null> = authState(this.auth);
@@ -38,7 +38,7 @@ export class AuthService {
 
   /* --- INICIAR SESIÓN Y VERIFICAR BORRADO --- */
   async login(email: string, password: string): Promise<any> {
-    const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
 
     // Comprobamos si el admin ha borrado el documento del usuario en Firestore
     const userDocRef = doc(this.firestore, `users/${userCredential.user.uid}`);

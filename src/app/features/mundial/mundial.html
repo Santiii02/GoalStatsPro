@@ -50,11 +50,12 @@
                 <td>
                   <div class="team-row clickable" 
                       (click)="goToTeamDetail(team.teamName)"
-                      (keydown.enter)="goToTeamDetail(team.teamName)"
-                      tabindex="0">
-                    <img [src]="team.teamBadge || 'assets/images/Logo.png'"
+                      (keydown)="$event.key === 'Enter' && goToTeamDetail(team.teamName)"
+                      tabindex="0"
+                      role="button">
+                    <img #groupFlag [src]="team.teamBadge || 'assets/images/Logo.png'"
                       width="24" height="24" alt="Bandera" class="country-flag"
-                      onerror="this.src='assets/images/Logo.png'">
+                      (error)="groupFlag.src='assets/images/Logo.png'">
                     <strong>{{ translateTeam(team.teamName) }}</strong>
                   </div>
                 </td>
@@ -85,8 +86,9 @@
             <div class="matches-grid" *ngIf="knockouts[round].length > 0">
               <div *ngFor="let match of knockouts[round]" class="match-card clickable fade-in" 
                   (click)="goToMatch(match)"
-                  (keydown.enter)="goToMatch(match)"
-                  tabindex="0">
+                  (keydown)="$event.key === 'Enter' && goToMatch(match)"
+                  tabindex="0"
+                  role="button">
                 
                 <div class="match-card-header">
                   <span class="tournament-name">
@@ -98,7 +100,7 @@
                 <div class="match-content">
                   <div class="team team-home">
                     <span class="team-name" [class.fw-bold]="isWinner(match, 'home')">{{ translateTeam(match.homeName) }}</span>
-                    <img [src]="getLogoUrl(match.homeLogo)" alt="Bandera" class="team-logo" onerror="this.src='assets/images/Logo.png'">                  
+                    <img #koHomeImg [src]="getLogoUrl(match.homeLogo)" alt="Bandera" class="team-logo" (error)="koHomeImg.src='assets/images/Logo.png'">                  
                   </div>
             
                   <div class="score-board">
@@ -113,7 +115,7 @@
                   </div>
             
                   <div class="team team-away">
-                    <img [src]="getLogoUrl(match.awayLogo)" alt="Bandera" class="team-logo" onerror="this.src='assets/images/Logo.png'">
+                    <img #koAwayImg [src]="getLogoUrl(match.awayLogo)" alt="Bandera" class="team-logo" (error)="koAwayImg.src='assets/images/Logo.png'">
                     <span class="team-name" [class.fw-bold]="isWinner(match, 'away')">{{ translateTeam(match.awayName) }}</span>
                   </div>
                 </div>
@@ -133,8 +135,9 @@
       <div class="matches-grid">
         <div *ngFor="let match of upcomingMatches" class="match-card clickable" 
             (click)="goToMatch(match)"
-            (keydown.enter)="goToMatch(match)"
-            tabindex="0">
+            (keydown)="$event.key === 'Enter' && goToMatch(match)"
+            tabindex="0"
+            role="button">
           
           <div class="match-card-header">
               <span class="tournament-name">{{ match.round || $any(match).tournamentStage?.name || 'Fase de Grupos' }}</span>            <span class="ms-2 text-muted" style="font-size: 0.75rem;">
@@ -145,7 +148,7 @@
           <div class="match-content">
             <div class="team team-home">
               <span class="team-name">{{ translateTeam(match.homeName) }}</span>
-              <img [src]="getLogoUrl(match.homeLogo)" alt="Bandera" class="team-logo" onerror="this.src='assets/images/Logo.png'">
+              <img #upHomeImg [src]="getLogoUrl(match.homeLogo)" alt="Bandera" class="team-logo" (error)="upHomeImg.src='assets/images/Logo.png'">
             </div>
       
             <div class="score-board">
@@ -153,7 +156,7 @@
             </div>
       
             <div class="team team-away">
-              <img [src]="getLogoUrl(match.awayLogo)" alt="Bandera" class="team-logo" onerror="this.src='assets/images/Logo.png'">
+              <img #upAwayImg [src]="getLogoUrl(match.awayLogo)" alt="Bandera" class="team-logo" (error)="upAwayImg.src='assets/images/Logo.png'">
               <span class="team-name">{{ translateTeam(match.awayName) }}</span>
             </div>
           </div>

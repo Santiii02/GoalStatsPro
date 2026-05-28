@@ -29,9 +29,9 @@ export class HomeComponent implements OnInit {
   // Inyección de dependencias
   private sportService = inject(SportDbService);
   public authService = inject(AuthService);
-  private userService = inject(UserService);
-  private cdr = inject(ChangeDetectorRef);
-  private router = inject(Router);
+  private readonly userService = inject(UserService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
 
   // Constantes de negocio
   private readonly LIGA_NAME = 'LaLiga';
@@ -47,7 +47,7 @@ export class HomeComponent implements OnInit {
   filteredItems: any[] = [];
 
   // Busquedas de forma reactiva para evitar saturar la API y mejorar la experiencia del usuario
-  private searchSubject = new Subject<string>();
+  private readonly searchSubject = new Subject<string>();
   private searchSubscription!: Subscription;
 
   // Mensaje dinámico para informar al usuario sobre el filtro aplicado

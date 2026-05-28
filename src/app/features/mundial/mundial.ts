@@ -26,9 +26,9 @@ import { ButtonModule } from 'primeng/button';
 })
 export class MundialComponent implements OnInit {
   // Inyección de dependencias
-  private sportService = inject(SportDbService);
-  private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
+  private readonly sportService = inject(SportDbService);
+  private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // Estados de carga
   loading: boolean = true;

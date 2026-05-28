@@ -26,8 +26,8 @@ export class AppComponent implements OnInit{
 
   // Inyección de dependencias
   public authService = inject(AuthService);
-  private router = inject(Router);
-  private userService = inject(UserService);
+  private readonly router = inject(Router);
+  private readonly userService = inject(UserService);
 
   ngOnInit(): void {
     this.checkAdminRole();

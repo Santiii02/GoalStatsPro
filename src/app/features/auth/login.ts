@@ -22,9 +22,9 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent {
     // Inyección de dependencias
-    private authService = inject(AuthService);
-    private router = inject(Router);
-    private cdr = inject(ChangeDetectorRef);
+    private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
+    private readonly cdr = inject(ChangeDetectorRef);
 
     // Variables del formulario
     email: string = '';
