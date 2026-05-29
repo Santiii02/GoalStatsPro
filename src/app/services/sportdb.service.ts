@@ -22,7 +22,7 @@ export class SportDbService {
   /* --- Prefijo de rutas API --- */
   private readonly LALIGA_PREFIX = `/api/flashscore/football/spain:176/laliga:QVmLl54o/${this.CURRENT_SEASON}`;
   private readonly WORLD_CUP_PREFIX = '/api/flashscore/football/world:8/world-cup:lvUBR5F8/2026';
-  private readonly SPORTSDB_PREFIX = '/api/thesportsdb/api/v1/json/5032939090';
+  private readonly SPORTSDB_PREFIX = '/api/thesportsdb';
 
   /* --- Constantes de caché --- */
   private readonly CACHE_KEYS = {
@@ -43,12 +43,9 @@ export class SportDbService {
     STATIC: 6 * 60 * 60 * 1000  // 6 horas (Datos estáticos como calendarios)
   };
 
-  /* --- Genera las cabeceras HTTP necesarias, incluyendo la autenticación --- */
+  /* --- Genera los headers comunes para las peticiones sin clave --- */
   private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'X-API-Key': environment.apiKey
-    });
+    return new HttpHeaders({ 'Content-Type': 'application/json' });
   }
 
   /*

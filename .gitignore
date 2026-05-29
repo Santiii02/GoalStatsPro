@@ -42,5 +42,6 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
-# API keys
-/src/app/keys/
+# Variables de entorno locales
+.env
+.vercel

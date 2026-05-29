@@ -1,16 +1,7 @@
 {
-  "/api/thesportsdb": {
-    "target": "https://www.thesportsdb.com",
-    "secure": true,
-    "changeOrigin": true,
-    "pathRewrite": {
-      "^/api/thesportsdb": ""
-    }
-  },
   "/api": {
-    "target": "https://api.sportdb.dev",
+    "target": "https://goal-stats-pro.vercel.app",
     "secure": true,
-    "changeOrigin": true,
-    "logLevel": "debug"
+    "changeOrigin": true
   }
 }

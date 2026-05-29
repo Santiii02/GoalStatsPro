@@ -8,12 +8,12 @@ import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { SportDbService } from '../../services/sportdb.service';
 import { Match } from '../../models/sport.model';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-matches',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './matches.html',
   styleUrl: './matches.css'
 })

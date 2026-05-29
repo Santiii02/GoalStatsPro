@@ -19,18 +19,12 @@
 
         <div class="match-hero">
             <div class="team-col home">
-                <img [src]="match.homeLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team" alt="Local" 
-                    (click)="goToTeamDetail(match.homeTeam)" 
-                    (keydown)="$event.key === 'Enter' && goToTeamDetail(match.homeTeam)" 
-                    tabindex="0" 
-                    role="button"
+                <a [routerLink]="['/team', match.homeTeam]" 
+                    style="text-decoration: none; color: inherit; outline: none; display: flex; flex-direction: column; align-items: center; cursor: pointer;" 
                     title="Ver perfil del equipo">
-                <h2 class="team-name clickable-team" 
-                    (click)="goToTeamDetail(match.homeTeam)" 
-                    (keydown)="$event.key === 'Enter' && goToTeamDetail(match.homeTeam)" 
-                    tabindex="0" 
-                    role="button"
-                    title="Ver perfil del equipo">{{ match.homeTeam }}</h2>
+                    <img [src]="match.homeLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team" alt="Local">
+                    <h2 class="team-name clickable-team" style="margin: 0; margin-top: 10px;">{{ match.homeTeam }}</h2>
+                </a>
 
                 <div class="team-form mt-2" *ngIf="homeForm.length > 0">
                    <span *ngFor="let result of homeForm" 
@@ -62,18 +56,12 @@
             </div>
 
             <div class="team-col away">
-                <img [src]="match.awayLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team" alt="Visitante" 
-                    (click)="goToTeamDetail(match.awayTeam)" 
-                    (keydown)="$event.key === 'Enter' && goToTeamDetail(match.awayTeam)" 
-                    tabindex="0" 
-                    role="button"
+                <a [routerLink]="['/team', match.awayTeam]" 
+                    style="text-decoration: none; color: inherit; outline: none; display: flex; flex-direction: column; align-items: center; cursor: pointer;" 
                     title="Ver perfil del equipo">
-                <h2 class="team-name clickable-team" 
-                    (click)="goToTeamDetail(match.awayTeam)" 
-                    (keydown)="$event.key === 'Enter' && goToTeamDetail(match.awayTeam)" 
-                    tabindex="0" 
-                    role="button"
-                    title="Ver perfil del equipo">{{ match.awayTeam }}</h2>
+                    <img [src]="match.awayLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team" alt="Visitante">
+                    <h2 class="team-name clickable-team" style="margin: 0; margin-top: 10px;">{{ match.awayTeam }}</h2>
+                </a>
                     
                 <div class="team-form mt-2" *ngIf="awayForm.length > 0">
                    <span *ngFor="let result of awayForm" 

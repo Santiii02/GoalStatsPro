@@ -540,6 +540,14 @@
       font-size: 0.9rem;
   }
 
+  .rank-legend {
+    flex-wrap: wrap;       
+    gap: 10px;             
+    padding: 10px;         
+    font-size: 0.75rem;    
+    justify-content: flex-start;
+  }
+
   /* Ajuste de los marcadores en vivo para nombres largos */
   .match-card {
     padding: 12px 10px;
