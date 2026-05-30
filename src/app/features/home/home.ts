@@ -3,7 +3,7 @@
  *  EL USUARIO PUEDE BUSCAR UN EQUIPO Y VER SU INFORMACIÓN
  */
 
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { CommonModule } from '@angular/common';
@@ -25,10 +25,11 @@ import { translateTeamName } from '../../models/team-mapper';
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   // Inyección de dependencias
   private sportService = inject(SportDbService);
   public authService = inject(AuthService);
+  private userSubscription!: Subscription;
   private readonly userService = inject(UserService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
@@ -73,7 +74,7 @@ export class HomeComponent implements OnInit {
     }
 
     // Escuchamos cambios en la autenticación para recargar favoritos cuando el usuario inicie sesión o cierre sesión
-    this.authService.user$.subscribe(user => {
+    this.userSubscription = this.authService.user$.subscribe(user => {
       // Evitamos peticiones duplicadas si ya se están cargando o ya hay datos cargados
       if (user) {
         if (this.favoriteTeamsData.length === 0 && !this.loadingFavorites) {
@@ -120,6 +121,11 @@ export class HomeComponent implements OnInit {
         this.filteredItems = [];
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.userSubscription?.unsubscribe();
+    this.searchSubscription?.unsubscribe();
   }
 
   /* --- Buscador --- */

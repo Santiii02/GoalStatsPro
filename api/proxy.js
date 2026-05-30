@@ -1,4 +1,15 @@
-// Archivo que maneja las peticiones a /api/..., haciendo de intermediario (proxy) entre el navegador y los servicios externos.
+/* 
+ * Archivo que maneja las peticiones a /api/..., haciendo de intermediario (proxy) entre el navegador y los servicios externos.
+ * Enruta /api/... a /api/proxy?__path=... y decide a qué servicio llamar
+ */
+
+// Ejemplo: 
+// Angular pide:  /api/flashscore/football/live, entonces __path = "flashscore/football/live"
+// Vercel reescribe a:  /api/proxy?__path=flashscore/football/live
+// proxy.js lee:  req.query.__path = "flashscore/football/live"
+// Construye: https://api.sportdb.dev/api/flashscore/football/live (en este caso, porque empieza por "flashscore/")
+// Llama a esa dirección, coge la respuesta y se la devuelve al navegador tal cual
+
 
 // Direcciones base de los servicios externos a los que vamos a llamar:
 const SPORTDB_BASE = 'https://api.sportdb.dev';
@@ -9,9 +20,20 @@ const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemi
 // "req" = request, "res" = response.
 export default async function handler(req, res) {
     try {
-        // Quitamos el "/api/" del principio de la dirección para quedarnos solo con lo que viene después.
-        // Ejemplo: "/api/thesportsdb/searchteams.php?t=Madrid" -> "thesportsdb/searchteams.php?t=Madrid"
-        const afterApi = req.url.replace(/^\/api\//, '');
+        // Leemos la ruta que Vercel nos pasó en el parámetro __path
+        const pathParam = req.query.__path || '';
+
+        // Recogemos los demás parámetros de búsqueda y los quitamos de __path para no mezclarlo
+        const otherParams = { ...req.query };
+        delete otherParams.__path;
+
+        // Reconstruimos el query string original
+        const qs = Object.keys(otherParams).length > 0
+            ? '?' + new URLSearchParams(otherParams).toString()
+            : '';
+
+        // Ruta completa
+        const afterApi = pathParam + qs;
 
         // Si la petición empieza por "ai/", es para Gemini
         if (afterApi.startsWith('ai/')) {
@@ -31,6 +53,7 @@ export default async function handler(req, res) {
         }
 
         // El resto de peticiones van a SportDB.dev. Aquí la clave va en una cabecera, no en la URL
+        // https://api.sportdb.dev/api/flashscore/football/live
         return forward(res, `${SPORTDB_BASE}/api/${afterApi}`, {
             'X-API-Key': process.env.SPORT_API_KEY
         });
