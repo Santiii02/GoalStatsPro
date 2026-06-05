@@ -104,13 +104,12 @@
         <div class="match-meta">
           <span class="round-badge" *ngIf="getRoundLabel(match)">{{ getRoundLabel(match) }}</span>
           <div class="match-date">
-            <i class="pi pi-calendar me-1"></i>
             {{ getMatchDate(match) | date:'dd/MM/yyyy HH:mm' }}
           </div>
         </div>
 
         <div class="match-teams">
-          <span class="team-name" style="text-align: right;" [class.fw-bold]="match.homeName === team.strTeam">{{ translateName(match.homeName) }}</span>
+          <span class="team-name home-team" [class.fw-bold]="match.homeName === team.strTeam">{{ translateName(match.homeName) }}</span>
           
           <div class="match-score">
             <ng-container *ngIf="selectedMatchType === 'past'; else noScore">
@@ -121,7 +120,7 @@
             </ng-template>
           </div>
 
-          <span class="team-name" style="text-align: left;" [class.fw-bold]="match.awayName === team.strTeam">{{ translateName(match.awayName) }}</span>          
+          <span class="team-name away-team" [class.fw-bold]="match.awayName === team.strTeam">{{ translateName(match.awayName) }}</span>          
         </div>
       </div>
     </div>
@@ -217,7 +216,7 @@
           <span class="number-badge" *ngIf="player.strNumber">#{{ player.strNumber }}</span>
 
           <div class="nationality" *ngIf="player.strNationality">
-            <small>📍 {{ player.strNationality }}</small>
+            <small>📍 {{ translateNationality(player.strNationality) }}</small>
           </div>
         </div>
 

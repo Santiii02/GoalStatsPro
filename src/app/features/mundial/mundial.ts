@@ -38,13 +38,20 @@ export class MundialComponent implements OnInit {
   groups: any[] = [];
 
   // Fase Eliminatoria 
-  knockoutRounds: string[] = ['Octavos', 'Cuartos', 'Semifinales', 'Final']; 
+  knockoutRounds: string[] = ['Dieciseisavos', 'Octavos', 'Cuartos', 'Semifinales', 'Final'];
   knockouts: { [key: string]: Match[] } = {
+    'Dieciseisavos': [],
     'Octavos': [],
     'Cuartos': [],
     'Semifinales': [],
     'Final': []
   };
+
+    // Partidos por Jornada
+  private allWorldCupMatches: Match[] = [];
+  worldCupRounds: string[] = [];
+  selectedRound: string = '';
+  matchesByRound: Match[] = [];
 
   // Próximos partidos generales
   upcomingMatches: Match[] = [];
@@ -77,6 +84,9 @@ export class MundialComponent implements OnInit {
 
         // Eliminatoria (Octavos, Cuartos...)
         this.processKnockouts(allMatches);
+
+        // Partidos por jornada
+        this.processMatchesByRound(allMatches);
 
         // Próximos Partidos
         this.processUpcomingMatches(data.fixtures || []);
@@ -115,9 +125,9 @@ export class MundialComponent implements OnInit {
                 }
                 return team;
               })
-            )
+      )
           ),
-          toArray()
+    toArray()
         )
       )
     ).subscribe(() => {
@@ -127,32 +137,88 @@ export class MundialComponent implements OnInit {
 
   /* --- Fase eliminatoria --- */
   private processKnockouts(allMatches: Match[]): void {
-    this.knockouts = { 'Octavos': [], 'Cuartos': [], 'Semifinales': [], 'Final': [] };
+    this.knockouts = { 'Dieciseisavos': [], 'Octavos': [], 'Cuartos': [], 'Semifinales': [], 'Final': [] };
 
     // Clasificamos cada partido en su ronda correspondiente según el nombre de la ronda
     allMatches.forEach(match => {
-      const roundName = match.round || '';
+      const round = (match.round || '').toLowerCase();
       
-      if (roundName.includes('1/8')) {
+      if (round.includes('1/16') || round.includes('round of 32')) {
+        this.knockouts['Dieciseisavos'].push(match);
+      } else if (round.includes('1/8') || round.includes('round of 16')) {
         this.knockouts['Octavos'].push(match);
-      } else if (roundName.includes('Quarter')) {
+      } else if (round.includes('1/4') || round.includes('quarter')) {
         this.knockouts['Cuartos'].push(match);
-      } else if (roundName.includes('Semi')) {
+      } else if (round.includes('semi')) {
         this.knockouts['Semifinales'].push(match);
-      } else if (roundName.includes('Final') && !roundName.includes('Quarter') && !roundName.includes('Semi')) {
+      } else if (round.includes('final') && !round.includes('quarter') && !round.includes('semi') && !round.includes('1/4')) {
         this.knockouts['Final'].push(match);
       }
     });
 
     for (const round of this.knockoutRounds) {
-      this.knockouts[round].sort((a, b) => Number(a.eventStartTime || 0) - Number(b.eventStartTime || 0));
+      this.knockouts[round].sort((a, b) => this.getMatchDate(a) - this.getMatchDate(b));
     }
+  }
+
+  /* --- Partidos por jornada --- */
+  private processMatchesByRound(allMatches: Match[]): void {
+    this.allWorldCupMatches = allMatches;
+
+    // Extraemos las jornadas únicas y las ordenamos
+    const rounds = [...new Set(
+      allMatches.map(m => m.round).filter((r): r is string => !!r)
+    )].sort((a, b) => this.sortRoundOrder(a) - this.sortRoundOrder(b));
+
+    this.worldCupRounds = rounds;
+
+    // Seleccionamos la primera jornada por defecto
+    if (rounds.length > 0) {
+      this.selectedRound = rounds[0];
+      this.filterMatchesByRound();
+    }
+  }
+
+  /* --- Filtra los partidos según la jornada seleccionada en el desplegable --- */
+  filterMatchesByRound(): void {
+    this.matchesByRound = this.allWorldCupMatches
+      .filter(m => m.round === this.selectedRound)
+      .sort((a, b) => this.getMatchDate(a) - this.getMatchDate(b));
+    this.cdr.detectChanges();
+  }
+
+
+  /* --- Cambia a la jornada seleccionada --- */
+  onRoundChange(event: Event): void {
+    this.selectedRound = (event.target as HTMLSelectElement).value;
+    this.filterMatchesByRound();
+  }
+
+  /* --- Ordena las jornadas --- */
+  private sortRoundOrder(round: string): number {
+    const r   = round.toLowerCase().trim();
+    const num = round.match(/(\d+)/);
+    
+    // Jornadas de fase de grupos: "Round 1", "Round 2", "Round 3"... aparecen antes de la fase eliminatoria
+    if (/^round\s+\d+$/i.test(r) && num) return parseInt(num[1]);
+    // Otros formatos de fase de grupos por si cambia la API
+    if (r.includes('group') || r.includes('grupo')) {
+      return num ? 10 + parseInt(num[1]) : 15;
+    }
+    // Fase eliminatoria (valores altos para que vayan después del grupo)
+    if (r.includes('1/16') || r.includes('round of 32')) return 100;
+    if (r.includes('1/8')  || r.includes('round of 16')) return 101;
+    if (r.includes('1/4')  || r.includes('quarter'))     return 102;
+    if (r.includes('semi'))                               return 103;
+    if (r.includes('final'))                              return 104;
+
+    return 50; // fallback: rondas desconocidas van al centro
   }
 
   /* --- Próximos partidos --- */
   private processUpcomingMatches(fixtures: Match[]): void {
     // Filtramos solo los partidos que no sean de clasificación y que tengan fecha futura
-    const sortedFixtures = [...fixtures].sort((a, b) => Number(a.eventStartTime || 0) - Number(b.eventStartTime || 0));
+    const sortedFixtures = [...fixtures].sort((a, b) => this.getMatchDate(a) - this.getMatchDate(b));
     this.upcomingMatches = sortedFixtures.slice(0, 6);
   }
 
@@ -200,5 +266,25 @@ export class MundialComponent implements OnInit {
   translateTeam(name: string | undefined | null): string {
     if (!name) return '';
     return translateTeamName(name);
+  }
+
+  /* --- Formatea el nombre de la jornada --- */
+  formatRound(round: string | undefined | null): string {
+    if (!round) return 'Fase de Grupos';
+    const r = round.trim();
+    const l = r.toLowerCase();
+
+    if (l.includes('1/16') || l.includes('round of 32'))                 return 'Dieciseisavos';
+    if (l.includes('1/8')  || l.includes('round of 16'))                 return 'Octavos de final';
+    if (l.includes('quarter'))                                            return 'Cuartos de final';
+    if (l.includes('semi'))                                               return 'Semifinales';
+    if (l.includes('final') && !l.includes('semi') && !l.includes('quarter')) return 'Final';
+
+    // Jornadas de fase de grupos: "Group Stage - Round 3" → "Jornada 3"
+    const matchNumber = r.match(/(\d+)/);
+    if (matchNumber) return `Jornada ${matchNumber[1]}`;
+
+    // "Round" por "Jornada"
+    return r.replace(/\bRound\b/gi, 'Jornada');
   }
 }

@@ -19,10 +19,11 @@
       >
         <ng-template pTemplate="selectedItem">
           <div class="flex align-items-center gap-2" *ngIf="selectedTeam">
-            <img
-              [src]="selectedTeam.badge"
+            <img #selBadge
+              [src]="selectedTeam.badge || 'assets/images/Logo.png'"
               alt="Escudo de {{ selectedTeam.name }}"
               style="width: 20px; margin-right: 5px; vertical-align: middle"
+              (error)="selBadge.src='assets/images/Logo.png'"
             />
             <span>{{ selectedTeam.name }}</span>
           </div>
@@ -30,11 +31,12 @@
 
         <ng-template let-team pTemplate="item">
           <div class="flex align-items-center gap-2">
-            <img
-              [src]="team.badge"
-              alt="Escudo de {{ team.name }}"
-              style="width: 20px; margin-right: 8px; vertical-align: middle"
-            />
+          <img #itemBadge
+            [src]="team.badge || 'assets/images/Logo.png'"
+            alt="Escudo de {{ team.name }}"
+            style="width: 20px; margin-right: 8px; vertical-align: middle"
+            (error)="itemBadge.src='assets/images/Logo.png'"
+          />
             <span>{{ team.name }}</span>
           </div>
         </ng-template>
@@ -42,27 +44,62 @@
 
       <span class="divider-text">O</span>
 
-      <div class="p-input-icon-right search-box">
-        <i class="pi pi-search clickable" 
+      <div class="search-box-wrapper p-input-icon-right">
+        
+        <p-autoComplete 
+          [(ngModel)]="selectedPlayer" 
+          [suggestions]="filteredPlayers" 
+          (completeMethod)="filterPlayersList($event)" 
+          (onSelect)="onPlayerSelect($event)"
+          (keyup.enter)="searchPlayerGlobal()"
+          field="strPlayer" 
+          placeholder="Buscar nombre (ej: Vinicius)..."
+          [forceSelection]="false"
+          scrollHeight="350px"
+          minLength="2"
+          styleClass="w-full" 
+          inputStyleClass="w-full search-input-custom">
+
+          <ng-template let-player pTemplate="item">
+            <div class="flex align-items-center gap-3 py-1">
+              <div class="suggestion-img-wrapper">
+                <img #searchImg 
+                  [src]="player.strThumb || player.strCutout || 'assets/images/Avatar.png'" 
+                  (error)="searchImg.src='assets/images/Avatar.png'" alt="avatar" />
+              </div>
+              <div class="flex flex-column text-left">
+                <span class="font-bold" style="font-size: 0.95rem; color: #1e293b;">
+                    {{ player.strPlayer }}
+                </span>
+                <span style="font-size: 0.75rem; color: #64748b;">
+                    {{ translatePosition(player.strPosition) }} • {{ translateNationality(player.strNationality) }}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+
+          <ng-template pTemplate="empty">
+            <div class="empty-search-msg">
+              <i class="pi pi-search-minus mb-2"></i>
+              <p class="font-bold m-0" style="color: #475569;">No se encontraron jugadores</p>
+            </div>
+          </ng-template>
+
+        </p-autoComplete>
+
+        <i class="pi pi-search clickable search-icon" 
           (click)="searchPlayerGlobal()"
-          (keydown.enter)="searchPlayerGlobal()"
           tabindex="0"
           aria-label="Buscar jugador"
           role="button"></i>
-        <input
-          type="text"
-          pInputText
-          [(ngModel)]="searchQuery"
-          (keyup.enter)="searchPlayerGlobal()"
-          placeholder="Buscar nombre (ej: Vinicius)..."
-        />
       </div>
+
     </div>
   </div>
 
   <div *ngIf="loading" class="text-center py-5">
     <i class="pi pi-spin pi-spinner text-primary" style="font-size: 3rem"></i>
-    <p class="mt-3 text-muted">Scouting jugadores...</p>
+    <p class="mt-3 text-muted">Buscando jugadores...</p>
   </div>
 
   <div *ngIf="!loading">
@@ -102,7 +139,7 @@
           </div>
 
           <div class="nationality" *ngIf="p.strNationality">
-            <small>📍 {{ p.strNationality }}</small>
+            <small>📍 {{ translateNationality(p.strNationality) }}</small>
           </div>
 
           <div class="team-mini" *ngIf="!selectedTeam">

@@ -73,6 +73,7 @@
         [suggestions]="filteredItems" 
         (completeMethod)="search($event)" 
         (onSelect)="onSelect($event)"
+        (onClear)="filteredItems = []" field="strTeam"
         field="strTeam" 
         placeholder="Ej: Real Madrid, Mbappé..."
         [forceSelection]="true"

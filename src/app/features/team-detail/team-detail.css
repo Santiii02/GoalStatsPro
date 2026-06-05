@@ -413,13 +413,6 @@
     letter-spacing: 0.5px;
 }
 
-.match-row:hover { transform: translateX(5px); }
-
-.match-date {
-    font-size: 0.85rem;
-    color: #888;
-    min-width: 130px;
-}
 
 .match-teams {
     display: flex;
@@ -531,26 +524,49 @@
         font-size: 2.2rem;
     }
 
-    /*  Apilamos las estadísticas en vertical */
-    .stats-container {
-        grid-template-columns: 1fr;
+    /* Convertimos las estadísticas a una cuadrícula 2x2 para móvil */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
 
-    /*  Apilamos los equipos y la fecha en vertical */
+    /* Lista de partidos */
     .match-row {
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
+        align-items: center;
+        padding: 15px;
         text-align: center;
-        cursor: pointer;
     }
 
-    /*  Centramos la fecha y la jornada */
+    .match-meta {
+        align-items: center;
+        min-width: auto;
+    }
+
+    .round-badge {
+        align-self: center;
+        margin-bottom: 5px;
+    }
+
     .match-teams {
         width: 100%;
-        justify-content: space-between;
+        gap: 8px; 
     }
 
-    /*  Apilamos el encabezado de partidos en vertical */
+    .team-name {
+        font-size: 0.85rem; 
+        line-height: 1.2;
+    }
+
+    .score-badge {
+        font-size: 0.95rem; 
+        padding: 5px 10px;
+        letter-spacing: 1px;
+    }
+
+    /* Apilamos el encabezado de partidos en vertical */
     .matches-header {
         flex-direction: column;
         gap: 15px;

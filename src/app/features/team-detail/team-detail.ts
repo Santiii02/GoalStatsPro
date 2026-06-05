@@ -403,4 +403,9 @@ export class TeamDetailComponent implements OnInit, OnChanges {
     // Resto de ligas
     return team.strLeague;
   }
+
+  /* --- Traductor de Nacionalidad (Inglés a Español)--- */
+  translateNationality(country: string): string {
+    return translateTeamName(country);
+  }
 }

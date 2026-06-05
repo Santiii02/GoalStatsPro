@@ -11,7 +11,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { SportDbService } from '../../services/sportdb.service';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { translatePositionMapping } from '../../models/team-mapper';
+import { translatePositionMapping, translateTeamName } from '../../models/team-mapper';
 
 @Component({
   selector: 'app-player-detail',
@@ -235,4 +235,42 @@ export class PlayerDetailComponent implements OnInit {
       this.router.navigate(['/team', teamName]);
     }
   }
+
+  /* --- Traductor de Nacionalidad (Inglés a Español)--- */
+  translateNationality(country: string): string {
+    return translateTeamName(country);
+  }
+
+  /* --- Convertidor de libras a kg --- */
+  LibrasToKg(weight: string): string {
+    if (!weight) return 'N/A';
+
+    const lowerWeight = weight.toLowerCase();
+
+    // Extraemos el valor numérico de la cadena
+    const match = weight.match(/\d+(\.\d+)?/);
+    // Si no hay número, devolvemos el texto original
+    if (!match) return weight; 
+
+    const numericValue = parseFloat(match[0]);
+
+    // Si ya está en kg lo respetamos
+    if (lowerWeight.includes('kg')) {
+      return `${numericValue} kg`;
+    }
+
+    // Pasamos de lb a kg
+    const kgValue = Math.round(numericValue * 0.453592);
+    return `${kgValue} kg`;
+  }
+
+  /* --- Convertidor de altura --- */
+  formatHeight(height: string): string {
+    if (!height) return 'N/A';
+    
+    // Cortamos la cadena en el primer paréntesis y nos quedamos con la parte izquierda
+    // Por ejemplo: "1.91 m (6 ft 3 in)" -> ["1.91 m ", "6 ft 3 in)"] -> Tomamos el índice 0 y le quitamos los espacios
+    return height.split('(')[0].trim();
+  }
+  
 }

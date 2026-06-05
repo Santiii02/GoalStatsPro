@@ -3,11 +3,11 @@
   <header class="mb-4 d-flex justify-content-between align-items-end flex-wrap gap-3 border-bottom pb-3">
     <h2 class="m-0 text-primary fw-bold">
       <i class="pi pi-calendar me-2"></i>
-      {{ selectedRound === 'upcoming' ? 'Próximos Partidos' : selectedRound }}
+      {{ selectedRound === 'upcoming' ? 'Próximos Partidos' : formatRound(selectedRound) }}
     </h2>
 
     <div class="filter-group">
-      <label for="roundSelect" class="form-label text-muted small mb-1">Filtrar por jornada:</label>
+      <label for="roundSelect" class="form-label text-muted small mb-1">Filtrar por jornada: </label>
       <select id="roundSelect" 
               class="form-select shadow-sm border-primary" 
               [(ngModel)]="selectedRound" 
@@ -16,7 +16,7 @@
         <option value="upcoming">Próximos Partidos</option>
         
         <optgroup label="Jornadas disponibles" *ngIf="rounds.length > 0">
-          <option *ngFor="let round of rounds" [value]="round">{{ round }}</option>
+          <option *ngFor="let round of rounds" [value]="round">{{ formatRound(round) }}</option>
         </optgroup>
       </select>
     </div>
@@ -48,7 +48,7 @@
         style="text-decoration: none; color: inherit; cursor: pointer; display: block;">
       
       <div class="match-header" *ngIf="match.round">
-        <span class="badge-round">{{ match.round }}</span>
+        <span class="badge-round">{{ formatRound(match.round) }}</span>
       </div>
 
       <div class="match-content">

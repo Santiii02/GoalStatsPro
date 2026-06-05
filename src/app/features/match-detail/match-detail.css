@@ -131,6 +131,14 @@ img.clickable-team:hover {
     border-bottom: 1px solid #f1f5f9;
     display: flex;
     justify-content: center;
+    min-width: 100%;
+    flex-wrap: nowrap;
+    scrollbar-width: none;       
+    -ms-overflow-style: none;    
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav::-webkit-scrollbar {
+    display: none;               
 }
 
 :host ::ng-deep .p-tabview .p-tabview-nav li .p-tabview-nav-link {
@@ -139,11 +147,22 @@ img.clickable-team:hover {
     color: #64748b;
     font-weight: 600;
     transition: color 0.3s;
+    white-space: nowrap;
 }
 
 :host ::ng-deep .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
     color: var(--primary-color, #3b82f6);
     border-bottom: 3px solid var(--primary-color, #3b82f6);
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav-content {
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+:host ::ng-deep .p-tabview .p-tabview-nav-content::-webkit-scrollbar {
+    display: none;
 }
 
 /* --- ALINEACIONES --- */
@@ -583,6 +602,12 @@ img.clickable-team:hover {
         padding: 15px 5px; 
         gap: 0; 
     }
+
+    .match-status {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
     
     .team-badge-lg {
         width: 45px; 
@@ -602,7 +627,8 @@ img.clickable-team:hover {
     
     .score-display {
         font-size: 2rem;
-    }
+        letter-spacing: 0;
+    }   
 
     .score-display .divider {
         font-size: 1.5rem;
@@ -653,4 +679,8 @@ img.clickable-team:hover {
 
     .sub-in { font-size: 0.8rem; }
     .sub-out { font-size: 0.75rem; }
+
+    :host ::ng-deep .p-tabview .p-tabview-nav {
+        justify-content: flex-start;
+}
 }

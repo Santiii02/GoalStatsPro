@@ -39,6 +39,7 @@ export class NavbarComponent implements OnInit, OnDestroy{
       switchMap(query => {
         // Si borran el texto o escriben menos de 2 letras, no buscamos nada
         if (!query || query.trim().length < 2) {
+          this.filteredItems = [];
           return of({ teams: [], players: [] });
         }
         
@@ -69,8 +70,14 @@ export class NavbarComponent implements OnInit, OnDestroy{
 
   /* --- Lógica de Búsqueda del usuario --- */
   search(event: any) {
-    this.searchSubject.next(event.query);
+    const query = event.query;   
+    if (!query || query.trim() === '') {
+      this.filteredItems = [];
+      return; 
+    }
+    this.searchSubject.next(query);
   }
+
 
   /* --- Redirigimos la búsqueda según el tipo --- */
   onSelect(event: AutoCompleteSelectEvent) {

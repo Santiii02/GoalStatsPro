@@ -6,6 +6,7 @@
       [suggestions]="filteredItems" 
       (completeMethod)="search($event)" 
       (onSelect)="onSelect($event)"
+      (onClear)="filteredItems = []" field="strTeam"
       field="strTeam" 
       placeholder="Buscar equipo o jugador..."
       [forceSelection]="true"

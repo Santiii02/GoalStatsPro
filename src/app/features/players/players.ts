@@ -2,7 +2,7 @@
  *  CATÁLOGO DE JUGADORES
  */
 
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,11 +12,15 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SportDbService } from '../../services/sportdb.service';
 import { Standing } from '../../models/sport.model';
-import { getPlayerRoleMapping, translatePositionMapping } from '../../models/team-mapper';
+import { getPlayerRoleMapping, translatePositionMapping, translateTeamName } from '../../models/team-mapper';
+import { Subject, Subscription, from, of } from 'rxjs';
+import { concatMap, map, catchError, toArray, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
+
 @Component({
   selector: 'app-players',
   standalone: true,
-  imports: [CommonModule, FormsModule, InputTextModule, ButtonModule, DropdownModule, ProgressSpinnerModule],
+  imports: [CommonModule, FormsModule, InputTextModule, ButtonModule, DropdownModule, ProgressSpinnerModule, AutoCompleteModule],
   templateUrl: './players.html',
   styleUrl: './players.css'
 })
@@ -33,13 +37,47 @@ export class PlayersComponent implements OnInit {
   
   // Estado del componente
   loading: boolean = false;
-  searchQuery: string = '';
   currentFilter: string = 'Destacados (Líder de Liga)'; 
   error: string | null = null;
+
+  // Variables para el buscador
+  selectedPlayer: any = null; 
+  filteredPlayers: any[] = [];
+  private readonly searchSubject = new Subject<string>();
+  private searchSubscription!: Subscription;
 
 
   ngOnInit(): void {
     this.loadInitialData();
+    this.initPredictiveSearch();
+  }
+
+  ngOnDestroy(): void {
+    this.searchSubscription?.unsubscribe();
+  }
+
+  /* --- Inicializa el buscador reactivo--- */
+  private initPredictiveSearch(): void {
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(300), // Espera 300ms después de que el usuario deje de escribir
+      distinctUntilChanged(), // Solo busca si el texto es realmente distinto al anterior
+      switchMap(query => {
+        // Si borran el texto o escriben menos de 2 letras, no buscamos nada
+        if (!query || query.trim().length < 2) {
+          return of([]);
+        }
+        // Buscamos jugadores y si hay error devolvemos vacío
+        return this.sportService.searchPlayers(query).pipe(catchError(() => of([])));
+      })
+    ).subscribe({
+      next: (results) => {
+        this.filteredPlayers = results || [];
+      },
+      error: (err) => {
+        console.error('Error en búsqueda predictiva:', err);
+        this.filteredPlayers = [];
+      }
+    });
   }
 
   /* --- Carga inicial: Clasificación y Líder --- */
@@ -63,6 +101,30 @@ export class PlayersComponent implements OnInit {
           
           // Cargamos sus jugadores
           this.loadTeamPlayersByName(leader.name);
+          
+          // Cargamos los escudos de todos los equipos en paralelo
+          from(this.teamsList).pipe(
+            concatMap(team =>
+              this.sportService.searchTeams(team.name).pipe(
+                map(results => {
+                  if (results?.[0]) {
+                    team.badge = results[0].strTeamBadge || results[0].strBadge || team.badge;
+                  }
+                  return team;
+                }),
+                // si falla una búsqueda, continuamos con el resto
+                catchError(() => of(team)) 
+              )
+            ),
+            toArray()
+          ).subscribe(teamsWithBadges => {
+            this.teamsList = teamsWithBadges;
+            // Refrescamos el equipo seleccionado para que el header del dropdown actualice su escudo
+            const updatedSelected = teamsWithBadges.find(t => t.name === this.selectedTeam?.name);
+            if (updatedSelected) this.selectedTeam = updatedSelected;
+          });
+
+
         } else {
           this.loading = false;
         }
@@ -109,20 +171,50 @@ export class PlayersComponent implements OnInit {
   /* --- Cambio en el Dropdown de equipos --- */
   onTeamChange(event: any): void {
     if (event.value) {
-      this.searchQuery = ''; 
+      this.selectedPlayer = null; 
       this.loadTeamPlayersByName(event.value.name);
     }
   }
 
+  /* --- Filtra la lista de jugadores en tiempo real --- */
+  filterPlayersList(event: any): void {
+    const query = event.query;
+    if (!query || query.trim() === '') {
+      this.filteredPlayers = [];
+      return; 
+    }
+    this.searchSubject.next(query);
+  }
+
+  /* --- Selección de jugador desde el buscador predictivo --- */
+  onPlayerSelect(event: AutoCompleteSelectEvent): void {
+    const player = event.value;
+    if (player && player.idPlayer) {
+      this.router.navigate(['/player', player.idPlayer]);
+    }
+    
+    // Limpiamos el input tras navegar
+    setTimeout(() => {
+      this.selectedPlayer = null;
+      this.filteredPlayers = [];
+    }, 10);
+  }
+
   /* --- Búsqueda Manual de Jugador --- */
   searchPlayerGlobal(): void {
-    if (!this.searchQuery.trim()) return;
+    if (!this.selectedPlayer) return;
+
+    const query = typeof this.selectedPlayer === 'string' ? this.selectedPlayer : this.selectedPlayer?.strPlayer;
+
+    if (!query || !query.trim()) return;
 
     this.loading = true;
     this.selectedTeam = null; 
-    this.currentFilter = `Resultados para "${this.searchQuery}"`;
+    this.currentFilter = `Resultados para "${query}"`;
 
-    this.sportService.searchPlayers(this.searchQuery).subscribe({
+    this.filteredPlayers = [];
+
+    this.sportService.searchPlayers(query).subscribe({
       next: (results) => {
         this.players = results;
         this.loading = false;
@@ -146,5 +238,10 @@ export class PlayersComponent implements OnInit {
   /* --- Traductor de Posiciones (Inglés a Español) --- */
   translatePosition(position: string): string {
     return translatePositionMapping(position);
+  }
+
+  /* --- Traductor de Nacionalidad (Inglés a Español)--- */
+  translateNationality(country: string): string {
+    return translateTeamName(country);
   }
 }

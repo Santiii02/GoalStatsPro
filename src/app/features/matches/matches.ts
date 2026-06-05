@@ -127,6 +127,12 @@ export class MatchesComponent implements OnInit {
     }
   }
 
+  /* --- Formatea el nombre de la jornada --- */
+  formatRound(round: string | undefined | null): string {
+    if (!round) return '';
+    return round.replace(/\bRound\b/gi, 'Jornada');
+  }
+
   /* --- Información detalla del partido  --- */
   goToMatch(match: Match): void {
       if (match && match.eventId) {

@@ -92,7 +92,6 @@
                 
                 <div class="match-card-header">
                   <span class="tournament-name">
-                    <i class="pi pi-calendar me-1"></i> 
                     {{ getMatchDate(match) | date:'dd/MM/yyyy HH:mm' }}
                   </span>
                 </div>
@@ -129,7 +128,7 @@
 
     <section class="mt-5 mb-5 dashboard-section fade-in" *ngIf="upcomingMatches.length > 0">
       <div class="section-header">
-        <h3>🗓️ Próximos Partidos del Torneo</h3>
+        <h3>📅 Próximos Partidos del Torneo</h3>
       </div>
 
       <div class="matches-grid">
@@ -140,7 +139,8 @@
             role="button">
           
           <div class="match-card-header">
-              <span class="tournament-name">{{ match.round || $any(match).tournamentStage?.name || 'Fase de Grupos' }}</span>            <span class="ms-2 text-muted" style="font-size: 0.75rem;">
+            <span class="tournament-name">{{ formatRound(match.round) }}</span>
+            <span class="match-date">
               {{ getMatchDate(match) | date:'dd/MM/yyyy HH:mm' }}
             </span>
           </div>
@@ -165,5 +165,76 @@
       </div>
     </section>
 
+    <section class="mt-5 mb-5 dashboard-section fade-in" *ngIf="worldCupRounds.length > 0">
+      <div class="section-header">
+        <h3>⚽ Partidos por Jornada</h3>
+      </div>
+
+      <div class="round-selector-wrapper">
+        <div class="round-selector-container">
+          <label class="round-selector-label" for="roundSelect">Seleccionar jornada</label>
+          <div class="round-selector-inner">
+            <select id="roundSelect"
+                    class="round-selector"
+                    [value]="selectedRound"
+                    (change)="onRoundChange($event)">
+              <option *ngFor="let round of worldCupRounds" [value]="round">
+                {{ formatRound(round) }}
+              </option>
+            </select>
+            <i class="pi pi-chevron-down round-selector-icon"></i>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="matchesByRound.length === 0" class="empty-state mt-3">
+        <p>No hay partidos disponibles para esta jornada.</p>
+      </div>
+
+      <div class="matches-grid mt-3" *ngIf="matchesByRound.length > 0">
+        <div *ngFor="let match of matchesByRound"
+            class="match-card clickable fade-in"
+            (click)="goToMatch(match)"
+            (keydown)="$event.key === 'Enter' && goToMatch(match)"
+            tabindex="0" role="button">
+          <div class="match-card-header">
+            <span class="tournament-name">{{ formatRound(match.round) }}</span>
+            <span class="match-date">
+              {{ getMatchDate(match) | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+          </div>
+
+          <div class="match-content">
+            <div class="team team-home">
+              <span class="team-name" [class.fw-bold]="isWinner(match, 'home')">
+                {{ translateTeam(match.homeName) }}
+              </span>
+              <img #jHomeImg [src]="getLogoUrl(match.homeLogo)" alt="Escudo"
+                  class="team-logo" (error)="jHomeImg.src='assets/images/Logo.png'">
+            </div>
+
+            <div class="score-board">
+              <div class="score-box"
+                  *ngIf="match.homeScore !== undefined && match.homeScore !== null; else noScoreJ">
+                <span class="score-number">{{ match.homeScore }}</span>
+                <span class="score-separator">-</span>
+                <span class="score-number">{{ match.awayScore }}</span>
+              </div>
+              <ng-template #noScoreJ>
+                <div class="vs-badge">VS</div>
+              </ng-template>
+            </div>
+
+            <div class="team team-away">
+              <img #jAwayImg [src]="getLogoUrl(match.awayLogo)" alt="Escudo"
+                  class="team-logo" (error)="jAwayImg.src='assets/images/Logo.png'">
+              <span class="team-name" [class.fw-bold]="isWinner(match, 'away')">
+                {{ translateTeam(match.awayName) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </div>

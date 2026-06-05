@@ -530,6 +530,12 @@
       padding: 1rem !important; 
   }
 
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
   :host ::ng-deep .search-input-custom {
       padding: 0.6rem 1rem 0.6rem 2.2rem !important; 
       font-size: 0.9rem !important;
