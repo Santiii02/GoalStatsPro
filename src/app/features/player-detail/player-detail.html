@@ -1,29 +1,28 @@
 <div class="container fade-in" *ngIf="player">
 
   <div class="mb-3">
-    <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()" styleClass="p-button-text text-secondary"></p-button>
+    <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()"
+      styleClass="p-button-text text-secondary"></p-button>
   </div>
 
   <div class="player-hero">
-    
+
     <div class="hero-image-container">
-      <img #heroImg [src]="player.strCutout || player.strThumb || 'assets/images/Avatar.png'" 
-          alt="Foto de {{ player.strPlayer }}"
-          class="hero-img"
-          (error)="heroImg.src='assets/images/Avatar.png'">
+      <img #heroImg [src]="player.strCutout || player.strThumb || 'assets/images/Avatar.png'"
+        alt="Foto de {{ player.strPlayer }}" class="hero-img" (error)="heroImg.src='assets/images/Avatar.png'">
     </div>
 
     <div class="hero-info">
       <div class="team-badge-mini" *ngIf="player.strTeam">
         <small>{{ player.strTeam }}</small>
       </div>
-      
+
       <h1>{{ player.strPlayer }}</h1>
-      
+
       <div class="main-stats">
         <span class="position-tag">{{ translatePosition(player.strPosition) }}</span>
         <span class="number-tag" *ngIf="player.strNumber">#{{ player.strNumber }}</span>
-          <p-button *ngIf="authService.user$ | async" [icon]="isFavorite ? 'pi pi-star-fill' : 'pi pi-star'"
+        <p-button *ngIf="authService.user$ | async" [icon]="isFavorite ? 'pi pi-star-fill' : 'pi pi-star'"
           (onClick)="toggleFavorite()" [loading]="isFavLoading"
           [styleClass]="isFavorite ? 'p-button-rounded p-button-warning fav-btn' : 'p-button-rounded p-button-outlined fav-btn p-button-secondary'"
           [pTooltip]="isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'" tooltipPosition="top">
@@ -31,21 +30,24 @@
       </div>
 
       <div class="social-links mt-3">
-        <a *ngIf="player.strInstagram" [href]="getSocialUrl(player.strInstagram)" target="_blank" class="social-btn insta">
+        <a *ngIf="player.strInstagram" [href]="getSocialUrl(player.strInstagram)" target="_blank"
+          class="social-btn insta">
           <i class="pi pi-instagram"></i>
         </a>
-        <a *ngIf="player.strTwitter" [href]="getSocialUrl(player.strTwitter)" target="_blank" class="social-btn twitter">
+        <a *ngIf="player.strTwitter" [href]="getSocialUrl(player.strTwitter)" target="_blank"
+          class="social-btn twitter">
           <i class="pi pi-twitter"></i>
         </a>
-        <a *ngIf="player.strFacebook" [href]="getSocialUrl(player.strFacebook)" target="_blank" class="social-btn facebook">
+        <a *ngIf="player.strFacebook" [href]="getSocialUrl(player.strFacebook)" target="_blank"
+          class="social-btn facebook">
           <i class="pi pi-facebook"></i>
         </a>
       </div>
     </div>
   </div>
 
-  <div class="stats-grid mt-4">    
-    
+  <div class="stats-grid mt-4">
+
     <div class="stat-box">
       <i class="pi pi-globe text-primary"></i>
       <span class="label">Nacionalidad</span>
@@ -86,14 +88,11 @@
   <div class="mt-5" *ngIf="formerTeams.length > 0">
     <h3 class="mb-3"><i class="pi pi-history text-primary me-2"></i> Historial de Traspasos</h3>
     <div class="former-teams-grid">
-      <div class="former-team-card clickable" *ngFor="let fTeam of formerTeams" 
-          (click)="goToTeamDetail(fTeam.strFormerTeam)"
-          (keydown)="$event.key === 'Enter' && goToTeamDetail(fTeam.strFormerTeam)"
-          tabindex="0"
-          role="button">
-        <img #formerTeamImg [src]="fTeam.strTeamBadge || 'assets/images/Logo.png'" 
-            alt="Escudo de {{ fTeam.strFormerTeam }}"
-            (error)="formerTeamImg.src='assets/images/Logo.png'">
+      <div class="former-team-card clickable" *ngFor="let fTeam of formerTeams"
+        (click)="goToTeamDetail(fTeam.strFormerTeam)"
+        (keydown)="$event.key === 'Enter' && goToTeamDetail(fTeam.strFormerTeam)" tabindex="0" role="button">
+        <img #formerTeamImg [src]="fTeam.strTeamBadge || 'assets/images/Logo.png'"
+          alt="Escudo de {{ fTeam.strFormerTeam }}" (error)="formerTeamImg.src='assets/images/Logo.png'">
         <div class="fteam-info">
           <strong>{{ fTeam.strFormerTeam }}</strong>
           <small class="text-muted">{{ fTeam.strJoined }} - {{ fTeam.strDeparted || 'Presente' }}</small>
@@ -102,36 +101,44 @@
     </div>
   </div>
 
-<div class="mt-5 mb-5" *ngIf="cleanedBioText">
+  <div class="mt-5 mb-5" *ngIf="cleanedBioText">
     <h3 class="mb-3">Biografía</h3>
-    
+
     <div class="bio-section">
       <div class="history-content">
         <p [class.truncated]="!showFullBio" class="bio-text">
-          {{ showFullBio ? cleanedBioText : (cleanedBioText | slice:0:400) + (cleanedBioText.length > 400 ? '...' : '') }}
+          {{ showFullBio ? cleanedBioText : (cleanedBioText | slice:0:400) + (cleanedBioText.length > 400 ? '...' : '')
+          }}
         </p>
-      
+
         <button *ngIf="cleanedBioText && cleanedBioText.length > 400" class="btn-read-more" (click)="toggleBio()">
           {{ showFullBio ? 'Leer menos' : 'Leer más' }}
           <i class="pi" [ngClass]="showFullBio ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
         </button>
       </div>
-      
+
       <small class="text-muted mt-3 d-block" *ngIf="isBioEnglishOnly" style="font-style: italic;">
-        <i class="pi pi-info-circle mr-1"></i> La información detallada solo está disponible en inglés en la base de datos oficial.
+        <i class="pi pi-info-circle mr-1"></i> La información detallada solo está disponible en inglés en la base de
+        datos oficial.
       </small>
-    </div> </div> </div> <div *ngIf="loading" class="text-center mt-5 p-5">
+    </div>
+  </div>
+</div>
+<div *ngIf="loading" class="text-center mt-5 p-5">
   <i class="pi pi-spin pi-spinner text-primary" style="font-size: 3rem"></i>
   <p class="mt-3 text-muted">Cargando perfil del jugador...</p>
 </div>
 
 <div *ngIf="errorFetchingPlayer && !loading" class="container mt-5 fade-in">
-  <div class="alert alert-warning text-center p-5 border-round shadow-sm" style="background-color: #fff8e1; border: 1px solid #ffe082;">
+  <div class="alert alert-warning text-center p-5 border-round shadow-sm"
+    style="background-color: #fff8e1; border: 1px solid #ffe082;">
     <i class="pi pi-exclamation-triangle mb-3" style="font-size: 3rem; color: #ffb300;"></i>
     <h3 style="color: #ff8f00;">Jugador no disponible</h3>
     <p class="text-secondary mt-2 mb-4" style="max-width: 500px; margin: 0 auto; line-height: 1.5;">
-      No hemos podido localizar la información de este jugador en nuestra base de datos. Es posible que el enlace esté roto o que el jugador haya sido eliminado del sistema.
+      No hemos podido localizar la información de este jugador en nuestra base de datos. Es posible que el enlace esté
+      roto o que el jugador haya sido eliminado del sistema.
     </p>
-    <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()" styleClass="p-button-warning p-button-outlined"></p-button>
+    <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()"
+      styleClass="p-button-warning p-button-outlined"></p-button>
   </div>
 </div>

@@ -7,22 +7,22 @@
 }
 
 .team-card {
-background: white;
+  background: white;
   border-radius: 12px;
   padding: 20px;
   border: 1px solid #f0f0f0;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
   display: flex;
   flex-direction: column;
 }
 
-  .team-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    border-color: var(--primary-color, #3b82f6);
-  }
+.team-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary-color, #3b82f6);
+}
 
 .card-header {
   display: flex;
@@ -32,97 +32,13 @@ background: white;
   gap: 10px;
 }
 
-.rank {
-font-size: 1.1rem;
-  font-weight: bold;
-  color: #7f8c8d;
-  background: #f5f5f5;
-  padding: 5px 10px;
-  border-radius: 8px;
-  min-width: 35px;
-  text-align: center;
-}
-
-.rank-legend {
-  display: flex;
-  gap: 15px;
-  background: white;
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: 1px solid #f0f0f0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-  font-size: 0.85rem;
-  color: #555;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  cursor: help;
-}
-
-.legend-color {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-}
-
-.top-rank-color {
-  background: #e3f2fd;
-  border: 1px solid #bbdefb;
-}
-
-.relegation-rank-color {
-  background: #ffebee;
-  border: 1px solid #ffcdd2;
-}
-
-/* Puestos de Champions (Top 5) */
-.rank.top-rank {
-  background: #e3f2fd;
-  color: #1565c0; 
-  border: 1px solid #bbdefb;
-}
-
-/* Puestos de descenso */
-.rank.relegation-rank {
-  background: #ffebee;
-  color: #c62828;
-  border: 1px solid #ffcdd2;
-}
-
-/* Europa League */
-.rank.europa-rank {
-  background: #fff3e0;
-  color: #e65100;
-  border: 1px solid #ffe0b2;
-}
-.europa-rank-color {
-  background: #fff3e0;
-  border: 1px solid #ffe0b2;
-}
-
-/* Conference League */
-.rank.conference-rank {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #c8e6c9;
-}
-.conference-rank-color {
-  background: #e8f5e9;
-  border: 1px solid #c8e6c9;
-}
-
 /* Contenedor Identidad (Escudo + Texto) */
 .team-identity {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-grow: 1; 
-  justify-content: flex-end; 
+  flex-grow: 1;
+  justify-content: flex-end;
 }
 
 .team-mini-badge {
@@ -135,7 +51,7 @@ font-size: 1.1rem;
   font-size: 1.1rem;
   font-weight: 700;
   color: #333;
-  margin: 0; 
+  margin: 0;
   text-align: right;
 }
 
@@ -160,7 +76,7 @@ font-size: 1.1rem;
 .stat-label {
   font-size: 0.75rem;
   text-transform: uppercase;
-  color: #777;
+  color: #555;
   font-weight: 600;
   letter-spacing: 0.5px;
 }
@@ -172,9 +88,9 @@ font-size: 1.1rem;
 }
 
 .stat-item.highlight .stat-value {
-    color: #2e7d32; 
-    font-weight: 800;
-  }
+  color: #2e7d32;
+  font-weight: 800;
+}
 
 .stat-divider {
   width: 1px;
@@ -183,8 +99,8 @@ font-size: 1.1rem;
 }
 
 .stats-mini {
-text-align: center;
-  margin-top: auto; 
+  text-align: center;
+  margin-top: auto;
   padding-top: 10px;
   border-top: 1px solid #f5f5f5;
   color: #666;
@@ -192,16 +108,15 @@ text-align: center;
 }
 
 @media (max-width: 768px) {
-  .page-header {
+  .card-header {
     flex-direction: column;
-    align-items: flex-start;
+    text-align: center;
   }
-
-  .rank-legend {
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px 12px;
-    font-size: 0.75rem;
-    width: 100%;
+  .team-identity {
+    justify-content: center;
+    margin-top: 10px;
+  }
+  .team-name {
+    text-align: center;
   }
 }

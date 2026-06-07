@@ -3,9 +3,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 150px); /* Restamos aprox el tamaño del navbar y footer */
+    min-height: calc(100vh - 150px);
+    /* Restamos aprox el tamaño del navbar y footer */
     padding: 2rem;
-    background-color: #f8fafc; 
+    background-color: #f8fafc;
 }
 
 /* Estilos específicos de PrimeNG Tabs */
@@ -29,7 +30,7 @@
     :host ::ng-deep .auth-card .p-card-body {
         padding: 1.5rem 1rem;
     }
-    
+
     .auth-card img {
         width: 150px !important;
     }

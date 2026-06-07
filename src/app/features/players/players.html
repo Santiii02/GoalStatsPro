@@ -6,37 +6,23 @@
     </div>
 
     <div class="filters-actions">
-      <p-dropdown
-        [options]="teamsList"
-        [(ngModel)]="selectedTeam"
-        optionLabel="name"
-        placeholder="Seleccionar Equipo"
-        (onChange)="onTeamChange($event)"
-        [style]="{ width: '220px' }"
-        scrollHeight="300px"
-        [filter]="true"
-        filterBy="name"
-      >
+      <p-dropdown [options]="teamsList" [(ngModel)]="selectedTeam" optionLabel="name" placeholder="Seleccionar Equipo"
+        (onChange)="onTeamChange($event)" [style]="{ width: '220px' }" scrollHeight="300px" [filter]="true"
+        filterBy="name">
         <ng-template pTemplate="selectedItem">
           <div class="flex align-items-center gap-2" *ngIf="selectedTeam">
-            <img #selBadge
-              [src]="selectedTeam.badge || 'assets/images/Logo.png'"
-              alt="Escudo de {{ selectedTeam.name }}"
-              style="width: 20px; margin-right: 5px; vertical-align: middle"
-              (error)="selBadge.src='assets/images/Logo.png'"
-            />
+            <img #selBadge [src]="selectedTeam.badge || 'assets/images/Logo.png'"
+              alt="Escudo de {{ selectedTeam.name }}" style="width: 20px; margin-right: 5px; vertical-align: middle"
+              (error)="selBadge.src='assets/images/Logo.png'" />
             <span>{{ selectedTeam.name }}</span>
           </div>
         </ng-template>
 
         <ng-template let-team pTemplate="item">
           <div class="flex align-items-center gap-2">
-          <img #itemBadge
-            [src]="team.badge || 'assets/images/Logo.png'"
-            alt="Escudo de {{ team.name }}"
-            style="width: 20px; margin-right: 8px; vertical-align: middle"
-            (error)="itemBadge.src='assets/images/Logo.png'"
-          />
+            <img #itemBadge [src]="team.badge || 'assets/images/Logo.png'" alt="Escudo de {{ team.name }}"
+              style="width: 20px; margin-right: 8px; vertical-align: middle"
+              (error)="itemBadge.src='assets/images/Logo.png'" />
             <span>{{ team.name }}</span>
           </div>
         </ng-template>
@@ -45,34 +31,25 @@
       <span class="divider-text">O</span>
 
       <div class="search-box-wrapper p-input-icon-right">
-        
-        <p-autoComplete 
-          [(ngModel)]="selectedPlayer" 
-          [suggestions]="filteredPlayers" 
-          (completeMethod)="filterPlayersList($event)" 
-          (onSelect)="onPlayerSelect($event)"
-          (keyup.enter)="searchPlayerGlobal()"
-          field="strPlayer" 
-          placeholder="Buscar nombre (ej: Vinicius)..."
-          [forceSelection]="false"
-          scrollHeight="350px"
-          minLength="2"
-          styleClass="w-full" 
-          inputStyleClass="w-full search-input-custom">
+
+        <p-autoComplete [(ngModel)]="selectedPlayer" [suggestions]="filteredPlayers"
+          (completeMethod)="filterPlayersList($event)" (onSelect)="onPlayerSelect($event)"
+          (onBlur)="clearIfNotSelected()" (onClear)="clearIfNotSelected()" (keyup.enter)="searchPlayerGlobal()"
+          field="strPlayer" placeholder="Buscar nombre (ej: Vinicius)..." [forceSelection]="false" scrollHeight="350px"
+          minLength="2" styleClass="w-full" inputStyleClass="w-full search-input-custom">
 
           <ng-template let-player pTemplate="item">
             <div class="flex align-items-center gap-3 py-1">
               <div class="suggestion-img-wrapper">
-                <img #searchImg 
-                  [src]="player.strThumb || player.strCutout || 'assets/images/Avatar.png'" 
+                <img #searchImg [src]="player.strThumb || player.strCutout || 'assets/images/Avatar.png'"
                   (error)="searchImg.src='assets/images/Avatar.png'" alt="avatar" />
               </div>
               <div class="flex flex-column text-left">
                 <span class="font-bold" style="font-size: 0.95rem; color: #1e293b;">
-                    {{ player.strPlayer }}
+                  {{ player.strPlayer }}
                 </span>
                 <span style="font-size: 0.75rem; color: #64748b;">
-                    {{ translatePosition(player.strPosition) }} • {{ translateNationality(player.strNationality) }}
+                  {{ translatePosition(player.strPosition) }} • {{ translateNationality(player.strNationality) }}
                 </span>
               </div>
             </div>
@@ -87,11 +64,9 @@
 
         </p-autoComplete>
 
-        <i class="pi pi-search clickable search-icon" 
-          (click)="searchPlayerGlobal()"
-          tabindex="0"
-          aria-label="Buscar jugador"
-          role="button"></i>
+        <i class="pi pi-search clickable search-icon" (click)="searchPlayerGlobal()"
+          (keydown.enter)="searchPlayerGlobal()" (keydown.space)="searchPlayerGlobal()" tabindex="0"
+          aria-label="Buscar jugador" role="button"></i>
       </div>
 
     </div>
@@ -114,18 +89,12 @@
     </div>
 
     <div class="players-grid">
-      <div class="player-card fade-in" *ngFor="let p of players" 
-          (click)="goToPlayer(p)"
-          (keydown)="$event.key === 'Enter' && goToPlayer(p)"
-          tabindex="0"
-          role="button">
+      <div class="player-card fade-in" *ngFor="let p of players" (click)="goToPlayer(p)"
+        (keydown)="$event.key === 'Enter' && goToPlayer(p)" tabindex="0" role="button">
         <div class="player-img-container">
-          <img #playerImg
-            [src]="p.strCutout || p.strThumb || 'assets/images/player-placeholder.png'"
-            alt="{{ p.strPlayer }}"
-            loading="lazy"
-            (error)="playerImg.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'"
-          />
+          <img #playerImg [src]="p.strCutout || p.strThumb || 'assets/images/player-placeholder.png'"
+            alt="{{ p.strPlayer }}" loading="lazy"
+            (error)="playerImg.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'" />
         </div>
 
         <div class="player-info">

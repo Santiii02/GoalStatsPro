@@ -2,11 +2,11 @@
  *  INFORMACIÓN DEL EQUIPO.
  */
 
-import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef} from '@angular/core';
-import { CommonModule, Location } from '@angular/common'; 
-import { RouterModule, Router } from '@angular/router'; 
-import { ButtonModule } from 'primeng/button';  
-import { CardModule } from 'primeng/card';      
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
@@ -21,7 +21,7 @@ import { getFlashscoreName, translateTeamName, getPlayerRoleMapping, translatePo
   standalone: true,
   imports: [CommonModule, RouterModule, ButtonModule, CardModule, TooltipModule, FormsModule, DropdownModule],
   templateUrl: './team-detail.html',
-  styleUrl: './team-detail.css'     
+  styleUrl: './team-detail.css'
 })
 export class TeamDetailComponent implements OnInit, OnChanges {
 
@@ -31,7 +31,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   /* --- Inyección del servicio --- */
   private readonly sportService = inject(SportDbService);
   private readonly router = inject(Router);
-  public readonly authService = inject(AuthService); 
+  public readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly location = inject(Location);
@@ -57,13 +57,13 @@ export class TeamDetailComponent implements OnInit, OnChanges {
     return this.team?.strLeague === 'Spanish La Liga';
   }
 
- /* --- Opciones para el desplegable de partidos --- */
+  /* --- Opciones para el desplegable de partidos --- */
   matchFilterOptions = [
     { label: 'Últimos Resultados', value: 'past' },
     { label: 'Próximos Partidos ', value: 'future' }
   ];
   selectedMatchType: string = 'past';
-  
+
   /* --- Estadísticas totales de la temporada (V-E-D) --- */
   matchStats = { played: 0, wins: 0, draws: 0, losses: 0 };
 
@@ -138,7 +138,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
       this.pastMatches = this.filterUniqueMatches(filtered);
       this.pastMatches.sort((a, b) => (b.eventStartTime || 0) - (a.eventStartTime || 0));
       this.calculateStats(flashscoreName);
-      this.onMatchTypeChange(); 
+      this.onMatchTypeChange();
       this.cdr.detectChanges();
     });
 
@@ -159,19 +159,19 @@ export class TeamDetailComponent implements OnInit, OnChanges {
       if (filtered.length === 0) console.warn(`⚠️ Equipo no encontrado en historial Mundial: ${flashscoreName}`);
 
       this.pastMatches = this.filterUniqueMatches(filtered);
-      if (this.pastMatches.length > 0) this.isWorldCupTeam = true; 
-      
+      if (this.pastMatches.length > 0) this.isWorldCupTeam = true;
+
       this.pastMatches.sort((a, b) => this.getMatchDate(b) - this.getMatchDate(a));
       this.calculateStats(flashscoreName);
-      this.onMatchTypeChange(); 
+      this.onMatchTypeChange();
       this.cdr.detectChanges();
     });
 
     this.sportService.getWorldCupFixtures().subscribe(matches => {
       const filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
       this.upcomingMatches = this.filterUniqueMatches(filtered);
-      if (this.upcomingMatches.length > 0) this.isWorldCupTeam = true; 
-      
+      if (this.upcomingMatches.length > 0) this.isWorldCupTeam = true;
+
       this.upcomingMatches.sort((a, b) => this.getMatchDate(a) - this.getMatchDate(b));
       this.onMatchTypeChange();
       this.cdr.detectChanges();
@@ -205,7 +205,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
    */
   private async checkIfFavorite() {
     if (!this.authService.currentUser || !this.team?.strTeam) return;
-    
+
     try {
       const favorites = await this.userService.getFavoriteTeams();
       this.isFavorite = favorites.includes(this.team.strTeam);
@@ -227,7 +227,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
       // Llamamos a Firestore
       await this.userService.toggleFavorite(this.team.strTeam, this.isFavorite);
       // Actualizamos el estado local del favorito
-      this.isFavorite = !this.isFavorite; 
+      this.isFavorite = !this.isFavorite;
     } catch (error) {
       console.error('Error al guardar favorito', error);
     } finally {
@@ -241,7 +241,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
    */
   private calculateStats(teamName: string): void {
     let w = 0, d = 0, l = 0;
-    
+
     this.pastMatches.forEach(m => {
       const homeScore = Number(m.homeScore);
       const awayScore = Number(m.awayScore);
@@ -250,7 +250,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
         d++;
       } else {
         const isHome = m.homeName === teamName;
-        if (isHome) { homeScore > awayScore ? w++ : l++; } 
+        if (isHome) { homeScore > awayScore ? w++ : l++; }
         else { awayScore > homeScore ? w++ : l++; }
       }
     });
@@ -288,20 +288,20 @@ export class TeamDetailComponent implements OnInit, OnChanges {
     if (tournamentName.toLowerCase().includes('qualification')) {
       return 'Clasificación';
     }
-    
+
     // Numeramos las jornadas
     const roundInfo = match.roundInfo?.round || match.round || match.stage;
     if (!roundInfo) return '';
-    
+
     // Si ya es un número puro
     if (!Number.isNaN(Number(roundInfo))) return `J${roundInfo}`;
-    
+
     // Si trae texto ("Round X" o "Jornada X"), extraemos solo el número
-    const num = String(roundInfo).replace(/\D/g, ''); 
+    const num = String(roundInfo).replace(/\D/g, '');
     return num ? `J${num}` : roundInfo;
   }
 
-   /* --- Posición del jugador --- */
+  /* --- Posición del jugador --- */
   getPlayerRole(position: string): string {
     return getPlayerRoleMapping(position);
   }
@@ -318,13 +318,13 @@ export class TeamDetailComponent implements OnInit, OnChanges {
 
   /* --- Ver el partido --- */
   goToMatch(match: any): void {
-      if (match && match.eventId) {
-          this.router.navigate(['/match', match.eventId], {
-            state: { data: match } 
-          });
-      }
+    if (match && match.eventId) {
+      this.router.navigate(['/match', match.eventId], {
+        state: { data: match }
+      });
+    }
   }
-  
+
   /* --- Mapeo de colores para las insignias V-E-D --- */
   getFormColorClass(result: string): string {
     if (result === 'V') return 'form-win';
@@ -342,13 +342,13 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   /* --- Selecciona el mejor fondo disponible para el Hero --- */
   getHeroBackground(): string {
     if (!this.team) return 'none';
-    
+
     // Prioridad: 1. Banner, 2. Foto del estadio, 3. Fanart1
-    const bgImage = this.team['strBanner'] || 
-                    this.team['strTeamBanner'] ||
-                    this.team['strStadiumThumb'] ||
-                    this.team['strFanart1'];
-                    
+    const bgImage = this.team['strBanner'] ||
+      this.team['strTeamBanner'] ||
+      this.team['strStadiumThumb'] ||
+      this.team['strFanart1'];
+
     return bgImage ? `url(${bgImage})` : 'none';
   }
 
@@ -384,22 +384,22 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   /* --- Etiquetas de Liga --- */
   getLeagueLabel(team: any): string {
     if (!team) return 'Desconocido';
-    
+
     // Si nuestros endpoints ya han detectado partidos oficiales
     if (this.isWorldCupTeam) return 'Selección Nacional';
     if (this.isLaLigaTeam) return 'LaLiga';
-    
+
     // Intentamos detectar por el nombre de la liga
     if (!team.strLeague) return 'Desconocido';
     const league = team.strLeague.toLowerCase();
-    
+
     if (league === 'spanish la liga') return 'LaLiga';
-    if (league.includes('world cup') || league.includes('qualifying') || 
-        league.includes('nations league') || league.includes('friendlies') || 
-        league.includes('euro ') || league.includes('copa america')) {
+    if (league.includes('world cup') || league.includes('qualifying') ||
+      league.includes('nations league') || league.includes('friendlies') ||
+      league.includes('euro ') || league.includes('copa america')) {
       return 'Selección Nacional';
     }
-    
+
     // Resto de ligas
     return team.strLeague;
   }

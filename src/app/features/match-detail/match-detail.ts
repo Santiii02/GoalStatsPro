@@ -6,7 +6,7 @@ import { Component, Input, OnInit, OnDestroy, inject, ChangeDetectorRef } from '
 import { CommonModule, Location } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { TabViewModule } from 'primeng/tabview'; 
+import { TabViewModule } from 'primeng/tabview';
 import { TagModule } from 'primeng/tag';
 import { SportDbService } from '../../services/sportdb.service';
 import { AiService } from '../../services/ai.service';
@@ -44,7 +44,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   substitutes: any = null;
   matchStats: any[] = [];
   groupedMatchStats: { category: string, stats: any[] }[] = [];
-  matchSummary: any[] = []; 
+  matchSummary: any[] = [];
 
   // Variables para la IA
   aiAnalysis: string | null = null;
@@ -71,13 +71,13 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     } else {
       // El usuario recarga F5 y los datos en memoria se pierden, buscamos en las listas cacheadas
       this.loading = true;
-      
+
       this.sportService.getMatchBasicInfo(this.id).subscribe({
         next: (rescuedMatch) => {
           if (rescuedMatch) {
             this.initMatchData(rescuedMatch);
           } else {
-            this.loading = false; 
+            this.loading = false;
           }
         },
         error: () => this.loading = false
@@ -95,7 +95,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     this.match = this.normalizeBasicData(data);
     this.loading = false;
     this.loadMatchDetails();
-    this.upgradeImages();  
+    this.upgradeImages();
     this.loadTeamForms();
 
     // Arrancamos el motor si el partido está en vivo o si faltan menos de 5 min para empezar
@@ -110,18 +110,18 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-/* --- Normaliza los datos principales del partido --- */
+  /* --- Normaliza los datos principales del partido --- */
   private normalizeBasicData(basic: any): any {
     const matchDate = this.parseMatchDate(basic);
     const currentStatus = this.determineMatchStatus(basic.status || basic.eventStatus, matchDate, basic.homeScore);
     const realLeague = basic.tournamentName || basic.league || 'Competición Oficial';
-    
+
     return {
       homeTeam: basic.homeName || basic.homeTeam,
       awayTeam: basic.awayName || basic.awayTeam,
       homeLogo: basic.homeLogo,
       awayLogo: basic.awayLogo,
-      homeScore: basic.homeScore, 
+      homeScore: basic.homeScore,
       awayScore: basic.awayScore,
       status: currentStatus,
       league: realLeague,
@@ -143,16 +143,16 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   /* --- Determina el estado exacto del partido --- */
   private determineMatchStatus(rawStatus: string, matchDate: Date | undefined, homeScore: any): string {
     const status = String(rawStatus || '').toUpperCase();
-    
+
     const finalStatuses = ['FT', 'FINISHED', 'FULL TIME', 'MATCH FINISHED', 'AET', 'PEN'];
     if (finalStatuses.includes(status)) return 'Finalizado';
-    
+
     const halfTimeStatuses = ['HT', 'HALF TIME', 'HALF-TIME', 'HALFTIME'];
     if (halfTimeStatuses.includes(status)) return 'Descanso';
-    
+
     const postponedStatuses = ['POSTPONED', 'PST', 'ABD', 'CANCELLED', 'CANCELED', 'CANC'];
     if (postponedStatuses.includes(status)) return 'Aplazado';
-    
+
     if (status && !['UNDEFINED', 'NULL', 'NS', 'SCHEDULED', 'NOT STARTED'].includes(status)) {
       return 'En vivo';
     }
@@ -166,11 +166,11 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     if (!matchDate) return 'Programado';
 
     const diffMins = Math.floor((Date.now() - matchDate.getTime()) / 60000);
-    
+
     if (diffMins >= 0 && diffMins < 180) {
       return 'En vivo';
-    } 
-    
+    }
+
     if (diffMins >= 180 && homeScore !== undefined) {
       return 'Finalizado';
     }
@@ -193,7 +193,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
       error: () => this.handleMatchDetailsError()
     });
   }
-  
+
   private handleMatchDetailsSuccess(data: any): void {
     if (!data) {
       this.handleMatchDetailsError();
@@ -205,7 +205,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     this.processStats(data.stats);
     this.extractAndProcessEvents(data.summary);
 
-    this.loadingDetails = false;   
+    this.loadingDetails = false;
     this.cdr.detectChanges();
   }
 
@@ -268,10 +268,10 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
 
     try {
       const response = await this.aiService.generateMatchAnalysis(
-        this.match.homeTeam, 
-        this.match.awayTeam, 
+        this.match.homeTeam,
+        this.match.awayTeam,
         this.matchStats || [], // Si es null, pasamos array vacío
-        this.match.league || 'La Liga', 
+        this.match.league || 'La Liga',
         this.hasRealStats
       );
 
@@ -291,7 +291,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   /* --- Comprueba si las estadísticas no están todas a cero, el partido ha comenzado y tenemos estadísticas reales --- */
   get hasRealStats(): boolean {
     if (!this.matchStats || this.matchStats.length === 0) return false;
-    
+
     // Busca si al menos un valor de todo el array es mayor que 0
     return this.matchStats.some(s => {
       // Limpiamos los posibles '%' para convertir a número
@@ -308,7 +308,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     return text.replaceAll(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   }
 
-/* --- Configurar Gráfico de Radar (Escala Proporcional de Dominio) --- */
+  /* --- Configurar Gráfico de Radar (Escala Proporcional de Dominio) --- */
   private initRadarChart(): void {
     // Si no hay estadísticas, no hacemos nada
     if (!this.matchStats || this.matchStats.length === 0) return;
@@ -316,24 +316,24 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     // Elegimos y definimos métricas a mostrar
     const searchKeys = ['possession', 'total shots', 'corner', 'fouls', 'duels won'];
     const labels = ['Posesión', 'Tiros Totales', 'Córners', 'Faltas', 'Duelos Ganados'];
-    
+
     // Arrays para guardar los porcentajes calculados para pintar el gráfico (0-100%)
     const homeData: number[] = [];
     const awayData: number[] = [];
-    
+
     // Arrays para guardar el dato real
     const realHomeValues: string[] = [];
     const realAwayValues: string[] = [];
 
     // Procesamos cada estadística
     searchKeys.forEach(key => {
-      const stat = this.matchStats.find(s => 
+      const stat = this.matchStats.find(s =>
         s.statName && s.statName.toLowerCase().includes(key)
       );
-      
+
       const homeRaw = stat?.homeValue?.toString() || '0';
       const awayRaw = stat?.awayValue?.toString() || '0';
-      
+
       realHomeValues.push(homeRaw);
       realAwayValues.push(awayRaw);
 
@@ -358,7 +358,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
       datasets: [
         {
           label: this.match.homeTeam,
-          backgroundColor: 'rgba(59, 130, 246, 0.2)', 
+          backgroundColor: 'rgba(59, 130, 246, 0.2)',
           borderColor: 'rgba(59, 130, 246, 1)',
           pointBackgroundColor: 'rgba(59, 130, 246, 1)',
           pointBorderColor: '#fff',
@@ -368,7 +368,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
         },
         {
           label: this.match.awayTeam,
-          backgroundColor: 'rgba(239, 68, 68, 0.2)', 
+          backgroundColor: 'rgba(239, 68, 68, 0.2)',
           borderColor: 'rgba(239, 68, 68, 1)',
           pointBackgroundColor: 'rgba(239, 68, 68, 1)',
           pointBorderColor: '#fff',
@@ -388,7 +388,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
         tooltip: {
           callbacks: {
             // Reemplazamos el texto del Tooltip por el valor real de la estadística
-            label: function(context: any) {
+            label: function (context: any) {
               const isHome = context.datasetIndex === 0;
               const realVal = isHome ? realHomeValues[context.dataIndex] : realAwayValues[context.dataIndex];
               return `${context.dataset.label}: ${realVal} (Dominio: ${context.raw}%)`;
@@ -402,19 +402,19 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
           max: 100, // Fijamos el límite del radar en 100% para que sea una telaraña perfecta
           grid: { color: '#e9ecef' },
           pointLabels: { color: '#6c757d', font: { size: 11, weight: 'bold' } },
-          ticks: { display: false } 
+          ticks: { display: false }
         }
       }
     };
   }
-  
+
   /* --- Cargar la Guía de Forma (Rachas V-E-D) --- */
   private loadTeamForms(): void {
     if (this.match.homeTeam) {
-      this.sportService.getTeamForm(this.match.homeTeam).subscribe(form => this.homeForm = form);
+      this.sportService.getTeamForm(this.match.homeTeam).subscribe(form => this.homeForm = form || []);
     }
     if (this.match.awayTeam) {
-      this.sportService.getTeamForm(this.match.awayTeam).subscribe(form => this.awayForm = form);
+      this.sportService.getTeamForm(this.match.awayTeam).subscribe(form => this.awayForm = form || []);
     }
   }
 
@@ -429,14 +429,14 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
       this.router.navigate(['/team', teamName]);
     }
   }
-  
+
   /* --- Comprueba si el partido está en juego --- */
   isLive(status: string): boolean {
     if (!status) return false;
     return status === 'En vivo' || status === 'Descanso';
   }
 
-/* --- MOTOR DE TIEMPO REAL (Polling) --- */
+  /* --- MOTOR DE TIEMPO REAL (Polling) --- */
   private startPolling(): void {
     if (this.pollingInterval) return;
 
@@ -464,7 +464,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
       details: this.sportService.getMatchDetails(this.id)
     }).subscribe({
       next: (res) => {
-        
+
         if (res.basic) {
           const freshBasic = this.normalizeBasicData(res.basic);
           this.match.status = freshBasic.status;
@@ -485,7 +485,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
             const eventsArray = Array.isArray(rawEvents) ? rawEvents : [rawEvents];
             this.processSummaryEvents(eventsArray);
           }
-          
+
           if (data.stats && Array.isArray(data.stats)) {
             const globalStats = data.stats.find((s: any) => s && s.period === 'Match');
             this.matchStats = globalStats ? globalStats.stats : [];
@@ -493,13 +493,13 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
             this.initRadarChart();
           }
         }
-        
+
         this.cdr.detectChanges();
       }
     });
   }
 
-/* --- Calcula el porcentaje proporcional de la barra entre los dos equipos --- */
+  /* --- Calcula el porcentaje proporcional de la barra entre los dos equipos --- */
   getStatPercent(homeVal: string, awayVal: string, isHome: boolean): number {
     // Extraemos el número limpio (quitando '%' o '(...)' )
     const extractNum = (val: string) => {
@@ -612,17 +612,17 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   /* --- Función auxiliar para comprobar de quién es el evento --- */
   isHomeEvent(event: any): boolean {
     // Si la API tiene un campo team o participantTeam que coincida con el local
-    return event.incidentParticipant === 1 || event.participantTeam === 'home' || event.team === 'home'; 
+    return event.incidentParticipant === 1 || event.participantTeam === 'home' || event.team === 'home';
   }
 
-/* --- Procesa la lista plana de eventos de la API y la agrupa por partes --- */
+  /* --- Procesa la lista plana de eventos de la API y la agrupa por partes --- */
   private processSummaryEvents(rawEvents: any[]): void {
     const firstHalf: any[] = [];
     const secondHalf: any[] = [];
 
     rawEvents.forEach(ev => {
       const normalizedEvent = this.normalizeSingleEvent(ev);
-      
+
       if (ev.incidentHalf == 1 || ev.incidentHalf === '1') {
         firstHalf.push(normalizedEvent);
       } else {
@@ -682,7 +682,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     if (typeRaw.includes('yellow') || comment.includes('yellow')) return 'yellow';
     if (typeRaw.includes('red') || comment.includes('red')) return 'red';
     if (typeRaw.includes('sub') || comment.includes('substitut') || isSub) return 'sub';
-    
+
     return typeRaw;
   }
 
@@ -691,18 +691,18 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     if (ev.incidentParticipant !== undefined) return ev.incidentParticipant == 1;
     if (ev.participant !== undefined) return ev.participant == 1;
     if (ev.participantTeam) return ev.participantTeam === 'home' || ev.participantTeam == 1;
-    
+
     if (mainName) {
-      const searchName = mainName.toLowerCase().split(' ')[0]; 
+      const searchName = mainName.toLowerCase().split(' ')[0];
       const awayLineup = this.startingLineups?.away || [];
       const awaySubs = this.substitutes?.away || [];
-      
+
       const isAwayPlayer = [...awayLineup, ...awaySubs].some((p: any) =>
-          String(p.participantName).toLowerCase().includes(searchName)
+        String(p.participantName).toLowerCase().includes(searchName)
       );
       if (isAwayPlayer) return false;
     }
-    
+
     return true; // Por defecto asumimos local si no hay datos
   }
 

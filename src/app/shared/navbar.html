@@ -1,0 +1,8 @@
+<div class="search-widget">
+  <div class="search-box">
+    <app-search-autocomplete [suggestions]="filteredItems" placeholder="Buscar equipo o jugador..." styleClass="w-full"
+      inputStyleClass="navbar-search-input" (completeMethod)="search($event)" (itemSelect)="onSelect($event)"
+      (cleared)="filteredItems = []">
+    </app-search-autocomplete>
+  </div>
+</div>

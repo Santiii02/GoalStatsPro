@@ -8,7 +8,7 @@
     justify-content: center;
     gap: 40px;
     color: white;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     position: relative;
     overflow: hidden;
     min-height: 300px;
@@ -17,10 +17,11 @@
 .player-hero::before {
     content: '';
     position: absolute;
-    top: 0; right: 0;
+    top: 0;
+    right: 0;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
     border-radius: 50%;
     transform: translate(30%, -30%);
 }
@@ -36,7 +37,7 @@
     max-width: 100%;
     height: auto;
     max-height: 280px;
-    filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
     transition: transform 0.3s ease;
 }
 
@@ -53,7 +54,7 @@
 .title-and-fav {
     display: flex;
     align-items: center;
-    gap: 15px; 
+    gap: 15px;
 }
 
 .hero-info h1 {
@@ -102,7 +103,7 @@
 }
 
 .number-tag {
-    border: 2px solid rgba(255,255,255,0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     padding: 5px 12px;
     border-radius: 20px;
     font-weight: bold;
@@ -118,7 +119,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -133,9 +134,17 @@
     transform: translateY(-3px);
 }
 
-.social-btn.insta:hover { color: #E1306C; }
-.social-btn.twitter:hover { color: #1DA1F2; }
-.social-btn.facebook:hover { color: #4267B2; }
+.social-btn.insta:hover {
+    color: #E1306C;
+}
+
+.social-btn.twitter:hover {
+    color: #1DA1F2;
+}
+
+.social-btn.facebook:hover {
+    color: #4267B2;
+}
 
 /* --- GRID DE ESTADÍSTICAS --- */
 .stats-grid {
@@ -148,7 +157,7 @@
     background: white;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -163,7 +172,7 @@
 
 .stat-box .label {
     font-size: 0.85rem;
-    color: #64748b;
+    color: #475569;
     text-transform: uppercase;
     font-weight: 600;
 }
@@ -185,10 +194,12 @@
 .honours-scroll::-webkit-scrollbar {
     height: 6px;
 }
+
 .honours-scroll::-webkit-scrollbar-track {
     background: #f1f5f9;
     border-radius: 10px;
 }
+
 .honours-scroll::-webkit-scrollbar-thumb {
     background: #cbd5e1;
     border-radius: 10px;
@@ -207,10 +218,10 @@
     gap: 8px;
 }
 
-.honour-title { 
-    font-size: 0.85rem; 
-    font-weight: bold; 
-    color: #555; 
+.honour-title {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #555;
 }
 
 /* --- HISTORIAL DE EQUIPOS --- */
@@ -227,14 +238,14 @@
     display: flex;
     align-items: center;
     gap: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     border: 1px solid #f1f5f9;
     transition: transform 0.2s;
 }
 
 .former-team-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .former-team-card.clickable {
@@ -267,17 +278,13 @@
     background: white;
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-}
-
-.history-content {
-    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .bio-text {
-    text-align: justify;       
-    line-height: 1.8;          
-    color: #4a4a4a;            
+    text-align: justify;
+    line-height: 1.8;
+    color: #4a4a4a;
     font-size: 1rem;
     transition: all 0.3s ease;
     white-space: pre-line;
@@ -288,40 +295,22 @@
     mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
 
-.btn-read-more {
-    background: none;
-    border: none;
-    color: var(--primary-color, #007ad9);
-    font-weight: bold;
-    cursor: pointer;
-    padding: 10px 0 0 0;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.95rem;
-    transition: color 0.2s;
-}
-
-.btn-read-more:hover {
-    color: #0056b3;
-    text-decoration: underline;
-}
-
 /* Diseño responsive */
 @media (max-width: 768px) {
     .player-hero {
-        flex-direction: column; 
+        flex-direction: column;
         text-align: center;
         padding: 20px;
         gap: 15px;
     }
-    
+
     .hero-info h1 {
-        font-size: 2rem; 
+        font-size: 2rem;
     }
-    
-    .main-stats, .social-links {
-        justify-content: center; 
+
+    .main-stats,
+    .social-links {
+        justify-content: center;
         flex-wrap: wrap;
     }
 }

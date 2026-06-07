@@ -3,7 +3,7 @@
     background: white;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -12,8 +12,15 @@
     border: 1px solid #f0f0f0;
 }
 
-.header-text h2 { margin: 0 0 5px 0; color: #1e293b; }
-.header-text p { margin: 0; font-size: 0.95rem; }
+.header-text h2 {
+    margin: 0 0 5px 0;
+    color: #1e293b;
+}
+
+.header-text p {
+    margin: 0;
+    font-size: 0.95rem;
+}
 
 .filters-actions {
     display: flex;
@@ -25,7 +32,7 @@
 
 .divider-text {
     font-weight: bold;
-    color: #cbd5e1;
+    color: #6c757d;
     font-size: 0.9rem;
 }
 
@@ -41,55 +48,14 @@
 .search-icon {
     position: absolute;
     z-index: 2;
-    right: 1.2rem; 
-    color: #94a3b8;
-    font-size: 1rem; 
+    right: 1.2rem;
+    color: #475569;
+    font-size: 1rem;
     transition: color 0.3s ease;
 }
 
 .search-box-wrapper:focus-within .search-icon {
     color: var(--primary-color, #3b82f6);
-}
-
-:host ::ng-deep p-autocomplete {
-    width: 100%;
-    display: block;
-}
-
-:host ::ng-deep .search-input-custom {
-    padding: 0.7rem 2.5rem 0.7rem 1.2rem !important; 
-    border-radius: 25px !important;
-    border: 1px solid #e2e8f0 !important;
-    background-color: #f8fafc !important;
-    font-size: 0.95rem !important; 
-    color: #334155 !important;
-    transition: all 0.3s ease !important;
-    box-shadow: none !important;
-    width: 100%;
-}
-
-:host ::ng-deep .search-input-custom:focus {
-    border-color: var(--primary-color, #3b82f6) !important;
-    background-color: #ffffff !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-}
-
-/* Panel Desplegable */
-:host ::ng-deep .p-autocomplete-panel {
-    border-radius: 12px !important;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.1) !important;
-    border: 1px solid #f1f5f9 !important;
-    margin-top: 4px !important;
-    overflow: hidden;
-}
-
-:host ::ng-deep .p-autocomplete-items .p-autocomplete-item {
-    padding: 0.4rem 0.8rem !important;
-    transition: background-color 0.2s;
-}
-
-:host ::ng-deep .p-autocomplete-items .p-autocomplete-item:hover {
-    background-color: #f8fafc !important;
 }
 
 /* Sugerencia individual */
@@ -138,116 +104,12 @@
 
 .badge-count {
     font-size: 0.8em;
-    color: #888;
+    color: #5a5a5a;
     font-weight: normal;
 }
 
-/* --- JUGADORES --- */
-.players-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-    padding-bottom: 40px;
-}
-
-.player-card {
-    background: white;
-    border-radius: 12px; 
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-    text-align: center;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    cursor: pointer;
-    border: 1px solid #f0f0f0;
-    display: flex;
-    flex-direction: column;
-}
-
-.player-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
-    border-color: var(--primary-color, #3b82f6);
-}
-
-.player-img-container {
-    height: 200px;
-    background: radial-gradient(circle at bottom, #eef2f3, #d9e2e6);    
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    overflow: hidden;
-    padding-bottom: 0;
-}
-
-.player-img-container img {
-    max-height: 95%;
-    max-width: 100%;
-    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.player-card:hover .player-img-container img {
-    transform: scale(1.1) translateY(-5px); 
-}
-
-/* Información del Jugador */
-.player-info {
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    flex-grow: 1;
-}
-
-.player-info strong {
-    display: block;
-    font-size: 1.1rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #2c3e50;
-    font-weight: 700;
-}
-
-/* Player tags */
-.meta-tags {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 5px;
-}
-
-.position-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    background-color: #eee;
-    color: #555;
-}
-
-.number-badge {
-    color: #64748b;
-    font-weight: bold;
-    font-size: 0.8rem;
-    align-self: center;
-}
-
-.gk { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-.df { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-.mf { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-.fw { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-
-.nationality {
-    color: #888;
-    font-size: 0.8rem;
-    margin-top: 4px;
-}
-
 .team-mini {
-    margin-top: auto; 
+    margin-top: auto;
     padding-top: 10px;
     border-top: 1px solid #f5f5f5;
     font-size: 0.85rem;
@@ -255,19 +117,7 @@
     font-weight: 500;
 }
 
-/* --- EMPTY STATE --- */
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #cbd5e1;
-    background: #f9fafb;
-    border-radius: 12px;
-}
-.empty-state i { 
-    font-size: 3rem; 
-    margin-bottom: 15px; 
-    display: block; 
-}
+
 
 /* Diseño responsive */
 @media (max-width: 768px) {
@@ -275,8 +125,9 @@
         flex-direction: column;
         width: 100%;
     }
-    
-    .filters-actions p-dropdown, .search-box-wrapper {
+
+    .filters-actions p-dropdown,
+    .search-box-wrapper {
         width: 100%;
         max-width: 100%;
     }

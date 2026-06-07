@@ -2,7 +2,8 @@
 
   <header class="hero-section">
     <div class="hero-content">
-      <img src="https://static.flashscore.com/res/image/data/GxXrrSiU-dny9du44.png" alt="World Cup Logo" class="wc-logo">
+      <img src="https://static.flashscore.com/res/image/data/GxXrrSiU-dny9du44.png" alt="World Cup Logo"
+        class="wc-logo">
       <h1 class="wc-title">Copa del Mundo 2026</h1>
       <p class="subtitle">Clasificación, Eliminatorias y Próximos Partidos</p>
     </div>
@@ -30,7 +31,7 @@
           <div class="group-header">
             <h4 class="m-0">{{ group.roundType }}</h4>
           </div>
-          
+
           <table class="table-custom">
             <thead>
               <tr>
@@ -48,14 +49,10 @@
                   </span>
                 </td>
                 <td>
-                  <div class="team-row clickable" 
-                      (click)="goToTeamDetail(team.teamName)"
-                      (keydown)="$event.key === 'Enter' && goToTeamDetail(team.teamName)"
-                      tabindex="0"
-                      role="button">
-                    <img #groupFlag [src]="team.teamBadge || 'assets/images/Logo.png'"
-                      width="24" height="24" alt="Bandera" class="country-flag"
-                      (error)="groupFlag.src='assets/images/Logo.png'">
+                  <div class="team-row clickable" (click)="goToTeamDetail(team.teamName)"
+                    (keydown)="$event.key === 'Enter' && goToTeamDetail(team.teamName)" tabindex="0" role="button">
+                    <img #groupFlag [src]="team.teamBadge || 'assets/images/Logo.png'" width="24" height="24"
+                      alt="Bandera" class="country-flag" (error)="groupFlag.src='assets/images/Logo.png'">
                     <strong>{{ translateTeam(team.teamName) }}</strong>
                   </div>
                 </td>
@@ -78,32 +75,33 @@
       <div class="card bg-white p-3 border-round shadow-sm">
         <p-tabView styleClass="custom-tabs">
           <p-tabPanel *ngFor="let round of knockoutRounds" [header]="round | uppercase">
-            
+
             <div *ngIf="knockouts[round].length === 0" class="empty-state">
               <p>Aún no hay cruces definidos para esta ronda.</p>
             </div>
 
             <div class="matches-grid" *ngIf="knockouts[round].length > 0">
-              <div *ngFor="let match of knockouts[round]" class="match-card clickable fade-in" 
-                  (click)="goToMatch(match)"
-                  (keydown)="$event.key === 'Enter' && goToMatch(match)"
-                  tabindex="0"
-                  role="button">
-                
+              <div *ngFor="let match of knockouts[round]" class="match-card clickable fade-in"
+                (click)="goToMatch(match)" (keydown)="$event.key === 'Enter' && goToMatch(match)" tabindex="0"
+                role="button">
+
                 <div class="match-card-header">
                   <span class="tournament-name">
                     {{ getMatchDate(match) | date:'dd/MM/yyyy HH:mm' }}
                   </span>
                 </div>
-            
+
                 <div class="match-content">
                   <div class="team team-home">
-                    <span class="team-name" [class.fw-bold]="isWinner(match, 'home')">{{ translateTeam(match.homeName) }}</span>
-                    <img #koHomeImg [src]="getLogoUrl(match.homeLogo)" alt="Bandera" class="team-logo" (error)="koHomeImg.src='assets/images/Logo.png'">                  
+                    <span class="team-name" [class.fw-bold]="isWinner(match, 'home')">{{ translateTeam(match.homeName)
+                      }}</span>
+                    <img #koHomeImg [src]="getLogoUrl(match.homeLogo)" alt="Bandera" class="team-logo"
+                      (error)="koHomeImg.src='assets/images/Logo.png'">
                   </div>
-            
+
                   <div class="score-board">
-                    <div class="score-box" *ngIf="match.homeScore !== undefined && match.homeScore !== null; else noScore">
+                    <div class="score-box"
+                      *ngIf="match.homeScore !== undefined && match.homeScore !== null; else noScore">
                       <span class="score-number">{{ match.homeScore }}</span>
                       <span class="score-separator">-</span>
                       <span class="score-number">{{ match.awayScore }}</span>
@@ -112,10 +110,12 @@
                       <div class="vs-badge">VS</div>
                     </ng-template>
                   </div>
-            
+
                   <div class="team team-away">
-                    <img #koAwayImg [src]="getLogoUrl(match.awayLogo)" alt="Bandera" class="team-logo" (error)="koAwayImg.src='assets/images/Logo.png'">
-                    <span class="team-name" [class.fw-bold]="isWinner(match, 'away')">{{ translateTeam(match.awayName) }}</span>
+                    <img #koAwayImg [src]="getLogoUrl(match.awayLogo)" alt="Bandera" class="team-logo"
+                      (error)="koAwayImg.src='assets/images/Logo.png'">
+                    <span class="team-name" [class.fw-bold]="isWinner(match, 'away')">{{ translateTeam(match.awayName)
+                      }}</span>
                   </div>
                 </div>
               </div>
@@ -132,31 +132,30 @@
       </div>
 
       <div class="matches-grid">
-        <div *ngFor="let match of upcomingMatches" class="match-card clickable" 
-            (click)="goToMatch(match)"
-            (keydown)="$event.key === 'Enter' && goToMatch(match)"
-            tabindex="0"
-            role="button">
-          
+        <div *ngFor="let match of upcomingMatches" class="match-card clickable" (click)="goToMatch(match)"
+          (keydown)="$event.key === 'Enter' && goToMatch(match)" tabindex="0" role="button">
+
           <div class="match-card-header">
             <span class="tournament-name">{{ formatRound(match.round) }}</span>
             <span class="match-date">
               {{ getMatchDate(match) | date:'dd/MM/yyyy HH:mm' }}
             </span>
           </div>
-      
+
           <div class="match-content">
             <div class="team team-home">
               <span class="team-name">{{ translateTeam(match.homeName) }}</span>
-              <img #upHomeImg [src]="getLogoUrl(match.homeLogo)" alt="Bandera" class="team-logo" (error)="upHomeImg.src='assets/images/Logo.png'">
+              <img #upHomeImg [src]="getLogoUrl(match.homeLogo)" alt="Bandera" class="team-logo"
+                (error)="upHomeImg.src='assets/images/Logo.png'">
             </div>
-      
+
             <div class="score-board">
               <div class="vs-badge">VS</div>
             </div>
-      
+
             <div class="team team-away">
-              <img #upAwayImg [src]="getLogoUrl(match.awayLogo)" alt="Bandera" class="team-logo" (error)="upAwayImg.src='assets/images/Logo.png'">
+              <img #upAwayImg [src]="getLogoUrl(match.awayLogo)" alt="Bandera" class="team-logo"
+                (error)="upAwayImg.src='assets/images/Logo.png'">
               <span class="team-name">{{ translateTeam(match.awayName) }}</span>
             </div>
           </div>
@@ -174,10 +173,7 @@
         <div class="round-selector-container">
           <label class="round-selector-label" for="roundSelect">Seleccionar jornada</label>
           <div class="round-selector-inner">
-            <select id="roundSelect"
-                    class="round-selector"
-                    [value]="selectedRound"
-                    (change)="onRoundChange($event)">
+            <select id="roundSelect" class="round-selector" [value]="selectedRound" (change)="onRoundChange($event)">
               <option *ngFor="let round of worldCupRounds" [value]="round">
                 {{ formatRound(round) }}
               </option>
@@ -192,11 +188,8 @@
       </div>
 
       <div class="matches-grid mt-3" *ngIf="matchesByRound.length > 0">
-        <div *ngFor="let match of matchesByRound"
-            class="match-card clickable fade-in"
-            (click)="goToMatch(match)"
-            (keydown)="$event.key === 'Enter' && goToMatch(match)"
-            tabindex="0" role="button">
+        <div *ngFor="let match of matchesByRound" class="match-card clickable fade-in" (click)="goToMatch(match)"
+          (keydown)="$event.key === 'Enter' && goToMatch(match)" tabindex="0" role="button">
           <div class="match-card-header">
             <span class="tournament-name">{{ formatRound(match.round) }}</span>
             <span class="match-date">
@@ -209,13 +202,12 @@
               <span class="team-name" [class.fw-bold]="isWinner(match, 'home')">
                 {{ translateTeam(match.homeName) }}
               </span>
-              <img #jHomeImg [src]="getLogoUrl(match.homeLogo)" alt="Escudo"
-                  class="team-logo" (error)="jHomeImg.src='assets/images/Logo.png'">
+              <img #jHomeImg [src]="getLogoUrl(match.homeLogo)" alt="Escudo" class="team-logo"
+                (error)="jHomeImg.src='assets/images/Logo.png'">
             </div>
 
             <div class="score-board">
-              <div class="score-box"
-                  *ngIf="match.homeScore !== undefined && match.homeScore !== null; else noScoreJ">
+              <div class="score-box" *ngIf="match.homeScore !== undefined && match.homeScore !== null; else noScoreJ">
                 <span class="score-number">{{ match.homeScore }}</span>
                 <span class="score-separator">-</span>
                 <span class="score-number">{{ match.awayScore }}</span>
@@ -226,8 +218,8 @@
             </div>
 
             <div class="team team-away">
-              <img #jAwayImg [src]="getLogoUrl(match.awayLogo)" alt="Escudo"
-                  class="team-logo" (error)="jAwayImg.src='assets/images/Logo.png'">
+              <img #jAwayImg [src]="getLogoUrl(match.awayLogo)" alt="Escudo" class="team-logo"
+                (error)="jAwayImg.src='assets/images/Logo.png'">
               <span class="team-name" [class.fw-bold]="isWinner(match, 'away')">
                 {{ translateTeam(match.awayName) }}
               </span>

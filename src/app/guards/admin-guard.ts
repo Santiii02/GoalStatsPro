@@ -19,7 +19,7 @@ export const adminGuard: CanActivateFn = async (route, state) => {
   try {
     // Esperamos a que Firebase termine de arrancar y nos de una respuesta definitiva
     const user = await firstValueFrom(authService.user$);
-    
+
     // Si no hay sesión, lo expulsamos
     if (!user) {
       router.navigate(['/']);
@@ -28,7 +28,7 @@ export const adminGuard: CanActivateFn = async (route, state) => {
 
     // Si hay usuario, obtenemos su rol
     const role = await userService.getUserRole();
-    
+
     if (role === 'admin') {
       return true; // Concedemos acceso al admin
     } else {

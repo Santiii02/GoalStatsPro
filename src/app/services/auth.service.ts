@@ -18,7 +18,7 @@ export class AuthService {
   // Observable que nos dirá en tiempo real si el usuario está conectado o no
   public readonly user$: Observable<User | null> = authState(this.auth);
 
-  constructor() {}
+  constructor() { }
 
   /* --- REGISTRAR UN NUEVO USUARIO --- */
   async register(email: string, password: string): Promise<any> {
@@ -49,7 +49,7 @@ export class AuthService {
       await this.logout();
       throw new Error('admin_deleted');
     }
-    
+
     return userCredential;
   }
 

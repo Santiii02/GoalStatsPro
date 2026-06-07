@@ -43,7 +43,7 @@ export class MatchesComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-  // Pedimos tanto los partidos futuros (fixtures) como los resultados recientes (results)
+    // Pedimos tanto los partidos futuros (fixtures) como los resultados recientes (results)
     forkJoin({
       fixtures: this.sportService.getFixtures(),
       results: this.sportService.getResults()
@@ -74,7 +74,7 @@ export class MatchesComponent implements OnInit {
           if (match.awayLogo && !match.awayLogo.startsWith('http')) {
             match.awayLogo = imgBase + match.awayLogo;
           }
-          
+
           return match;
         }).filter(m => m.processedDate); // Descartamos los que no tengan fecha válida
 
@@ -135,10 +135,10 @@ export class MatchesComponent implements OnInit {
 
   /* --- Información detalla del partido  --- */
   goToMatch(match: Match): void {
-      if (match && match.eventId) {
-          this.router.navigate(['/match', match.eventId], {
-            state: { data: match } 
-          });
-      }
+    if (match && match.eventId) {
+      this.router.navigate(['/match', match.eventId], {
+        state: { data: match }
+      });
+    }
   }
 }

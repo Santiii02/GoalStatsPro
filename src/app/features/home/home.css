@@ -27,18 +27,18 @@
 
 .match-card {
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   background: #ffffff;
   padding: 12px 16px;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
 }
 
 .match-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   background-color: #fafafa;
 }
 
@@ -59,13 +59,13 @@
 .tournament-name {
   font-size: 0.7rem;
   text-transform: uppercase;
-  color: #64748b;
+  color: #475569;
   font-weight: 700;
   letter-spacing: 0.5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: block; 
+  display: block;
 }
 
 /* Contenedor de la fila de equipos y marcador */
@@ -85,12 +85,14 @@
 }
 
 .team-home {
-  justify-content: flex-end; /* Local alineado a la derecha del bloque izquierdo */
+  justify-content: flex-end;
+  /* Local alineado a la derecha del bloque izquierdo */
   text-align: right;
 }
 
 .team-away {
-  justify-content: flex-start; /* Visitante alineado a la izquierda del bloque derecho */
+  justify-content: flex-start;
+  /* Visitante alineado a la izquierda del bloque derecho */
   text-align: left;
 }
 
@@ -131,13 +133,13 @@
 }
 
 .score-separator {
-  color: #94a3b8;
+  color: #64748b;
   font-weight: 500;
 }
 
 .vs-badge {
   background: #f1f5f9;
-  color: #64748b;
+  color: #374151;
   font-size: 0.85rem;
   font-weight: 800;
   padding: 6px 16px;
@@ -170,26 +172,27 @@
   background: white;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-  .table-custom th {
-    background-color: #f8f9fa;
-    color: #555;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-  }
+.table-custom th {
+  background-color: #f8f9fa;
+  color: #555;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
 
-  .table-custom th, .table-custom td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #f1f1f1;
-  }
+.table-custom th,
+.table-custom td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #f1f1f1;
+}
 
 .rank-cell {
   font-weight: bold;
-  color: #777;
+  color: #555;
 }
 
 .points-cell {
@@ -197,23 +200,15 @@
   color: #007bff;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 20px;
-  color: #888;
-  background: #f9f9f9;
-  border-radius: 8px;
-}
-
 .btn-link {
-  color: #007bff;
+  color: var(--primary-color, #3b82f6);
   text-decoration: none;
   font-size: 0.9rem;
 }
 
-  .btn-link:hover {
-    text-decoration: underline;
-  }
+.btn-link:hover {
+  text-decoration: underline;
+}
 
 /* --- LOGO APP --- */
 .app-logo {
@@ -232,14 +227,14 @@
   text-align: center;
   cursor: pointer;
   background-color: white;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .team-result-card:hover {
-  transform: translateY(-8px); 
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
-  border-color: var(--primary-color, #3b82f6); 
+  transform: translateY(-8px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary-color, #3b82f6);
 }
 
 .team-result-card img {
@@ -270,177 +265,63 @@
 }
 
 .favorites-section {
-    background-color: transparent !important;
-    border: none !important;            
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important; 
-    padding: 1.5rem !important; 
-    border-radius: 12px !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+  padding: 1.5rem !important;
+  border-radius: 12px !important;
 }
 
 /* --- SECCIÓN JUGADORES FAVORITOS --- */
 .player-avatar-container {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto;
-    border-radius: 50%;
-    background: radial-gradient(circle at bottom, #eef2f3, #d9e2e6);
-    display: flex;
-    align-items: flex-end; 
-    justify-content: center;
-    overflow: hidden;
-    border: 2px solid #f1f5f9;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at bottom, #eef2f3, #d9e2e6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  border: 2px solid #f1f5f9;
 }
 
 .player-avatar {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 /* --- BUSCADOR --- */
 .search-section {
-    border: 1px solid #f1f5f9;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    max-width: 800px; 
-    margin-left: auto;
-    margin-right: auto;
+  border: 1px solid #f1f5f9;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .search-section:hover {
-    box-shadow: 0 8px 20px rgba(0,0,0,0.04) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04) !important;
 }
 
 .search-box-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .search-icon {
-    position: absolute;
-    z-index: 2;
-    left: 1rem; 
-    color: #94a3b8;
-    font-size: 1rem; 
-    transition: color 0.3s ease;
-}
-
-:host ::ng-deep p-autocomplete {
-    width: 100%;
-    display: block;
-}
-
-:host ::ng-deep .search-input-custom {
-    padding: 0.7rem 1.2rem 0.7rem 2.5rem !important; 
-    border-radius: 25px !important;
-    border: 1px solid #e2e8f0 !important;
-    background-color: #f8fafc !important;
-    font-size: 0.95rem !important; 
-    color: #334155 !important;
-    transition: all 0.3s ease !important;
-    box-shadow: none !important;
-    width: 100%;
-}
-
-:host ::ng-deep .search-input-custom:focus {
-    border-color: var(--primary-color, #3b82f6) !important;
-    background-color: #ffffff !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-}
-
-:host ::ng-deep .p-autocomplete-panel .p-autocomplete-empty-message {
-    padding: 0 !important;
+  position: absolute;
+  z-index: 2;
+  left: 1rem;
+  color: #475569;
+  font-size: 1rem;
+  transition: color 0.3s ease;
 }
 
 .search-box-wrapper:focus-within .search-icon {
-    color: var(--primary-color, #3b82f6);
-}
-
-/* --- DESPLEGABLE DE SUGERENCIAS --- */
-:host ::ng-deep .p-autocomplete-panel {
-    border-radius: 12px !important;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.1) !important;
-    border: 1px solid #f1f5f9 !important;
-    margin-top: 4px !important;
-    overflow: hidden;
-}
-
-:host ::ng-deep .p-autocomplete-items .p-autocomplete-item {
-    padding: 0.4rem 0.8rem !important;
-    transition: background-color 0.2s;
-}
-
-:host ::ng-deep .p-autocomplete-items .p-autocomplete-item:hover {
-    background-color: #f8fafc !important;
-}
-
-.suggestion-img-wrapper {
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f1f5f9;
-    border-radius: 50%;
-    padding: 4px;
-}
-
-.suggestion-img-wrapper img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-
-.suggestion-type {
-    font-size: 0.65rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.suggestion-type.team { color: #3b82f6; }
-.suggestion-type.player { color: #10b981; }
-
-/* --- SIN RESULTADOS (Empty State) --- */
-.empty-search-msg {
-    padding: 15px 10px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #ffffff;
-}
-
-.empty-search-msg i {
-    font-size: 1.8rem;
-    color: #cbd5e1;
-}
-
-.empty-search-msg p {
-    font-size: 0.95rem;
-}
-
-.empty-search-msg small {
-    font-size: 0.8rem;
-    max-width: 250px;
-    white-space: normal;
-}
-
-.block {
-    display: block;
-}
-
-/* --- COLORES CLASIFICACIÓN EN LA TABLA --- */
-.rank-badge {
-  display: inline-block;
-  font-weight: bold;
-  color: #7f8c8d;
-  background: #f5f5f5;
-  padding: 4px 10px;
-  border-radius: 6px;
-  min-width: 32px;
-  text-align: center;
-  border: 1px solid transparent;
+  color: var(--primary-color, #3b82f6);
 }
 
 .page-header {
@@ -450,68 +331,6 @@
   flex-wrap: wrap;
   gap: 15px;
 }
-
-.rank-legend {
-  display: flex;
-  gap: 15px;
-  background: white;
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: 1px solid #f0f0f0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-  font-size: 0.85rem;
-  color: #555;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  cursor: help;
-}
-
-.legend-color {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-}
-
-.top-rank-color { background: #e3f2fd; border: 1px solid #bbdefb; }
-.europa-rank-color { background: #fff3e0; border: 1px solid #ffe0b2; }
-.conference-rank-color { background: #e8f5e9; border: 1px solid #c8e6c9; }
-.relegation-rank-color { background: #ffebee; border: 1px solid #ffcdd2; }
-
-/* Puestos de Champions (Top 5) */
-.rank-badge.top-rank {
-  background: #e3f2fd;
-  color: #1565c0; 
-  border: 1px solid #bbdefb;
-}
-
-/* Puestos de Descenso (Puesto > 17) */
-.rank-badge.relegation-rank {
-  background: #ffebee;
-  color: #c62828;
-  border: 1px solid #ffcdd2;
-}
-
-/* Europa League */
-.rank-badge.europa-rank {
-  background: #fff3e0;
-  color: #e65100;
-  border: 1px solid #ffe0b2;
-}
-
-/* Conference League */
-.rank-badge.conference-rank {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #c8e6c9;
-}
-
-
 
 /* Cursor pointer para ir al detalle desde la tabla */
 .team-row.clickable {
@@ -525,9 +344,10 @@
 
 /* Diseño responsive */
 @media (max-width: 768px) {
+
   /* Ajuste del buscador y su botón */
   .search-section {
-      padding: 1rem !important; 
+    padding: 1rem !important;
   }
 
   .section-header {
@@ -536,54 +356,48 @@
     gap: 4px;
   }
 
-  :host ::ng-deep .search-input-custom {
-      padding: 0.6rem 1rem 0.6rem 2.2rem !important; 
-      font-size: 0.9rem !important;
-  }
-
   .search-icon {
-      left: 0.8rem;
-      font-size: 0.9rem;
-  }
-
-  .rank-legend {
-    flex-wrap: wrap;       
-    gap: 10px;             
-    padding: 10px;         
-    font-size: 0.75rem;    
-    justify-content: flex-start;
+    left: 0.8rem;
+    font-size: 0.9rem;
   }
 
   /* Ajuste de los marcadores en vivo para nombres largos */
   .match-card {
     padding: 12px 10px;
   }
+
   .team-name {
-    font-size: 0.75rem; 
-    word-break: break-word; 
+    font-size: 0.75rem;
+    word-break: break-word;
   }
+
   .team-logo {
     width: 28px;
     height: 28px;
   }
-  .score-box { 
-    padding: 4px 10px; 
-    gap: 6px; 
+
+  .score-box {
+    padding: 4px 10px;
+    gap: 6px;
   }
-  .score-number { 
-    font-size: 1.1rem; 
+
+  .score-number {
+    font-size: 1.1rem;
   }
-  .vs-badge { 
-    padding: 4px 10px; 
-    font-size: 0.75rem; 
+
+  .vs-badge {
+    padding: 4px 10px;
+    font-size: 0.75rem;
   }
+
   .score-board {
-    min-width: 60px; 
+    min-width: 60px;
     margin: 0 5px;
   }
-  
+
   /* Ajustes de la tabla de clasificación */
-  .table-custom th, .table-custom td {
+  .table-custom th,
+  .table-custom td {
     padding: 10px 8px;
     font-size: 0.85rem;
   }

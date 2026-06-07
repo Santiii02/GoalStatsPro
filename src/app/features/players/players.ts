@@ -25,23 +25,23 @@ import { AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplet
   styleUrl: './players.css'
 })
 
-export class PlayersComponent implements OnInit {
+export class PlayersComponent implements OnInit, OnDestroy {
   // Inyección de dependencias
   private readonly sportService = inject(SportDbService);
   private readonly router = inject(Router);
 
   // Datos
-  teamsList: any[] = [];      
-  selectedTeam: any = null;   
-  players: any[] = [];        
-  
+  teamsList: any[] = [];
+  selectedTeam: any = null;
+  players: any[] = [];
+
   // Estado del componente
   loading: boolean = false;
-  currentFilter: string = 'Destacados (Líder de Liga)'; 
+  currentFilter: string = 'Destacados (Líder de Liga)';
   error: string | null = null;
 
   // Variables para el buscador
-  selectedPlayer: any = null; 
+  selectedPlayer: any = null;
   filteredPlayers: any[] = [];
   private readonly searchSubject = new Subject<string>();
   private searchSubscription!: Subscription;
@@ -88,20 +88,20 @@ export class PlayersComponent implements OnInit {
     this.sportService.getStandings().subscribe({
       next: (standings: Standing[]) => {
         if (standings && standings.length > 0) {
-          
+
           // Mapeamos datos para el Dropdown
           this.teamsList = standings.map(s => ({
             name: s.teamName,
-            badge: s.teamBadge 
+            badge: s.teamBadge
           }));
 
           // Seleccionamos al líder de la liga por defecto
           const leader = this.teamsList[0];
-          this.selectedTeam = leader; 
-          
+          this.selectedTeam = leader;
+
           // Cargamos sus jugadores
           this.loadTeamPlayersByName(leader.name);
-          
+
           // Cargamos los escudos de todos los equipos en paralelo
           from(this.teamsList).pipe(
             concatMap(team =>
@@ -113,7 +113,7 @@ export class PlayersComponent implements OnInit {
                   return team;
                 }),
                 // si falla una búsqueda, continuamos con el resto
-                catchError(() => of(team)) 
+                catchError(() => of(team))
               )
             ),
             toArray()
@@ -147,10 +147,10 @@ export class PlayersComponent implements OnInit {
       next: (foundTeams) => {
         if (foundTeams && foundTeams.length > 0) {
           const teamId = foundTeams[0].idTeam;
-          
+
           this.loadPlayersByTeamId(teamId);
         } else {
-          this.loading = false; 
+          this.loading = false;
         }
       },
       error: () => this.loading = false
@@ -171,7 +171,7 @@ export class PlayersComponent implements OnInit {
   /* --- Cambio en el Dropdown de equipos --- */
   onTeamChange(event: any): void {
     if (event.value) {
-      this.selectedPlayer = null; 
+      this.selectedPlayer = null;
       this.loadTeamPlayersByName(event.value.name);
     }
   }
@@ -181,18 +181,30 @@ export class PlayersComponent implements OnInit {
     const query = event.query;
     if (!query || query.trim() === '') {
       this.filteredPlayers = [];
-      return; 
+      this.searchSubject.next('');
+      return;
     }
     this.searchSubject.next(query);
+  }
+
+  /* --- Limpia el input si pierden el foco (con retraso para no pisar el click) --- */
+  clearIfNotSelected(): void {
+    setTimeout(() => {
+      // Si no seleccionaron o si está vacío
+      if (!this.selectedPlayer || typeof this.selectedPlayer === 'string') {
+        this.selectedPlayer = null;
+        this.filteredPlayers = [];
+      }
+    }, 100);
   }
 
   /* --- Selección de jugador desde el buscador predictivo --- */
   onPlayerSelect(event: AutoCompleteSelectEvent): void {
     const player = event.value;
-    if (player && player.idPlayer) {
+    if (player?.idPlayer) {
       this.router.navigate(['/player', player.idPlayer]);
     }
-    
+
     // Limpiamos el input tras navegar
     setTimeout(() => {
       this.selectedPlayer = null;
@@ -209,14 +221,14 @@ export class PlayersComponent implements OnInit {
     if (!query || !query.trim()) return;
 
     this.loading = true;
-    this.selectedTeam = null; 
+    this.selectedTeam = null;
     this.currentFilter = `Resultados para "${query}"`;
 
     this.filteredPlayers = [];
 
     this.sportService.searchPlayers(query).subscribe({
       next: (results) => {
-        this.players = results;
+        this.players = results || [];
         this.loading = false;
       },
       error: () => this.loading = false
@@ -225,7 +237,7 @@ export class PlayersComponent implements OnInit {
 
   /* --- Ver el jugador --- */
   goToPlayer(player: any): void {
-    if (player && player.idPlayer) {
+    if (player?.idPlayer) {
       this.router.navigate(['/player', player.idPlayer]);
     }
   }

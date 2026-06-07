@@ -5,7 +5,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { NavbarComponent } from './shared/navbar/navbar';
+import { NavbarComponent } from './shared/navbar';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { AuthService } from './services/auth.service';
@@ -18,7 +18,7 @@ import { UserService } from './services/user.service';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
   title = 'GoalStatsPro';
 
   // Variable para controlar la visibilidad de opciones de admin

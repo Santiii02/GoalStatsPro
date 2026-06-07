@@ -7,23 +7,18 @@
   </header>
 
   <!-- Equipos favoritos -->
-  <div *ngIf="(authService.user$ | async) && favoriteTeamsData.length > 0" class="favorites-section mt-4 mb-5 p-4 rounded bg-white shadow-sm">
+  <div *ngIf="(authService.user$ | async) && favoriteTeamsData.length > 0"
+    class="favorites-section mt-4 mb-5 p-4 rounded bg-white shadow-sm">
     <h3 class="mb-4" style="color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
       <i class="pi pi-star-fill text-warning"></i> Mis Equipos
     </h3>
 
     <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;">
-      <div *ngFor="let team of favoriteTeamsData" 
-        (click)="goToTeamDetail(team)"
-        (keydown.enter)="goToTeamDetail(team)"
-        tabindex="0"
-        role="button"
-        class="team-result-card fade-in" style="min-width: 150px;">
+      <div *ngFor="let team of favoriteTeamsData" (click)="goToTeamDetail(team)" (keydown.enter)="goToTeamDetail(team)"
+        tabindex="0" role="button" class="team-result-card fade-in" style="min-width: 150px;">
 
-        <img #favTeamImg [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'" 
-          width="80" 
-          alt="Escudo de {{ translateName(team.strTeam) }}"
-          (error)="favTeamImg.src='assets/images/Logo.png'">
+        <img #favTeamImg [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'" width="80"
+          alt="Escudo de {{ translateName(team.strTeam) }}" (error)="favTeamImg.src='assets/images/Logo.png'">
 
         <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px;">{{ translateName(team.strTeam) }}</p>
         <span class="league-tag-small">{{ getLeagueLabel(team) }}</span>
@@ -32,27 +27,27 @@
   </div>
 
   <!-- Jugadores favoritos -->
-  <div *ngIf="(authService.user$ | async) && favoritePlayersData.length > 0" class="favorites-section mt-4 mb-5 p-4 rounded bg-white shadow-sm">
+  <div *ngIf="(authService.user$ | async) && favoritePlayersData.length > 0"
+    class="favorites-section mt-4 mb-5 p-4 rounded bg-white shadow-sm">
     <h3 class="mb-4" style="color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
       <i class="pi pi-user text-primary"></i> Mis Jugadores
     </h3>
 
     <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;">
-      <div *ngFor="let player of favoritePlayersData" 
-        (click)="goToPlayerDetail(player.idPlayer)"
-        (keydown.enter)="goToPlayerDetail(player.idPlayer)"
-        tabindex="0"
-        role="button"
-        class="team-result-card fade-in" style="min-width: 150px; max-width: 150px;">
+      <div *ngFor="let player of favoritePlayersData" (click)="goToPlayerDetail(player.idPlayer)"
+        (keydown.enter)="goToPlayerDetail(player.idPlayer)" tabindex="0" role="button" class="team-result-card fade-in"
+        style="min-width: 150px; max-width: 150px;">
 
         <div class="player-avatar-container">
-          <img #favPlayerImg [src]="player.strCutout || player.strThumb || 'https://www.thesportsdb.com/images/media/player/cutout/default.png'" 
-            alt="Foto de {{ player.strPlayer }}"
-            class="player-avatar"
+          <img #favPlayerImg
+            [src]="player.strCutout || player.strThumb || 'https://www.thesportsdb.com/images/media/player/cutout/default.png'"
+            alt="Foto de {{ player.strPlayer }}" class="player-avatar"
             (error)="favPlayerImg.src='https://www.thesportsdb.com/images/media/player/cutout/default.png'">
         </div>
 
-        <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ player.strPlayer }}</p>
+        <p
+          style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          {{ player.strPlayer }}</p>
         <span class="league-tag-small">{{ translateName(player.strTeam) || 'Sin Equipo' }}</span>
       </div>
     </div>
@@ -60,57 +55,18 @@
 
   <!-- Buscador -->
   <div class="search-section mt-4 mb-5 p-3 md:p-4 rounded bg-white shadow-sm fade-in">
-    <h3 class="mb-2" style="color: var(--primary-color); display: flex; align-items: center; gap: 8px; font-size: 1.2rem;">
+    <h3 class="mb-2"
+      style="color: var(--primary-color); display: flex; align-items: center; gap: 8px; font-size: 1.2rem;">
       <i class="pi pi-search text-primary"></i> Buscador
     </h3>
     <p class="text-muted mb-3" style="font-size: 0.85rem;">Encuentra rápidamente jugadores o equipos.</p>
-    
-    <div class="search-box-wrapper p-input-icon-left w-full">
+
+    <div class="search-box-wrapper w-full">
       <i class="pi pi-search search-icon"></i>
-      
-      <p-autoComplete 
-        [(ngModel)]="selectedItem" 
-        [suggestions]="filteredItems" 
-        (completeMethod)="search($event)" 
-        (onSelect)="onSelect($event)"
-        (onClear)="filteredItems = []" field="strTeam"
-        field="strTeam" 
-        placeholder="Ej: Real Madrid, Mbappé..."
-        [forceSelection]="true"
-        scrollHeight="350px"
-        minLength="2"
-        styleClass="w-full" 
-        inputStyleClass="w-full search-input-custom">
-
-        <ng-template let-item pTemplate="item">
-          <div class="suggestion-item flex align-items-center gap-3 py-1">
-            <div class="suggestion-img-wrapper">
-                <img #searchImg 
-                    [src]="item.type === 'team' ? (item.strTeamBadge || item.strBadge) : (item.strThumb || item.strCutout)" 
-                    (error)="searchImg.src='assets/images/Logo.png'" alt="logo" />
-            </div>
-            <div class="flex flex-column text-left">
-              <span class="font-bold suggestion-name" style="font-size: 0.95rem;">
-                  {{ item.type === 'team' ? item.strTeam : item.strPlayer }}
-              </span>
-              <span class="suggestion-type" [ngClass]="item.type">
-                  {{ item.type === 'team' ? 'Equipo' : 'Jugador' }}
-              </span>
-            </div>
-          </div>
-        </ng-template>
-
-        <ng-template pTemplate="empty">
-          <div class="empty-search-msg">
-            <i class="pi pi-search-minus mb-2"></i>
-            <p class="font-bold m-0" style="color: #475569;">No se encontraron resultados</p>
-            <small class="text-muted mt-2 block" style="line-height: 1.4;">
-              💡 <strong>Tip:</strong> Para equipos internacionales, prueba a buscar su nombre en inglés (ej: <em>Bayern Munich</em> o <em>Red Star</em>).
-            </small>
-          </div>
-        </ng-template>
-
-      </p-autoComplete>
+      <app-search-autocomplete [suggestions]="filteredItems" placeholder="Ej: Real Madrid, Mbappé..."
+        styleClass="w-full" inputStyleClass="w-full search-input-custom" (completeMethod)="search($event)"
+        (itemSelect)="onSelect($event)" (cleared)="filteredItems = []">
+      </app-search-autocomplete>
     </div>
   </div>
 
@@ -122,48 +78,47 @@
     </div>
 
     <div class="matches-grid" *ngIf="liveMatches.length > 0">
-      <div *ngFor="let match of liveMatches" class="match-card live-border clickable" 
-          (click)="goToMatch(match)" 
-          (keydown.enter)="goToMatch(match)" 
-          tabindex="0"
-          role="button">
-    
+      <div *ngFor="let match of liveMatches" class="match-card live-border clickable" (click)="goToMatch(match)"
+        (keydown.enter)="goToMatch(match)" tabindex="0" role="button">
+
         <div class="match-card-header">
           <span class="tournament-name">{{ match.tournamentName || 'Competición' }}</span>
         </div>
-    
+
         <div class="match-content">
           <div class="team team-home">
             <span class="team-name">{{ match.homeName }}</span>
-            <img #homeLogoImg [src]="match.homeLogo" alt="Escudo local" class="team-logo" (error)="homeLogoImg.src='assets/placeholder.png'">
+            <img #homeLogoImg [src]="match.homeLogo" alt="Escudo local" class="team-logo"
+              (error)="homeLogoImg.src='assets/placeholder.png'">
           </div>
-    
+
           <div class="score-board">
-    
+
             <div class="score-box" *ngIf="match.homeScore !== undefined && match.homeScore !== null; else noScore">
               <span class="score-number">{{ match.homeScore }}</span>
               <span class="score-separator">-</span>
               <span class="score-number">{{ match.awayScore }}</span>
             </div>
-    
+
             <ng-template #noScore>
               <div class="vs-badge">VS</div>
             </ng-template>
-    
+
             <div class="live-badge" *ngIf="match.gameTime && match.gameTime !== '-1'">
               <span class="blink">●</span> {{ match.gameTime }}'
             </div>
           </div>
-    
+
           <div class="team team-away">
-            <img #awayLogoImg [src]="match.awayLogo" alt="Escudo visitante" class="team-logo" (error)="awayLogoImg.src='assets/placeholder.png'">
+            <img #awayLogoImg [src]="match.awayLogo" alt="Escudo visitante" class="team-logo"
+              (error)="awayLogoImg.src='assets/placeholder.png'">
             <span class="team-name">{{ match.awayName }}</span>
           </div>
         </div>
-    
+
       </div>
     </div>
-    
+
 
     <div *ngIf="liveMatches.length === 0" class="empty-state">
       <p>No hay partidos en juego en este momento.</p>
@@ -175,19 +130,19 @@
     <h3>🏆 Clasificación La Liga </h3>
 
     <div class="rank-legend">
-        <div class="legend-item" pTooltip="Puestos 1 al 5" tooltipPosition="top">
-          <span class="legend-color top-rank-color"></span> Champions
-        </div>
-        <div class="legend-item" pTooltip="Europa League" tooltipPosition="top">
-          <span class="legend-color europa-rank-color"></span> Europa League
-        </div>
-        <div class="legend-item" pTooltip="Conference League" tooltipPosition="top">
-          <span class="legend-color conference-rank-color"></span> Conference League
-        </div>
-        <div class="legend-item" pTooltip="Puestos 18 al 20" tooltipPosition="top">
-          <span class="legend-color relegation-rank-color"></span> Descenso
-        </div>
+      <div class="legend-item" pTooltip="Puestos 1 al 5" tooltipPosition="top">
+        <span class="legend-color top-rank-color"></span> Champions
       </div>
+      <div class="legend-item" pTooltip="Europa League" tooltipPosition="top">
+        <span class="legend-color europa-rank-color"></span> Europa League
+      </div>
+      <div class="legend-item" pTooltip="Conference League" tooltipPosition="top">
+        <span class="legend-color conference-rank-color"></span> Conference League
+      </div>
+      <div class="legend-item" pTooltip="Puestos 18 al 20" tooltipPosition="top">
+        <span class="legend-color relegation-rank-color"></span> Descenso
+      </div>
+    </div>
 
     <div *ngIf="standings.length === 0 && !loading" class="alert alert-warning">
       No se pudo cargar la información de la clasificación.
@@ -206,8 +161,7 @@
         <tbody>
           <tr *ngFor="let item of standings">
             <td class="rank-cell">
-              <span class="rank-badge" 
-                    [ngClass]="{
+              <span class="rank-badge" [ngClass]="{
                       'top-rank': isTopRank(item.rank), 
                       'europa-rank': isEuropaLeague(item),
                       'conference-rank': isConference(item),
@@ -216,16 +170,13 @@
                 {{ item.rank }}
               </span>
             </td>
-            
+
             <td>
-              <div class="team-row clickable" 
-                  (click)="goToTeamDetail(item.teamName)"
-                  (keydown.enter)="goToTeamDetail(item.teamName)"
-                  tabindex="0"
-                  role="button"
-                  style="display: flex; align-items: center; gap: 10px;">
-                <img #standingsImg [src]="item.teamBadge || item.teamLogo || 'assets/images/Logo.png'"
-                  width="30" height="30" alt="Escudo" style="object-fit: contain;"
+              <div class="team-row clickable" (click)="goToTeamDetail(item.teamName)"
+                (keydown.enter)="goToTeamDetail(item.teamName)" tabindex="0" role="button"
+                style="display: flex; align-items: center; gap: 10px;">
+                <img #standingsImg [src]="item.teamBadge || item.teamLogo || 'assets/images/Logo.png'" width="30"
+                  height="30" alt="Escudo" style="object-fit: contain;"
                   (error)="standingsImg.src='assets/images/Logo.png'">
                 <strong>{{ item.teamName }}</strong>
               </div>

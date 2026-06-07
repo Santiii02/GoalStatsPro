@@ -4,7 +4,7 @@
  */
 
 import { Injectable, inject } from '@angular/core';
-import { Firestore, doc, setDoc, getDoc, arrayUnion, arrayRemove, collection, getDocs, deleteDoc, updateDoc} from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, arrayUnion, arrayRemove, collection, getDocs, deleteDoc, updateDoc } from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -20,7 +20,7 @@ export class UserService {
   private getUserDocRef() {
     const user = this.authService.currentUser;
     if (!user) throw new Error('No hay un usuario autenticado');
-    
+
     // Apunta a la colección 'users' y al documento con el UID del usuario
     return doc(this.firestore, `users/${user.uid}`);
   }
@@ -147,7 +147,7 @@ export class UserService {
       // Obtenemos todos los documentos de la colección 'users'
       const usersRef = collection(this.firestore, 'users');
       const querySnapshot = await getDocs(usersRef);
-      
+
       // Mapeamos los documentos a un array de objetos legibles
       return querySnapshot.docs.map(doc => ({
         uid: doc.id,
@@ -168,18 +168,18 @@ export class UserService {
     } catch (error) {
       console.error('Error al eliminar el documento del usuario:', error);
       throw error;
-    } 
+    }
   }
 
   /* --- Crear documento inicial del usuario --- */
   async createInitialUserDocument(uid: string, email: string | null): Promise<void> {
     if (!email) return;
-    
+
     try {
       const userDocRef = doc(this.firestore, `users/${uid}`);
       await setDoc(userDocRef, {
         email: email,
-        role: 'user', 
+        role: 'user',
         favoriteTeams: [],
         favoritePlayers: []
       });

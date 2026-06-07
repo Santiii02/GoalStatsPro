@@ -11,8 +11,6 @@ import { concatMap, toArray, map } from 'rxjs/operators';
 import { SportDbService } from '../../services/sportdb.service';
 import { Match } from '../../models/sport.model';
 import { translateTeamName } from '../../models/team-mapper';
-
-// Importaciones de PrimeNG para la vista (Las usaremos en el HTML)
 import { TabViewModule } from 'primeng/tabview';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ButtonModule } from 'primeng/button';
@@ -47,7 +45,7 @@ export class MundialComponent implements OnInit {
     'Final': []
   };
 
-    // Partidos por Jornada
+  // Partidos por Jornada
   private allWorldCupMatches: Match[] = [];
   worldCupRounds: string[] = [];
   selectedRound: string = '';
@@ -106,7 +104,7 @@ export class MundialComponent implements OnInit {
   /* --- Procesamos los grupos --- */
   private processGroups(standingsData: any[]): void {
     // Filtramos solo los bloques que vienen etiquetados como "Group X"
-    this.groups = standingsData.filter(group => 
+    this.groups = standingsData.filter(group =>
       group.roundType && group.roundType.toLowerCase().includes('group')
     ).map(group => {
       group.roundType = group.roundType.replace('Group', 'Grupo');
@@ -115,9 +113,9 @@ export class MundialComponent implements OnInit {
 
     // Búsqueda de escudos en TheSportsDB usando nuestra caché local
     from(this.groups).pipe(
-      concatMap(group => 
+      concatMap(group =>
         from(group.teams).pipe(
-          concatMap((team: any) => 
+          concatMap((team: any) =>
             this.sportService.searchTeams(team.teamName).pipe(
               map(dbTeams => {
                 if (dbTeams && dbTeams.length > 0) {
@@ -125,9 +123,9 @@ export class MundialComponent implements OnInit {
                 }
                 return team;
               })
-      )
+            )
           ),
-    toArray()
+          toArray()
         )
       )
     ).subscribe(() => {
@@ -142,7 +140,7 @@ export class MundialComponent implements OnInit {
     // Clasificamos cada partido en su ronda correspondiente según el nombre de la ronda
     allMatches.forEach(match => {
       const round = (match.round || '').toLowerCase();
-      
+
       if (round.includes('1/16') || round.includes('round of 32')) {
         this.knockouts['Dieciseisavos'].push(match);
       } else if (round.includes('1/8') || round.includes('round of 16')) {
@@ -196,21 +194,21 @@ export class MundialComponent implements OnInit {
 
   /* --- Ordena las jornadas --- */
   private sortRoundOrder(round: string): number {
-    const r   = round.toLowerCase().trim();
+    const r = round.toLowerCase().trim();
     const num = round.match(/(\d+)/);
-    
+
     // Jornadas de fase de grupos: "Round 1", "Round 2", "Round 3"... aparecen antes de la fase eliminatoria
-    if (/^round\s+\d+$/i.test(r) && num) return parseInt(num[1]);
+    if (/^round\s+\d+$/i.test(r) && num) return Number.parseInt(num[1]);
     // Otros formatos de fase de grupos por si cambia la API
     if (r.includes('group') || r.includes('grupo')) {
-      return num ? 10 + parseInt(num[1]) : 15;
+      return num ? 10 + Number.parseInt(num[1]) : 15;
     }
     // Fase eliminatoria (valores altos para que vayan después del grupo)
     if (r.includes('1/16') || r.includes('round of 32')) return 100;
-    if (r.includes('1/8')  || r.includes('round of 16')) return 101;
-    if (r.includes('1/4')  || r.includes('quarter'))     return 102;
-    if (r.includes('semi'))                               return 103;
-    if (r.includes('final'))                              return 104;
+    if (r.includes('1/8') || r.includes('round of 16')) return 101;
+    if (r.includes('1/4') || r.includes('quarter')) return 102;
+    if (r.includes('semi')) return 103;
+    if (r.includes('final')) return 104;
 
     return 50; // fallback: rondas desconocidas van al centro
   }
@@ -233,7 +231,7 @@ export class MundialComponent implements OnInit {
   goToMatch(match: Match): void {
     if (match && match.eventId) {
       this.router.navigate(['/match', match.eventId], {
-        state: { data: match } 
+        state: { data: match }
       });
     }
   }
@@ -274,10 +272,10 @@ export class MundialComponent implements OnInit {
     const r = round.trim();
     const l = r.toLowerCase();
 
-    if (l.includes('1/16') || l.includes('round of 32'))                 return 'Dieciseisavos';
-    if (l.includes('1/8')  || l.includes('round of 16'))                 return 'Octavos de final';
-    if (l.includes('quarter'))                                            return 'Cuartos de final';
-    if (l.includes('semi'))                                               return 'Semifinales';
+    if (l.includes('1/16') || l.includes('round of 32')) return 'Dieciseisavos';
+    if (l.includes('1/8') || l.includes('round of 16')) return 'Octavos de final';
+    if (l.includes('quarter')) return 'Cuartos de final';
+    if (l.includes('semi')) return 'Semifinales';
     if (l.includes('final') && !l.includes('semi') && !l.includes('quarter')) return 'Final';
 
     // Jornadas de fase de grupos: "Group Stage - Round 3" → "Jornada 3"

@@ -47,7 +47,7 @@ export class PlayerDetailComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const playerId = params.get('id');
-      
+
       if (playerId) {
         this.loadPlayer(playerId);
       }
@@ -63,11 +63,11 @@ export class PlayerDetailComponent implements OnInit {
       next: (data) => {
         if (data && data.idPlayer) {
           this.player = data;
-          
+
           if (this.player.dateBorn) {
             this.age = this.calculateAge(this.player.dateBorn);
           }
-            
+
           // Limpiamos la biografía usando Regex
           const rawBio = this.player.strDescriptionES || this.player.strDescriptionEN || '';
           this.cleanedBioText = this.cleanWikipediaText(rawBio);
@@ -80,7 +80,7 @@ export class PlayerDetailComponent implements OnInit {
           this.checkIfFavorite();
           this.loadHonours(id);
           this.loadFormerTeams(id);
-          
+
           this.loading = false;
         } else {
           this.loading = false;
@@ -169,7 +169,7 @@ export class PlayerDetailComponent implements OnInit {
     // Actualizamos el estado de favorito
     try {
       await this.userService.toggleFavoritePlayer(this.player.idPlayer, this.isFavorite);
-      this.isFavorite = !this.isFavorite; 
+      this.isFavorite = !this.isFavorite;
     } catch (error) {
       console.error('Error al guardar jugador favorito', error);
     } finally {
@@ -250,9 +250,9 @@ export class PlayerDetailComponent implements OnInit {
     // Extraemos el valor numérico de la cadena
     const match = weight.match(/\d+(\.\d+)?/);
     // Si no hay número, devolvemos el texto original
-    if (!match) return weight; 
+    if (!match) return weight;
 
-    const numericValue = parseFloat(match[0]);
+    const numericValue = Number.parseFloat(match[0]);
 
     // Si ya está en kg lo respetamos
     if (lowerWeight.includes('kg')) {
@@ -267,10 +267,10 @@ export class PlayerDetailComponent implements OnInit {
   /* --- Convertidor de altura --- */
   formatHeight(height: string): string {
     if (!height) return 'N/A';
-    
+
     // Cortamos la cadena en el primer paréntesis y nos quedamos con la parte izquierda
     // Por ejemplo: "1.91 m (6 ft 3 in)" -> ["1.91 m ", "6 ft 3 in)"] -> Tomamos el índice 0 y le quitamos los espacios
     return height.split('(')[0].trim();
   }
-  
+
 }

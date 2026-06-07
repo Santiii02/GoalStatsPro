@@ -1,31 +1,21 @@
 <div class="container fade-in">
-  
-  <header class="mb-4 d-flex justify-content-between align-items-end flex-wrap gap-3 border-bottom pb-3">
-    <h2 class="m-0 text-primary fw-bold">
-      <i class="pi pi-calendar me-2"></i>
-      {{ selectedRound === 'upcoming' ? 'Próximos Partidos' : formatRound(selectedRound) }}
-    </h2>
+
+  <div class="page-header mb-4">
+    <h2 class="m-0">Partidos</h2>
 
     <div class="filter-group">
-      <label for="roundSelect" class="form-label text-muted small mb-1">Filtrar por jornada: </label>
-      <select id="roundSelect" 
-              class="form-select shadow-sm border-primary" 
-              [(ngModel)]="selectedRound" 
-              (change)="onFilterChange()">
-        
+      <select id="roundSelect" class="form-select shadow-sm" [(ngModel)]="selectedRound"
+        (change)="onFilterChange()">
         <option value="upcoming">Próximos Partidos</option>
-        
         <optgroup label="Jornadas disponibles" *ngIf="rounds.length > 0">
           <option *ngFor="let round of rounds" [value]="round">{{ formatRound(round) }}</option>
         </optgroup>
       </select>
     </div>
-  </header>
+  </div>
 
-  <div *ngIf="loading" class="text-center mt-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Cargando...</span>
-    </div>
+  <div *ngIf="loading" class="text-center p-5">
+    <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
     <p class="mt-2 text-muted">Sincronizando calendario oficial...</p>
   </div>
 
@@ -36,34 +26,29 @@
   <div *ngIf="!loading && !error && matches.length === 0" class="text-center mt-5 empty-state">
     <i class="pi pi-calendar-times text-muted" style="font-size: 3rem; margin-bottom: 15px;"></i>
     <h3>Sin partidos a la vista</h3>
-    <p class="text-muted" *ngIf="selectedRound === 'upcoming'">No hay encuentros programados en el calendario para los próximos 21 días.</p>
-    <p class="text-muted" *ngIf="selectedRound !== 'upcoming'">No se encontraron partidos para la jornada seleccionada.</p>
+    <p class="text-muted" *ngIf="selectedRound === 'upcoming'">No hay encuentros programados en el calendario para los
+      próximos 21 días.</p>
+    <p class="text-muted" *ngIf="selectedRound !== 'upcoming'">No se encontraron partidos para la jornada seleccionada.
+    </p>
   </div>
 
   <div *ngIf="!loading && !error" class="matches-grid">
-    <a *ngFor="let match of matches" 
-        class="match-card" 
-        [routerLink]="['/match', match.eventId]" 
-        [state]="{ data: match }"
-        style="text-decoration: none; color: inherit; cursor: pointer; display: block;">
-      
+    <a *ngFor="let match of matches" class="match-card" [routerLink]="['/match', match.eventId]"
+      [state]="{ data: match }" style="text-decoration: none; color: inherit; cursor: pointer; display: block;">
+
       <div class="match-header" *ngIf="match.round">
         <span class="badge-round">{{ formatRound(match.round) }}</span>
       </div>
 
       <div class="match-content">
         <div class="team">
-          <img #homeLogo [src]="match.homeLogo"
-              [alt]="match.homeName"
-              width="40"
-              height="40"
-              loading="lazy"
-              (error)="homeLogo.src='assets/placeholder.png'">
+          <img #homeLogo [src]="match.homeLogo" [alt]="match.homeName" width="40" height="40" loading="lazy"
+            (error)="homeLogo.src='assets/placeholder.png'">
           <span class="team-name">{{ match.homeName }}</span>
         </div>
 
         <div class="match-info text-center">
-          
+
           <div class="score-box" *ngIf="selectedRound !== 'upcoming' && match.homeScore !== undefined">
             <span class="score">{{ match.homeScore }}</span>
             <span class="score-divider">-</span>
@@ -79,12 +64,8 @@
 
         <div class="team">
           <span class="team-name">{{ match.awayName }}</span>
-          <img #awayLogo [src]="match.awayLogo"
-              [alt]="match.awayName"
-              width="40"
-              height="40"
-              loading="lazy"
-              (error)="awayLogo.src='assets/placeholder.png'">
+          <img #awayLogo [src]="match.awayLogo" [alt]="match.awayName" width="40" height="40" loading="lazy"
+            (error)="awayLogo.src='assets/placeholder.png'">
         </div>
       </div>
 

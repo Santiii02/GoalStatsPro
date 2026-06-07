@@ -65,7 +65,7 @@ export class SportDbService {
       if (now < entry.expiry) {
         return entry.data;
       } else {
-        localStorage.removeItem(key); 
+        localStorage.removeItem(key);
       }
     } catch (error) {
       console.warn(`Error leyendo la caché para ${key}:`, error);
@@ -86,7 +86,7 @@ export class SportDbService {
     } catch (error) {
       // Si QuotaExceededError
       console.warn('⚠️ Memoria caché llena. Vaciando datos antiguos...');
-      
+
       try {
         // Borramos toda la caché para hacer hueco
         localStorage.clear();
@@ -95,7 +95,7 @@ export class SportDbService {
       } catch (error) {
         console.error('No se pudo guardar en caché. Archivo demasiado grande.', error);
       }
-    }  
+    }
   }
 
   /*
@@ -119,14 +119,14 @@ export class SportDbService {
    * MÉTODO AUXILIAR PARA PAGINACIÓN
    */
   private fetchPaginatedResults(urlPrefix: string, cacheKey: string): Observable<Match[]> {
-    const pages = [1, 2, 3, 4]; 
-    
+    const pages = [1, 2, 3, 4];
+
     return from(pages).pipe(
       concatMap(page => {
         const url = `${this.baseUrl}${urlPrefix}/results?page=${page}`;
-        return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
+        return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
           this.getRetryStrategy(),
-          delay(500), 
+          delay(500),
           map((res: any) => res?.data || (Array.isArray(res) ? res : [])),
           catchError(() => of([]))
         );
@@ -189,9 +189,9 @@ export class SportDbService {
 
     // Endpoint de Flashscore via SportDB
     const url = `${this.baseUrl}${this.LALIGA_PREFIX}/fixtures?page=1`;
-    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
-        this.getRetryStrategy(),
-        map((res: any) => {
+    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
+      this.getRetryStrategy(),
+      map((res: any) => {
         // Si la API devuelve null (endpoint vacío/caído), devolvemos array vacío
         if (!res) return [];
         return res.data || (Array.isArray(res) ? res : []);
@@ -246,7 +246,7 @@ export class SportDbService {
     if (cached) return of(cached);
 
     const url = `${this.baseUrl}${this.WORLD_CUP_PREFIX}/fixtures?page=1`;
-    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(          
+    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
       this.getRetryStrategy(),
       map((res: any) => res?.data || (Array.isArray(res) ? res : [])),
       tap(data => {
@@ -296,10 +296,10 @@ export class SportDbService {
 
         // Guardamos el resultado en caché
         tap(data => {
-            // Solo guardamos si hemos encontrado algo para no cachear errores
-            if (data && data.length > 0) {
-                this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
-            }
+          // Solo guardamos si hemos encontrado algo para no cachear errores
+          if (data && data.length > 0) {
+            this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
+          }
         }),
         catchError(err => {
           console.error('Error en búsqueda:', err);
@@ -308,7 +308,7 @@ export class SportDbService {
       );
   }
 
-/* --- Buscar JUGADORES por nombre (utilizando la cache) --- */
+  /* --- Buscar JUGADORES por nombre (utilizando la cache) --- */
   searchPlayers(name: string): Observable<any[]> {
     // Generamos una clave única para guardar esto en memoria
     const cacheKey = `goalstats_search_player_${name.replace(/\s/g, '_')}`;
@@ -324,17 +324,17 @@ export class SportDbService {
       .pipe(
         this.getRetryStrategy(),
         map((response: any) => {
-          const allPlayers = response.player || []; 
+          const allPlayers = response.player || [];
 
           return allPlayers.filter((p: any) => p.strSport === 'Soccer');
         }),
 
         // Guardamos el resultado en caché
         tap(data => {
-            // Solo guardamos si hemos encontrado algo para no cachear errores
-            if (data && data.length > 0) {
-                this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
-            }
+          // Solo guardamos si hemos encontrado algo para no cachear errores
+          if (data && data.length > 0) {
+            this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
+          }
         }),
         catchError(err => {
           console.error('Error buscando jugadores:', err);
@@ -352,8 +352,8 @@ export class SportDbService {
     const cached = this.getFromCache<any[]>(cacheKey, this.CACHE_TTL.STATIC);
     if (cached) {
       return of(cached);
-    }   
-    
+    }
+
     // Si no está en caché llamamos a la API 
     return this.http.get<{ player: any[] }>(`${this.SPORTSDB_PREFIX}/lookup_all_players.php?id=${teamId}`)
       .pipe(
@@ -367,10 +367,10 @@ export class SportDbService {
           const getPosWeight = (pos: string) => {
             if (!pos) return 5;
             const p = pos.toLowerCase();
-            if (p.includes('goalkeeper')) return 1; 
-            if (p.includes('back') || p.includes('defender')) return 2; 
-            if (p.includes('midfield')) return 3; 
-            if (p.includes('wing') || p.includes('forward') || p.includes('striker')) return 4; 
+            if (p.includes('goalkeeper')) return 1;
+            if (p.includes('back') || p.includes('defender')) return 2;
+            if (p.includes('midfield')) return 3;
+            if (p.includes('wing') || p.includes('forward') || p.includes('striker')) return 4;
             return 5; // Otros
           };
 
@@ -380,10 +380,10 @@ export class SportDbService {
 
         // Guardamos el resultado en caché
         tap(data => {
-            // Solo guardamos si hemos encontrado algo para no cachear errores
-            if (data && data.length > 0) {
-                this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
-            }
+          // Solo guardamos si hemos encontrado algo para no cachear errores
+          if (data && data.length > 0) {
+            this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
+          }
         }),
         catchError(err => {
           console.error('Error en búsqueda:', err);
@@ -433,29 +433,29 @@ export class SportDbService {
 
     // Buscamos en getFixtures y getLiveMatches
     return forkJoin({
-      fixtures: this.getFixtures(), 
+      fixtures: this.getFixtures(),
       live: this.getLiveMatches(),
       wcFixtures: this.getWorldCupFixtures(),
-      wcResults: this.getWorldCupResults()   
+      wcResults: this.getWorldCupResults()
     }).pipe(
       map(results => {
         // Unificamos las listas
         const allMatches = [...(results.fixtures || []), ...(results.live || []), ...(results.wcFixtures || []), ...(results.wcResults || [])];
-        
+
         // Buscamos el partido por ID (con o sin prefijo)
         return allMatches.find(m => m.eventId === cleanId || m.eventId === `g_1_${cleanId}`);
       }),
       catchError(() => of(null))
     );
   }
-  
+
   /* --- Obtener detalles de un partido (Alineaciones, Eventos, Stats) --- */
   getMatchDetails(matchId: string): Observable<any> {
     // Generamos una clave única para guardar esto en memoria
     const cacheKey = `${this.CACHE_KEYS.MATCH_DETAIL_PREFIX}${matchId}`;
-    
+
     // Comprobamos si ya lo tenemos guardado
-    const cached = this.getFromCache<any>(cacheKey, this.CACHE_TTL.LIVE); 
+    const cached = this.getFromCache<any>(cacheKey, this.CACHE_TTL.LIVE);
     if (cached) {
       return of(cached);
     }
@@ -465,7 +465,7 @@ export class SportDbService {
 
     // Si no está en caché llamamos a la API 
     const urlLineups = `${this.baseUrl}/api/flashscore/match/${cleanId}/lineups`;
-    const urlStats   = `${this.baseUrl}/api/flashscore/match/${cleanId}/stats`;
+    const urlStats = `${this.baseUrl}/api/flashscore/match/${cleanId}/stats`;
     const urlSummary = `${this.baseUrl}/api/flashscore/match/${cleanId}/details?with_events=true`;
 
     // Ejecución paralela
@@ -477,9 +477,9 @@ export class SportDbService {
     }).pipe(
       map((results: any) => {
         const lineupsData = results.lineups?.data || results.lineups || null;
-        const statsData   = results.stats?.data   || results.stats   || null;
+        const statsData = results.stats?.data || results.stats || null;
         const summaryData = results.summary?.data?.events || results.summary?.events || results.summary?.data || results.summary || null;
-        
+
         // Si ambos endpoints fallan o están vacíos, devolvemos null
         if (!lineupsData && !statsData) return null;
 
@@ -517,8 +517,8 @@ export class SportDbService {
     return this.getResults().pipe(
       map(matches => {
         // Filtramos solo los partidos que haya jugado este equipo y que tengan resultado
-        const teamMatches = matches.filter(m => 
-          (m.homeName === teamName || m.awayName === teamName) && 
+        const teamMatches = matches.filter(m =>
+          (m.homeName === teamName || m.awayName === teamName) &&
           m.homeScore !== undefined && m.awayScore !== undefined
         );
 
@@ -536,7 +536,7 @@ export class SportDbService {
         const form: string[] = lastMatches.map(m => {
           const homeScore = Number(m.homeScore);
           const awayScore = Number(m.awayScore);
-          
+
           // Si el partido terminó en empate
           if (homeScore === awayScore) return 'E';
 
@@ -550,7 +550,7 @@ export class SportDbService {
           }
         });
 
-        return form; 
+        return form;
       }),
       tap(form => {
         // Guardamos la racha en caché
@@ -572,8 +572,8 @@ export class SportDbService {
 
     return this.getWorldCupResults().pipe(
       map(matches => {
-        const teamMatches = matches.filter(m => 
-          (m.homeName === teamName || m.awayName === teamName) && 
+        const teamMatches = matches.filter(m =>
+          (m.homeName === teamName || m.awayName === teamName) &&
           m.homeScore !== undefined && m.awayScore !== undefined
         );
 
@@ -593,17 +593,17 @@ export class SportDbService {
           return isHome ? (homeScore > awayScore ? 'V' : 'D') : (awayScore > homeScore ? 'V' : 'D');
         });
 
-        return form; 
+        return form;
       }),
       tap(form => {
         if (form.length > 0) {
           this.saveToCache(cacheKey, form, this.CACHE_TTL.STATIC);
-        }      
+        }
       }),
       catchError(() => of([]))
     );
   }
-  
+
   /* --- Obtener Palmarés/Trofeos del Jugador --- */
   getPlayerHonours(id: string): Observable<any[]> {
     // Generamos una clave única para guardar esto en memoria
@@ -611,14 +611,14 @@ export class SportDbService {
 
     // Comprobamos si ya lo tenemos guardado
     const cached = this.getFromCache<any[]>(cacheKey, this.CACHE_TTL.STATIC);
-    if (cached){ 
+    if (cached) {
       return of(cached);
     }
 
     // Si no está en caché llamamos a la API     
     return this.http.get<any>(`${this.SPORTSDB_PREFIX}/lookuphonours.php?id=${id}`).pipe(
       this.getRetryStrategy(),
-      map((res: any) => res.honours || []), 
+      map((res: any) => res.honours || []),
 
       // Guardamos el resultado en caché
       tap(data => {
@@ -647,14 +647,14 @@ export class SportDbService {
     // Si no está en caché llamamos a la API     
     return this.http.get<any>(`${this.SPORTSDB_PREFIX}/lookupformerteams.php?id=${playerId}`).pipe(
       this.getRetryStrategy(),
-      map((res: any) => res.formerteams || []), 
+      map((res: any) => res.formerteams || []),
 
       // Guardamos el resultado en caché
       tap(data => {
         // Solo guardamos si hemos encontrado algo para no cachear errores
         if (Array.isArray(data) && data.length > 0) {
           this.saveToCache(cacheKey, data, this.CACHE_TTL.STATIC);
-        } 
+        }
       }),
       catchError(err => {
         console.error('Error fetching former teams:', err);

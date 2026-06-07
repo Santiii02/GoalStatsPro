@@ -1,3 +1,12 @@
+/* --- CABECERA --- */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
 /* --- TARJETAS DE PARTIDO --- */
 .matches-grid {
   display: grid;
@@ -10,7 +19,7 @@
   background: white;
   border-radius: 12px;
   padding: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
@@ -19,11 +28,11 @@
   cursor: pointer;
 }
 
-  .match-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    border-color: var(--primary-color, #3b82f6);
-  }
+.match-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary-color, #3b82f6);
+}
 
 .match-content {
   display: flex;
@@ -42,12 +51,12 @@
   text-align: center;
 }
 
-  .team img {
-    margin-bottom: 8px;
-    height: 40px;
-    width: 40px;
-    object-fit: contain;
-  }
+.team img {
+  margin-bottom: 8px;
+  height: 40px;
+  width: 40px;
+  object-fit: contain;
+}
 
 .team-name {
   font-weight: 600;
@@ -77,7 +86,7 @@
   display: block;
   font-size: 0.8rem;
   font-weight: bold;
-  color: #6c757d;
+  color: #555;
   text-transform: uppercase;
   margin-bottom: 2px;
 }
@@ -127,15 +136,33 @@
 
 /* --- FILTRO --- */
 .filter-group {
-  min-width: 250px;
+  min-width: 220px;
 }
 
 .form-select {
   cursor: pointer;
   border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 10px 15px;
+  color: #475569;
+  font-weight: 500;
 }
 
 .form-select:focus {
   border-color: var(--primary-color, #3b82f6);
   box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+  outline: none;
+}
+
+/* Diseño responsive */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filter-group, 
+  .form-select {
+    width: 100%;
+  }
 }

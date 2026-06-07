@@ -6,14 +6,14 @@
     border-radius: 12px;
     padding: 30px 20px;
     margin-bottom: 30px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .wc-logo {
     width: 80px;
     height: auto;
     margin-bottom: 15px;
-    filter: drop-shadow(0 4px 6px rgba(255,255,255,0.2));
+    filter: drop-shadow(0 4px 6px rgba(255, 255, 255, 0.2));
 }
 
 .wc-title {
@@ -30,7 +30,7 @@
 }
 
 .section-header h3 {
-    color: var(--primary-color, #1e293b);
+    color: var(--primary-color, #3b82f6);
     font-weight: 700;
     margin-bottom: 20px;
     border-bottom: 2px solid #f1f5f9;
@@ -47,7 +47,7 @@
 .group-card {
     background: white;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     overflow: hidden;
     border: 1px solid #f1f5f9;
 }
@@ -62,7 +62,7 @@
 .country-flag {
     border-radius: 4px;
     object-fit: cover;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* --- TABLAS --- */
@@ -86,10 +86,10 @@
     vertical-align: middle;
 }
 
-.table-custom th.text-center, 
+.table-custom th.text-center,
 .table-custom td.text-center {
     white-space: nowrap !important;
-    width: 1%; 
+    width: 1%;
 }
 
 .team-row strong {
@@ -101,7 +101,7 @@
 .rank-badge {
     display: inline-block;
     font-weight: bold;
-    color: #94a3b8;
+    color: #64748b;
     background: #f1f5f9;
     padding: 3px 8px;
     border-radius: 6px;
@@ -124,6 +124,7 @@
     cursor: pointer;
     transition: opacity 0.2s;
 }
+
 .clickable:hover {
     opacity: 0.7;
 }
@@ -171,14 +172,14 @@
     font-weight: 600;
     color: #1e293b;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     transition: border-color 0.2s, box-shadow 0.2s;
     outline: none;
 }
 
 .round-selector:hover,
 .round-selector:focus {
-    border-color: var(--primary-color, #2563eb);
+    border-color: var(--primary-color, #3b82f6);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
@@ -206,14 +207,14 @@
     background: #ffffff;
     padding: 12px 16px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
 }
 
 .match-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
     background-color: #fafafa;
 }
 
@@ -228,7 +229,7 @@
 .tournament-name {
     font-size: 0.7rem;
     text-transform: uppercase;
-    color: #64748b;
+    color: #475569;
     font-weight: 700;
     letter-spacing: 0.5px;
     white-space: nowrap;
@@ -240,7 +241,7 @@
 .match-date {
     display: block;
     font-size: 0.7rem;
-    color: #94a3b8;
+    color: #64748b;
     margin-top: 3px;
 }
 
@@ -304,28 +305,18 @@
 }
 
 .score-separator {
-    color: #94a3b8;
+    color: #64748b;
     font-weight: 500;
 }
 
 .vs-badge {
     background: #f1f5f9;
-    color: #64748b;
+    color: #374151;
     font-size: 0.85rem;
     font-weight: 800;
     padding: 6px 16px;
     border-radius: 12px;
     letter-spacing: 1px;
-}
-
-/* --- ESTADOS VACÍOS --- */
-.empty-state {
-    text-align: center;
-    padding: 30px;
-    color: #94a3b8;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px dashed #cbd5e1;
 }
 
 /* --- PESTAÑAS PRIMENG --- */
@@ -334,12 +325,12 @@
     justify-content: center;
     overflow-x: auto;
     flex-wrap: nowrap;
-    scrollbar-width: none;        
-    -ms-overflow-style: none;     
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 :host ::ng-deep .custom-tabs .p-tabview-nav::-webkit-scrollbar {
-    display: none;              
+    display: none;
 }
 
 :host ::ng-deep .custom-tabs .p-tabview-nav li .p-tabview-nav-link {
@@ -352,69 +343,86 @@
 }
 
 :host ::ng-deep .custom-tabs .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-    color: var(--primary-color, #2563eb);
-    border-bottom: 3px solid var(--primary-color, #2563eb);
+    color: var(--primary-color, #3b82f6);
+    border-bottom: 3px solid var(--primary-color, #3b82f6);
 }
 
 /* Diseño responsive */
 @media (max-width: 768px) {
+
     /* Cabecera */
-    .hero-section { padding: 20px 15px; }
-    .wc-title { font-size: 1.7rem; }
-    .wc-logo { width: 60px; margin-bottom: 10px; }
+    .hero-section {
+        padding: 20px 15px;
+    }
+
+    .wc-title {
+        font-size: 1.7rem;
+    }
+
+    .wc-logo {
+        width: 60px;
+        margin-bottom: 10px;
+    }
 
     /* Grid */
-    .groups-grid { grid-template-columns: 1fr; }
-    
+    .groups-grid {
+        grid-template-columns: 1fr;
+    }
+
     /* Tablas */
-    .table-custom th, .table-custom td {
-        padding: 8px 5px; 
+    .table-custom th,
+    .table-custom td {
+        padding: 8px 5px;
         font-size: 0.8rem;
     }
-    
+
     .rank-badge {
         min-width: 22px;
         padding: 2px 5px;
         font-size: 0.75rem;
     }
-    
+
     .country-flag {
         width: 20px;
         height: 20px;
     }
 
     /* Selector de jornada */
-    .round-selector-container { min-width: 100%; }
+    .round-selector-container {
+        min-width: 100%;
+    }
 
     /* Tarjetas de Partido */
-    .match-card { padding: 12px 10px; }
-    
-    .team-name {
-        font-size: 0.75rem; 
-        word-break: break-word; 
+    .match-card {
+        padding: 12px 10px;
     }
-    
+
+    .team-name {
+        font-size: 0.75rem;
+        word-break: break-word;
+    }
+
     .team-logo {
         width: 24px;
         height: 24px;
     }
-    
-    .score-box { 
-        padding: 4px 8px; 
-        gap: 6px; 
+
+    .score-box {
+        padding: 4px 8px;
+        gap: 6px;
     }
-    
-    .score-number { 
-        font-size: 1rem; 
+
+    .score-number {
+        font-size: 1rem;
     }
-    
-    .vs-badge { 
-        padding: 4px 8px; 
-        font-size: 0.7rem; 
+
+    .vs-badge {
+        padding: 4px 10px;
+        font-size: 0.75rem;
     }
-    
+
     .score-board {
-        min-width: 50px; 
+        min-width: 50px;
         margin: 0 5px;
     }
 
@@ -422,7 +430,7 @@
     :host ::ng-deep .custom-tabs .p-tabview-nav {
         justify-content: flex-start;
     }
-    
+
     :host ::ng-deep .custom-tabs .p-tabview-nav li .p-tabview-nav-link {
         padding: 0.8rem 0.5rem;
         font-size: 0.75rem;

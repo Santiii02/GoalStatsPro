@@ -16,7 +16,16 @@ import { AuthService } from '../../services/auth.service';
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, CardModule, InputTextModule, PasswordModule, ButtonModule, MessageModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        RouterModule,
+        CardModule,
+        InputTextModule,
+        PasswordModule,
+        ButtonModule,
+        MessageModule,
+    ],
     templateUrl: './login.html',
     styleUrl: './login.css',
 })
@@ -64,7 +73,6 @@ export class LoginComponent {
 
             // Si todo va bien, redirigimos al inicio
             this.router.navigate(['/']);
-
         } catch (error: any) {
             // Capturamos y traducimos el error para el usuario
             const errorCode = error.code || error.message;

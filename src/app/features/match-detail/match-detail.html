@@ -19,17 +19,16 @@
 
         <div class="match-hero">
             <div class="team-col home">
-                <a [routerLink]="['/team', match.homeTeam]" 
-                    style="text-decoration: none; color: inherit; outline: none; display: flex; flex-direction: column; align-items: center; cursor: pointer;" 
+                <a [routerLink]="['/team', match.homeTeam]"
+                    style="text-decoration: none; color: inherit; outline: none; display: flex; flex-direction: column; align-items: center; cursor: pointer;"
                     title="Ver perfil del equipo">
-                    <img [src]="match.homeLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team" alt="Local">
+                    <img [src]="match.homeLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team"
+                        alt="Local">
                     <h2 class="team-name clickable-team" style="margin: 0; margin-top: 10px;">{{ match.homeTeam }}</h2>
                 </a>
 
                 <div class="team-form mt-2" *ngIf="homeForm.length > 0">
-                   <span *ngFor="let result of homeForm" 
-                        class="form-badge" 
-                        [ngClass]="getFormColorClass(result)"
+                    <span *ngFor="let result of homeForm" class="form-badge" [ngClass]="getFormColorClass(result)"
                         [title]="result === 'V' ? 'Victoria' : result === 'E' ? 'Empate' : 'Derrota'">
                         {{ result }}
                     </span>
@@ -46,7 +45,7 @@
                 <div class="match-status" [class.live-pulse]="isLive(match.status)">
                     <span *ngIf="isLive(match.status)" class="live-dot">●</span>
                     {{ match.status }}
-                    <div *ngIf="match.status === 'Programado' && match.matchDate" 
+                    <div *ngIf="match.status === 'Programado' && match.matchDate"
                         style="font-size: 0.75rem; margin-top: 2px; opacity: 0.9;">
                         {{ match.matchDate | date:'dd MMM - HH:mm' }}
                     </div>
@@ -56,17 +55,16 @@
             </div>
 
             <div class="team-col away">
-                <a [routerLink]="['/team', match.awayTeam]" 
-                    style="text-decoration: none; color: inherit; outline: none; display: flex; flex-direction: column; align-items: center; cursor: pointer;" 
+                <a [routerLink]="['/team', match.awayTeam]"
+                    style="text-decoration: none; color: inherit; outline: none; display: flex; flex-direction: column; align-items: center; cursor: pointer;"
                     title="Ver perfil del equipo">
-                    <img [src]="match.awayLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team" alt="Visitante">
+                    <img [src]="match.awayLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team"
+                        alt="Visitante">
                     <h2 class="team-name clickable-team" style="margin: 0; margin-top: 10px;">{{ match.awayTeam }}</h2>
                 </a>
-                    
+
                 <div class="team-form mt-2" *ngIf="awayForm.length > 0">
-                   <span *ngFor="let result of awayForm" 
-                        class="form-badge" 
-                        [ngClass]="getFormColorClass(result)"
+                    <span *ngFor="let result of awayForm" class="form-badge" [ngClass]="getFormColorClass(result)"
                         [title]="result === 'V' ? 'Victoria' : result === 'E' ? 'Empate' : 'Derrota'">
                         {{ result }}
                     </span>
@@ -83,11 +81,12 @@
         </div>
 
         <div *ngIf="!loadingDetails" class="match-tabs mt-4 fade-in">
-            
+
             <ng-template #eventTemplate let-event let-align="align">
                 <div class="e-content" [ngClass]="align === 'right' ? 'flex-row-reverse' : 'flex-row'">
-                    
-                    <div *ngIf="event.type === 'sub'" class="sub-block" [ngClass]="align === 'right' ? 'align-items-end' : 'align-items-start'">
+
+                    <div *ngIf="event.type === 'sub'" class="sub-block"
+                        [ngClass]="align === 'right' ? 'align-items-end' : 'align-items-start'">
                         <span class="sub-in">
                             <i class="pi pi-arrow-up"></i> {{ event.mainName }}
                         </span>
@@ -97,13 +96,13 @@
                     </div>
 
                     <ng-container *ngIf="event.type !== 'sub'">
-                        
+
                         <div class="e-score" *ngIf="event.type === 'goal' && event.homeScore !== undefined">
                             {{ event.homeScore }} - {{ event.awayScore }}
                         </div>
 
-                        <div style="display: flex; align-items: center; gap: 5px;">                            
-                            <span class="e-main fw-bold">{{ event.mainName }}</span>                           
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span class="e-main fw-bold">{{ event.mainName }}</span>
                             <span class="e-sub text-muted small" *ngIf="event.subName && event.type === 'goal'">
                                 ({{ event.subName }})
                             </span>
@@ -149,27 +148,31 @@
 
                         <div *ngIf="!aiAnalysis && !aiLoading && !aiError" class="text-center mt-3 text-muted">
                             <i class="pi pi-info-circle mb-2" style="font-size: 1.5rem"></i>
-                            <p class="m-0" *ngIf="hasRealStats">Genera un análisis basado en las estadísticas reales del partido.</p>
-                            <p class="m-0" *ngIf="!hasRealStats">No hay datos aún del encuentro. Se generará un pronóstico basado en el historial de los equipos.</p>
+                            <p class="m-0" *ngIf="hasRealStats">Genera un análisis basado en las estadísticas reales del
+                                partido.</p>
+                            <p class="m-0" *ngIf="!hasRealStats">No hay datos aún del encuentro. Se generará un
+                                pronóstico basado en el historial de los equipos.</p>
                         </div>
                     </div>
                 </p-tabPanel>
 
-                <p-tabPanel [header]="isLive(match.status) ? '🔴 En vivo' : 'Resumen'" *ngIf="isLive(match.status) || matchSummary.length > 0">
+                <p-tabPanel [header]="isLive(match.status) ? '🔴 En vivo' : 'Resumen'"
+                    *ngIf="isLive(match.status) || matchSummary.length > 0">
                     <div class="summary-container mt-3">
-                        
+
                         <div class="text-end mb-4" *ngIf="isLive(match.status)">
-                            <p-button icon="pi pi-sync" label="Actualizar minuto a minuto" 
-                                    styleClass="p-button-sm p-button-danger p-button-outlined p-button-rounded" 
-                                    (onClick)="refreshLiveEvents()">
+                            <p-button icon="pi pi-sync" label="Actualizar minuto a minuto"
+                                styleClass="p-button-sm p-button-danger p-button-outlined p-button-rounded"
+                                (onClick)="refreshLiveEvents()">
                             </p-button>
                         </div>
 
                         <div *ngIf="matchSummary.length === 0" class="text-center p-5 text-muted fade-in">
                             <i class="pi pi-clock mb-3" style="font-size: 2rem; opacity: 0.5;"></i>
-                            <p>El partido está en juego pero aún no se han registrado eventos (goles, tarjetas o cambios).</p>
+                            <p>El partido está en juego pero aún no se han registrado eventos (goles, tarjetas o
+                                cambios).</p>
                         </div>
-                        
+
                         <div *ngFor="let stage of matchSummary" class="match-stage mb-5">
                             <div class="stage-header">
                                 <span class="stage-name">{{ stage.stageName }}</span>
@@ -179,10 +182,11 @@
                                 <div class="timeline-line"></div>
 
                                 <div class="timeline-row fade-in" *ngFor="let event of stage.events">
-                                    
+
                                     <div class="t-half t-home">
                                         <ng-container *ngIf="event.isHome">
-                                            <ng-container *ngTemplateOutlet="eventTemplate; context: { $implicit: event, align: 'right' }"></ng-container>
+                                            <ng-container
+                                                *ngTemplateOutlet="eventTemplate; context: { $implicit: event, align: 'right' }"></ng-container>
                                         </ng-container>
                                     </div>
 
@@ -190,19 +194,23 @@
                                         <div class="e-time" [ngClass]="event.isHome ? 'time-left' : 'time-right'">
                                             {{ event.time }}'
                                         </div>
-                                        
+
                                         <div class="e-icon-box">
-                                            <span *ngIf="event.type === 'goal'" style="font-size: 1.1rem; line-height: 1;">⚽</span>
+                                            <span *ngIf="event.type === 'goal'"
+                                                style="font-size: 1.1rem; line-height: 1;">⚽</span>
                                             <div *ngIf="event.type === 'yellow'" class="card-yellow"></div>
                                             <div *ngIf="event.type === 'red'" class="card-red"></div>
-                                            <i *ngIf="event.type === 'sub'" class="pi pi-sync" style="color: #10b981; font-weight: bold;"></i>
-                                            <i *ngIf="!['goal', 'yellow', 'red', 'sub'].includes(event.type)" class="pi pi-info-circle text-muted"></i>
+                                            <i *ngIf="event.type === 'sub'" class="pi pi-sync"
+                                                style="color: #10b981; font-weight: bold;"></i>
+                                            <i *ngIf="!['goal', 'yellow', 'red', 'sub'].includes(event.type)"
+                                                class="pi pi-info-circle text-muted"></i>
                                         </div>
                                     </div>
 
                                     <div class="t-half t-away">
                                         <ng-container *ngIf="!event.isHome">
-                                            <ng-container *ngTemplateOutlet="eventTemplate; context: { $implicit: event, align: 'left' }"></ng-container>
+                                            <ng-container
+                                                *ngTemplateOutlet="eventTemplate; context: { $implicit: event, align: 'left' }"></ng-container>
                                         </ng-container>
                                     </div>
 
@@ -218,10 +226,10 @@
                         <div class="lineup-col">
                             <h4 class="mb-3 text-center">{{ match.homeTeam }}</h4>
                             <small class="d-block text-center text-muted mb-3">
-                                Formación: {{ startingLineups.home[0]?.formation || 'N/A' }}
+                                Formación: {{ startingLineups.home?.[0]?.formation || 'No disponible' }}
                             </small>
                             <ul class="player-list">
-                                <li *ngFor="let p of startingLineups.home">
+                                <li *ngFor="let p of startingLineups.home || []">
                                     <span class="p-number">{{ p.participantNumber }}</span>
                                     <span class="p-name">{{ p.participantName }}</span>
                                     <i *ngIf="p.participantSpecialPosition === '(C)'"
@@ -231,7 +239,7 @@
                             <ng-container *ngIf="substitutes">
                                 <h5 class="text-center text-muted mt-4 mb-3">Suplentes</h5>
                                 <ul class="player-list text-muted">
-                                    <li *ngFor="let p of substitutes.home">
+                                    <li *ngFor="let p of substitutes.home || []">
                                         <small>{{ p.participantNumber }} - {{ p.participantName }}</small>
                                     </li>
                                 </ul>
@@ -241,10 +249,10 @@
                         <div class="lineup-col">
                             <h4 class="mb-3 text-center">{{ match.awayTeam }}</h4>
                             <small class="d-block text-center text-muted mb-3">
-                                Formación: {{ startingLineups.away[0]?.formation || 'N/A' }}
+                                Formación: {{ startingLineups.away?.[0]?.formation || 'No disponible' }}
                             </small>
                             <ul class="player-list">
-                                <li *ngFor="let p of startingLineups.away">
+                                <li *ngFor="let p of startingLineups.away || []">
                                     <span class="p-number">{{ p.participantNumber }}</span>
                                     <span class="p-name">{{ p.participantName }}</span>
                                     <i *ngIf="p.participantSpecialPosition === '(C)'"
@@ -254,7 +262,7 @@
                             <ng-container *ngIf="substitutes">
                                 <h5 class="text-center text-muted mt-4 mb-3">Suplentes</h5>
                                 <ul class="player-list text-muted">
-                                    <li *ngFor="let p of substitutes.away">
+                                    <li *ngFor="let p of substitutes.away || []">
                                         <small>{{ p.participantNumber }} - {{ p.participantName }}</small>
                                     </li>
                                 </ul>
@@ -266,13 +274,15 @@
                     <div class="empty-state mt-4 fade-in" *ngIf="!startingLineups">
                         <i class="pi pi-users mb-3"></i>
                         <h4 class="mb-3" style="color: #475569; font-weight: 700;">Alineaciones no confirmadas</h4>
-                        
+
                         <p class="text-muted m-0" *ngIf="match?.status === 'Programado'">
-                            Los entrenadores suelen confirmar el once titular aproximadamente <strong>una hora antes</strong> del pitido inicial. Vuelve un poco más tarde para comprobar quién juega.
+                            Los entrenadores suelen confirmar el once titular aproximadamente <strong>una hora
+                                antes</strong> del pitido inicial. Vuelve un poco más tarde para comprobar quién juega.
                         </p>
-                        
+
                         <p class="text-muted m-0" *ngIf="match?.status !== 'Programado'">
-                            Nuestro proveedor de datos deportivos no ha facilitado el acta oficial con las alineaciones para este encuentro.
+                            Nuestro proveedor de datos deportivos no ha facilitado el acta oficial con las alineaciones
+                            para este encuentro.
                         </p>
                     </div>
                 </p-tabPanel>
@@ -290,34 +300,39 @@
                     <hr class="text-muted opacity-25 mb-4">
 
                     <div *ngFor="let group of groupedMatchStats; let last = last" class="mt-4">
-                        
-                        <h5 class="text-center mb-4" style="color: #475569; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px;">
+
+                        <h5 class="text-center mb-4"
+                            style="color: #475569; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px;">
                             {{ group.category }}
                         </h5>
-                        
+
                         <div class="stats-container">
                             <div class="stat-row" *ngFor="let stat of group.stats">
-                                
+
                                 <div class="stat-val home">{{ stat.homeValue }}</div>
-                                
-                                <div class="stat-label" style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+
+                                <div class="stat-label"
+                                    style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                                     {{ translateStat(stat.statName) }}
-                                    
-                                    <i *ngIf="getStatExplanation(stat.statName)" 
-                                        class="pi pi-info-circle stat-info-icon" 
-                                        [pTooltip]="getStatExplanation(stat.statName)" 
-                                        tooltipPosition="top">
+
+                                    <i *ngIf="getStatExplanation(stat.statName)"
+                                        class="pi pi-info-circle stat-info-icon"
+                                        [pTooltip]="getStatExplanation(stat.statName)" tooltipPosition="top">
                                     </i>
                                 </div>
-                                
+
                                 <div class="stat-val away">{{ stat.awayValue }}</div>
 
                                 <div class="stat-bar-bg mt-1">
                                     <div class="home-bar-container">
-                                        <div class="home-bar" [style.width.%]="getStatPercent(stat.homeValue, stat.awayValue, true)"></div>
+                                        <div class="home-bar"
+                                            [style.width.%]="getStatPercent(stat.homeValue, stat.awayValue, true)">
+                                        </div>
                                     </div>
                                     <div class="away-bar-container">
-                                        <div class="away-bar" [style.width.%]="getStatPercent(stat.homeValue, stat.awayValue, false)"></div>
+                                        <div class="away-bar"
+                                            [style.width.%]="getStatPercent(stat.homeValue, stat.awayValue, false)">
+                                        </div>
                                     </div>
                                 </div>
                             </div>

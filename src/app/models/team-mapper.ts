@@ -25,13 +25,13 @@ export const TEAM_NAME_MAPPER: Record<string, string> = {
  * NORMALIZACIÓN DE NOMBRES (Flashscore -> TheSportsDB)
  */
 export function normalizeTeamName(flashscoreName: string): string {
-    if (!flashscoreName) return '';
+  if (!flashscoreName) return '';
 
   // Quitamos espacios extra por si acaso
-    const cleanName = flashscoreName.trim();
+  const cleanName = flashscoreName.trim();
 
   // Devolvemos el valor o el original si no está en el diccionario
-return TEAM_NAME_MAPPER[cleanName] || cleanName;
+  return TEAM_NAME_MAPPER[cleanName] || cleanName;
 }
 
 
@@ -43,12 +43,12 @@ export function getFlashscoreName(sportsDbName: string): string {
 
   // Quitamos espacios extra por si acaso
   const cleanName = sportsDbName.trim();
-  
+
   // Buscamos qué clave tiene asignado este valor
   const flashscoreKey = Object.keys(TEAM_NAME_MAPPER).find(
     key => TEAM_NAME_MAPPER[key] === cleanName
   );
-  
+
   // Devolvemos la clave o el original si no está en el diccionario
   return flashscoreKey || cleanName;
 }
@@ -159,7 +159,7 @@ export function translatePositionMapping(position: string): string {
   const pos = position.toLowerCase();
 
   // Buscamos la primera regla donde alguna de sus "keys" esté incluida en la posición
-  const match = POSITION_TRANSLATIONS.find(entry => 
+  const match = POSITION_TRANSLATIONS.find(entry =>
     entry.keys.some(key => pos.includes(key))
   );
 
@@ -193,7 +193,7 @@ export function getPlayerRoleMapping(position: string): string {
   const pos = position.toLowerCase();
 
   // Misma lógica de búsqueda
-  const match = ROLE_MAPPINGS.find(entry => 
+  const match = ROLE_MAPPINGS.find(entry =>
     entry.keys.some(key => pos.includes(key))
   );
 

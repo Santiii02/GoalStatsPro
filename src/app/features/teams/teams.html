@@ -2,7 +2,7 @@
 
   <div class="page-header mb-4">
     <h2 class="m-0">Equipos de LaLiga</h2>
-    
+
     <div class="rank-legend">
       <div class="legend-item" pTooltip="Puestos 1 al 5" tooltipPosition="top">
         <span class="legend-color top-rank-color"></span> Champions
@@ -29,13 +29,9 @@
   </div>
 
   <div class="teams-grid" *ngIf="!loading && !error">
-    
-    <div *ngFor="let team of teams" 
-        class="team-card" 
-        (click)="goToTeamDetail(team)"
-        (keydown)="$event.key === 'Enter' && goToTeamDetail(team)"
-        tabindex="0"
-        role="button">
+
+    <div *ngFor="let team of teams" class="team-card" (click)="goToTeamDetail(team)"
+      (keydown)="$event.key === 'Enter' && goToTeamDetail(team)" tabindex="0" role="button">
 
       <div class="card-header">
         <span class="rank" [ngClass]="{
@@ -46,19 +42,17 @@
         }">
           #{{ team.rank }}
         </span>
-        
+
         <div class="team-identity">
-          <img #teamImg [src]="team.teamBadge || team.teamLogo || 'assets/images/Logo.png'" 
-                alt="Escudo de {{ team.teamName }}"
-                class="team-mini-badge"
-                (error)="teamImg.src='assets/images/Logo.png'">
-          
+          <img #teamImg [src]="team.teamBadge || team.teamLogo || 'assets/images/Logo.png'"
+            alt="Escudo de {{ team.teamName }}" class="team-mini-badge" (error)="teamImg.src='assets/images/Logo.png'">
+
           <h3 class="team-name">{{ team.teamName }}</h3>
         </div>
       </div>
 
       <div class="stats-row">
-        
+
         <div class="stat-item highlight">
           <span class="stat-value">{{ team.points }}</span>
           <span class="stat-label">Pts</span>

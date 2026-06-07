@@ -2,7 +2,8 @@
  * ESTILOS GLOBALES.
  */
 
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -24,13 +25,13 @@ body, html {
 .common-card-style {
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .common-card-style:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* --- Espaciado --- */
@@ -114,8 +115,8 @@ body, html {
   width: 2rem;
   height: 2rem;
   vertical-align: text-bottom;
-  border: 0.25em solid currentColor; 
-  border-right-color: transparent; 
+  border: 0.25em solid currentColor;
+  border-right-color: transparent;
   border-radius: 50%;
   animation: spinner-border .75s linear infinite;
 }
@@ -134,7 +135,7 @@ body, html {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(15px); 
+    transform: translateY(15px);
   }
 
   to {
@@ -154,4 +155,365 @@ body, html {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* --- Jugadores --- */
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  padding-bottom: 40px;
+}
+
+.player-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  border: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary-color, #3b82f6);
+}
+
+.player-img-container {
+  height: 200px;
+  background: radial-gradient(circle at bottom, #eef2f3, #d9e2e6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+.player-img-container img {
+  max-height: 95%;
+  max-width: 100%;
+  filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.player-card:hover .player-img-container img {
+  transform: scale(1.1) translateY(-5px);
+}
+
+/* --- Información del jugador --- */
+.player-info {
+  padding: 10px;
+}
+
+.player-info strong {
+  display: block;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 5px;
+  color: #2c3e50;
+}
+
+.meta-tags {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.position-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  background-color: #eee;
+  color: #555;
+}
+
+.number-badge {
+  color: #64748b;
+  font-weight: bold;
+  font-size: 0.8rem;
+  align-self: center;
+}
+
+/* Amarillo: Portero */
+.gk {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+/* Verde: Defensa */
+.df {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+/* Azul: Medio */
+.mf {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+/* Rojo: Delantero */
+.fw {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.nationality {
+  margin-top: 5px;
+  color: #5a5a5a;
+  font-size: 0.8rem;
+}
+
+/* --- Leyenda de posiciones --- */
+.rank-badge {
+  display: inline-block;
+  font-weight: bold;
+  color: #5a5a5a;
+  background: #f5f5f5;
+  padding: 4px 10px;
+  border-radius: 6px;
+  min-width: 32px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.rank {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #5d6b6c;
+  background: #f5f5f5;
+  padding: 5px 10px;
+  border-radius: 8px;
+  min-width: 35px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.rank-legend {
+  display: flex;
+  gap: 15px;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  cursor: help;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+/* Puestos de Champions (Top 5) */
+.top-rank,
+.top-rank-color {
+  background: #e3f2fd !important;
+  color: #1565c0 !important;
+  border-color: #bbdefb !important;
+}
+
+/* Europa League */
+.europa-rank,
+.europa-rank-color {
+  background: #fff3e0 !important;
+  color: #e65100 !important;
+  border-color: #ffe0b2 !important;
+}
+
+
+/* Conference League */
+.conference-rank,
+.conference-rank-color {
+  background: #e8f5e9 !important;
+  color: #2e7d32 !important;
+  border-color: #c8e6c9 !important;
+}
+
+/* Zona descenso */
+.relegation-rank,
+.relegation-rank-color {
+  background: #ffebee !important;
+  color: #c62828 !important;
+  border-color: #ffcdd2 !important;
+}
+
+/* --- Racha de equipo (V-E-D) --- */
+.team-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+.form-badge {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  cursor: help;
+}
+
+/* Colores de resultados */
+.form-win {
+  background-color: #22c55e;
+}
+
+.form-draw {
+  background-color: #64748b;
+}
+
+.form-loss {
+  background-color: #ef4444;
+}
+
+.p-autocomplete-panel {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #f1f5f9 !important;
+  margin-top: 4px !important;
+  overflow: hidden;
+}
+
+.search-input-custom {
+  padding: 0.7rem 2.5rem 0.7rem 2.5rem !important;
+  border-radius: 25px !important;
+  border: 1px solid #e2e8f0 !important;
+  background-color: #f8fafc !important;
+  font-size: 0.95rem !important;
+  color: #334155 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: none !important;
+  width: 100%;
+}
+
+.search-input-custom:focus {
+  border-color: var(--primary-color, #3b82f6) !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+.navbar-search-input {
+  width: 100% !important;
+  height: 40px !important;
+  padding: 0.6rem 1.2rem !important;
+  font-size: 0.95rem !important;
+  border-radius: 50px !important;
+  border: none !important;
+  background-color: white !important;
+  color: #333 !important;
+  outline: none !important;
+  transition: box-shadow 0.2s ease !important;
+}
+
+.navbar-search-input:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4) !important;
+}
+
+/* --- EMPTY STATE --- */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.empty-state p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* --- Estilos de la historia (Leer más) --- */
+.history-content {
+  position: relative;
+}
+
+.history-content p {
+  text-align: justify;
+  line-height: 1.8;
+  color: #4a4a4a;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.history-content p.truncated {
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+
+.btn-read-more {
+  background: none;
+  border: none;
+  color: var(--primary-color, #3b82f6);
+  font-weight: bold;
+  cursor: pointer;
+  padding: 10px 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+
+.btn-read-more:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.p-autocomplete {
+  width: 100% !important;
+  display: block;
+}
+
+/* --- DISEÑO RESPONSIVE --- */
+@media (max-width: 768px) {
+  .rank-legend {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 12px;
+    font-size: 0.75rem;
+    width: 100%;
+    justify-content: flex-start;
+  }
 }

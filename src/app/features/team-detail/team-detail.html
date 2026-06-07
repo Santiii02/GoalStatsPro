@@ -1,19 +1,17 @@
 <div class="container fade-in" *ngIf="team">
 
   <div class="mb-3">
-    <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()" styleClass="p-button-text text-secondary"></p-button>
+    <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()"
+      styleClass="p-button-text text-secondary"></p-button>
   </div>
 
-  <div class="hero-team" 
-    [ngStyle]="{'background-image': getHeroBackground()}"
-    style="background-color: #2c3e50;">
+  <div class="hero-team" [ngStyle]="{'background-image': getHeroBackground()}" style="background-color: #2c3e50;">
 
     <div class="overlay">
       <div class="team-header-content">
 
-        <img #teamBadge [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'" 
-          alt="Escudo de {{ translateName(team.strTeam) }}" 
-          class="big-badge"
+        <img #teamBadge [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'"
+          alt="Escudo de {{ translateName(team.strTeam) }}" class="big-badge"
           (error)="teamBadge.src='assets/images/Logo.png'">
 
         <div class="team-info">
@@ -35,16 +33,18 @@
           </p>
           <span class="league-tag">{{ getLeagueLabel(team) }}</span>
           <div class="social-links mt-3" *ngIf="team.strTwitter || team.strInstagram || team.strYoutube">
-            <a *ngIf="team.strTwitter" [href]="formatUrl(team.strTwitter)" target="_blank" class="social-icon twitter" pTooltip="Twitter" tooltipPosition="bottom"><i class="pi pi-twitter"></i></a>
-            <a *ngIf="team.strInstagram" [href]="formatUrl(team.strInstagram)" target="_blank" class="social-icon instagram" pTooltip="Instagram" tooltipPosition="bottom"><i class="pi pi-instagram"></i></a>
-            <a *ngIf="team.strYoutube" [href]="formatUrl(team.strYoutube)" target="_blank" class="social-icon youtube" pTooltip="YouTube" tooltipPosition="bottom"><i class="pi pi-youtube"></i></a>
+            <a *ngIf="team.strTwitter" [href]="formatUrl(team.strTwitter)" target="_blank" class="social-icon twitter"
+              pTooltip="Twitter" tooltipPosition="bottom"><i class="pi pi-twitter"></i></a>
+            <a *ngIf="team.strInstagram" [href]="formatUrl(team.strInstagram)" target="_blank"
+              class="social-icon instagram" pTooltip="Instagram" tooltipPosition="bottom"><i
+                class="pi pi-instagram"></i></a>
+            <a *ngIf="team.strYoutube" [href]="formatUrl(team.strYoutube)" target="_blank" class="social-icon youtube"
+              pTooltip="YouTube" tooltipPosition="bottom"><i class="pi pi-youtube"></i></a>
           </div>
 
           <div class="team-form mt-3" *ngIf="(isLaLigaTeam || isWorldCupTeam) && teamForm.length > 0">
             <span class="text-white-alpha-70 small text-uppercase fw-bold me-2" style="font-size: 0.8rem;">Racha:</span>
-            <span *ngFor="let result of teamForm" 
-              class="form-badge" 
-              [ngClass]="getFormColorClass(result)"
+            <span *ngFor="let result of teamForm" class="form-badge" [ngClass]="getFormColorClass(result)"
               [title]="result === 'V' ? 'Victoria' : result === 'E' ? 'Empate' : 'Derrota'">
               {{ result }}
             </span>
@@ -57,7 +57,8 @@
 
   <div class="season-stats-container mt-4" *ngIf="isLaLigaTeam || isWorldCupTeam">
     <div class="season-stats-card">
-      <h3 class="mb-3 text-center"><i class="pi pi-chart-bar me-2"></i> Estadísticas {{ isLaLigaTeam ? 'LaLiga 25/26' : 'Mundial 2026' }}</h3>
+      <h3 class="mb-3 text-center"><i class="pi pi-chart-bar me-2"></i> Estadísticas {{ isLaLigaTeam ? 'LaLiga 25/26' :
+        'Mundial 2026' }}</h3>
       <div class="stats-grid">
         <div class="stat-box">
           <span class="stat-value">{{ matchStats.played }}</span>
@@ -82,10 +83,7 @@
   <div class="matches-section mt-5" *ngIf="isLaLigaTeam || isWorldCupTeam">
     <div class="matches-header mb-4">
       <h3>Partidos</h3>
-      <p-dropdown 
-        [options]="matchFilterOptions" 
-        [(ngModel)]="selectedMatchType" 
-        (onChange)="onMatchTypeChange()"
+      <p-dropdown [options]="matchFilterOptions" [(ngModel)]="selectedMatchType" (onChange)="onMatchTypeChange()"
         styleClass="custom-dropdown">
       </p-dropdown>
     </div>
@@ -95,12 +93,9 @@
     </div>
 
     <div class="matches-list">
-      <div class="match-row" *ngFor="let match of displayedMatches" 
-          (click)="goToMatch(match)"
-          (keydown)="$event.key === 'Enter' && goToMatch(match)"
-          tabindex="0"
-          role="button">
-        
+      <div class="match-row" *ngFor="let match of displayedMatches" (click)="goToMatch(match)"
+        (keydown)="$event.key === 'Enter' && goToMatch(match)" tabindex="0" role="button">
+
         <div class="match-meta">
           <span class="round-badge" *ngIf="getRoundLabel(match)">{{ getRoundLabel(match) }}</span>
           <div class="match-date">
@@ -109,8 +104,9 @@
         </div>
 
         <div class="match-teams">
-          <span class="team-name home-team" [class.fw-bold]="match.homeName === team.strTeam">{{ translateName(match.homeName) }}</span>
-          
+          <span class="team-name home-team" [class.fw-bold]="match.homeName === team.strTeam">{{
+            translateName(match.homeName) }}</span>
+
           <div class="match-score">
             <ng-container *ngIf="selectedMatchType === 'past'; else noScore">
               <span class="score-badge">{{ match.homeScore }} - {{ match.awayScore }}</span>
@@ -120,7 +116,8 @@
             </ng-template>
           </div>
 
-          <span class="team-name away-team" [class.fw-bold]="match.awayName === team.strTeam">{{ translateName(match.awayName) }}</span>          
+          <span class="team-name away-team" [class.fw-bold]="match.awayName === team.strTeam">{{
+            translateName(match.awayName) }}</span>
         </div>
       </div>
     </div>
@@ -128,16 +125,15 @@
 
   <div class="mt-5" *ngIf="cleanedHistoryText">
     <h3 class="mb-3">Historia</h3>
-    
+
     <div class="description-section">
       <div class="history-content">
         <p [class.truncated]="!showFullHistory">
-          {{ showFullHistory ? cleanedHistoryText : (cleanedHistoryText | slice:0:400) + (cleanedHistoryText.length > 400 ? '...' : '') }}
+          {{ showFullHistory ? cleanedHistoryText : (cleanedHistoryText | slice:0:400) + (cleanedHistoryText.length >
+          400 ? '...' : '') }}
         </p>
-        
-        <button *ngIf="cleanedHistoryText.length > 400" 
-                class="btn-read-more" 
-                (click)="toggleHistory()">
+
+        <button *ngIf="cleanedHistoryText.length > 400" class="btn-read-more" (click)="toggleHistory()">
           {{ showFullHistory ? 'Leer menos' : 'Leer más' }}
           <i class="pi" [ngClass]="showFullHistory ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
         </button>
@@ -145,21 +141,19 @@
 
       <small class="text-muted mt-3 d-block" *ngIf="isHistoryEnglishOnly" style="font-style: italic;">
         <i class="pi pi-info-circle mr-1"></i> La historia del equipo no está disponible en español.
-      </small>  
+      </small>
     </div>
   </div>
 
   <div class="mt-5" *ngIf="team.strEquipment">
     <h3 class="mb-3">Equipación</h3>
-    
+
     <div class="players-grid">
       <div class="player-card fade-in" style="cursor: default; max-width: 200px;">
-        
+
         <div class="player-img-container" style="padding: 15px;">
-          <img [src]="team.strEquipment" 
-              alt="Equipación {{ team.strTeam }}" 
-              loading="lazy" 
-              style="object-fit: contain;">
+          <img [src]="team.strEquipment" alt="Equipación {{ team.strTeam }}" loading="lazy"
+            style="object-fit: contain;">
         </div>
 
         <div class="player-info">
@@ -174,14 +168,16 @@
     <h3 class="mb-3">Plantilla Principal</h3>
 
     <div *ngIf="players.length === 0" class="alert alert-info text-center p-4 border-round">
-      
+
       <ng-container *ngIf="isWorldCupTeam; else defaultEmpty">
         <i class="pi pi-id-card mb-3" style="font-size: 2.5rem; color: #0ea5e9;"></i>
         <h4 style="color: #1e3a8a;">Plantilla no disponible</h4>
         <p class="m-0 text-secondary" style="line-height: 1.5;">
-          Las convocatorias de las selecciones nacionales varían en cada torneo y nuestro proveedor no mantiene un listado de jugadores para <strong>{{ translateName(team.strTeam) }}</strong>. 
+          Las convocatorias de las selecciones nacionales varían en cada torneo y nuestro proveedor no mantiene un
+          listado de jugadores para <strong>{{ translateName(team.strTeam) }}</strong>.
           <br><br>
-          💡 <strong>Tip:</strong> Para ver qué jugadores están participando, consulta las <strong>alineaciones</strong> directamente en la pestaña del partido.
+          💡 <strong>Tip:</strong> Para ver qué jugadores están participando, consulta las <strong>alineaciones</strong>
+          directamente en la pestaña del partido.
         </p>
       </ng-container>
 
@@ -193,24 +189,18 @@
     </div>
 
     <div class="players-grid">
-      <div class="player-card fade-in" *ngFor="let player of players" 
-          (click)="goToPlayer(player.idPlayer)"
-          (keydown)="$event.key === 'Enter' && goToPlayer(player.idPlayer)"
-          tabindex="0"
-          role="button">
+      <div class="player-card fade-in" *ngFor="let player of players" (click)="goToPlayer(player.idPlayer)"
+        (keydown)="$event.key === 'Enter' && goToPlayer(player.idPlayer)" tabindex="0" role="button">
 
         <div class="player-img-container">
           <img #playerImg [src]="player.strCutout || player.strThumb || 'assets/images/Avatar.png'"
-            alt="Foto de {{ player.strPlayer }}" 
-            loading="lazy"
-            (error)="playerImg.src='assets/images/Avatar.png'">
+            alt="Foto de {{ player.strPlayer }}" loading="lazy" (error)="playerImg.src='assets/images/Avatar.png'">
         </div>
 
         <div class="player-info">
           <strong>{{ player.strPlayer }}</strong>
 
-          <span class="position-badge" 
-              [ngClass]="getPlayerRole(player.strPosition)">
+          <span class="position-badge" [ngClass]="getPlayerRole(player.strPosition)">
             {{ translatePosition(player.strPosition) }}
           </span>
           <span class="number-badge" *ngIf="player.strNumber">#{{ player.strNumber }}</span>
@@ -232,12 +222,14 @@
 </div>
 
 <div *ngIf="errorFetchingTeam && !loading" class="container mt-5 fade-in">
-  <div class="alert alert-warning text-center p-5 border-round shadow-sm" style="background-color: #fff8e1; border: 1px solid #ffe082;">
+  <div class="alert alert-warning text-center p-5 border-round shadow-sm"
+    style="background-color: #fff8e1; border: 1px solid #ffe082;">
     <i class="pi pi-exclamation-triangle mb-3" style="font-size: 3rem; color: #ffb300;"></i>
     <h3 style="color: #ff8f00;">Equipo no disponible</h3>
     <p class="text-secondary mt-2 mb-4" style="max-width: 500px; margin: 0 auto; line-height: 1.5;">
       No hemos podido localizar información sobre <strong>"{{ name }}"</strong> en nuestra base de datos.
     </p>
-    <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()" styleClass="p-button-warning p-button-outlined"></p-button>
+    <p-button label="Volver" icon="pi pi-arrow-left" (onClick)="goBack()"
+      styleClass="p-button-warning p-button-outlined"></p-button>
   </div>
 </div>
