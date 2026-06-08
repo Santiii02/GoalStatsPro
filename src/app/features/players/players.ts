@@ -218,7 +218,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
 
     const query = typeof this.selectedPlayer === 'string' ? this.selectedPlayer : this.selectedPlayer?.strPlayer;
 
-    if (!query || !query.trim()) return;
+    if (!query?.trim()) return;
 
     this.loading = true;
     this.selectedTeam = null;

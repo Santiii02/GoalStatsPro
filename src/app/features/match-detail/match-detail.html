@@ -24,7 +24,8 @@
                     title="Ver perfil del equipo">
                     <img [src]="match.homeLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team"
                         alt="Local">
-                    <h2 class="team-name clickable-team" style="margin: 0; margin-top: 10px;">{{ match.homeTeam }}</h2>
+                    <h2 class="team-name clickable-team" style="margin: 0; margin-top: 10px;">{{
+                        translateTeam(match.homeTeam) }}</h2>
                 </a>
 
                 <div class="team-form mt-2" *ngIf="homeForm.length > 0">
@@ -60,7 +61,8 @@
                     title="Ver perfil del equipo">
                     <img [src]="match.awayLogo || 'assets/placeholder.png'" class="team-badge-lg clickable-team"
                         alt="Visitante">
-                    <h2 class="team-name clickable-team" style="margin: 0; margin-top: 10px;">{{ match.awayTeam }}</h2>
+                    <h2 class="team-name clickable-team" style="margin: 0; margin-top: 10px;">{{
+                        translateTeam(match.awayTeam) }}</h2>
                 </a>
 
                 <div class="team-form mt-2" *ngIf="awayForm.length > 0">
@@ -73,9 +75,9 @@
         </div>
 
         <div *ngIf="loadingDetails" class="text-center my-5 fade-in">
-            <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+            <output class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem; display: inline-block;">
                 <span class="visually-hidden">Cargando...</span>
-            </div>
+            </output>
             <h5 class="text-muted">Obteniendo datos del partido...</h5>
             <p class="text-muted small">Recopilando alineaciones y estadísticas</p>
         </div>
@@ -224,7 +226,8 @@
                 <p-tabPanel header="Alineaciones">
                     <div class="lineups-grid" *ngIf="startingLineups">
                         <div class="lineup-col">
-                            <h4 class="mb-3 text-center">{{ match.homeTeam }}</h4>
+                            <h4 class="mb-3 text-center">{{ translateTeam(match.homeTeam) }}</h4>
+
                             <small class="d-block text-center text-muted mb-3">
                                 Formación: {{ startingLineups.home?.[0]?.formation || 'No disponible' }}
                             </small>
@@ -247,7 +250,7 @@
                         </div>
 
                         <div class="lineup-col">
-                            <h4 class="mb-3 text-center">{{ match.awayTeam }}</h4>
+                            <h4 class="mb-3 text-center">{{ translateTeam(match.awayTeam) }}</h4>
                             <small class="d-block text-center text-muted mb-3">
                                 Formación: {{ startingLineups.away?.[0]?.formation || 'No disponible' }}
                             </small>

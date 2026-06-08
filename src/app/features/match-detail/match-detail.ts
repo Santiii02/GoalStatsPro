@@ -14,6 +14,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ChartModule } from 'primeng/chart';
 import { TooltipModule } from 'primeng/tooltip';
 import { forkJoin } from 'rxjs';
+import { translateTeamName } from '../../models/team-mapper';
+
 
 @Component({
   selector: 'app-match-detail',
@@ -223,7 +225,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
 
   private processStats(stats: any): void {
     if (stats && Array.isArray(stats)) {
-      const globalStats = stats.find((s: any) => s && s.period === 'Match');
+      const globalStats = stats.find((s: any) => s?.period === 'Match');
       this.matchStats = globalStats ? globalStats.stats : [];
       this.groupStats();
       this.initRadarChart();
@@ -328,9 +330,8 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     // Procesamos cada estadística
     searchKeys.forEach(key => {
       const stat = this.matchStats.find(s =>
-        s.statName && s.statName.toLowerCase().includes(key)
+        s.statName?.toLowerCase().includes(key)
       );
-
       const homeRaw = stat?.homeValue?.toString() || '0';
       const awayRaw = stat?.awayValue?.toString() || '0';
 
@@ -487,7 +488,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
           }
 
           if (data.stats && Array.isArray(data.stats)) {
-            const globalStats = data.stats.find((s: any) => s && s.period === 'Match');
+            const globalStats = data.stats.find((s: any) => s?.period === 'Match');
             this.matchStats = globalStats ? globalStats.stats : [];
             this.groupStats();
             this.initRadarChart();
@@ -592,6 +593,11 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     if (!statName) return '';
     return this.statDictionary[statName] || statName;
   }
+
+  translateTeam(name: string | undefined | null): string {
+    if (!name) return '';
+    return translateTeamName(name);
+}
 
   /* --- Diccionario de Explicaciones para estadísitcas --- */
   private readonly statExplanations: Record<string, string> = {

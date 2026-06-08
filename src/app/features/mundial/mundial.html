@@ -49,12 +49,12 @@
                   </span>
                 </td>
                 <td>
-                  <div class="team-row clickable" (click)="goToTeamDetail(team.teamName)"
-                    (keydown)="$event.key === 'Enter' && goToTeamDetail(team.teamName)" tabindex="0" role="button">
+                  <button type="button" class="team-row clickable" (click)="goToTeamDetail(team.teamName)"
+                    style="display: flex; align-items: center; gap: 10px; background: none; border: none; padding: 0; font-family: inherit; font-size: inherit; color: inherit; text-align: inherit; width: 100%;">
                     <img #groupFlag [src]="team.teamBadge || 'assets/images/Logo.png'" width="24" height="24"
                       alt="Bandera" class="country-flag" (error)="groupFlag.src='assets/images/Logo.png'">
                     <strong>{{ translateTeam(team.teamName) }}</strong>
-                  </div>
+                  </button>
                 </td>
                 <td class="points-cell text-center">{{ team.points }}</td>
                 <td class="text-center text-muted" style="font-size: 0.85rem;">
@@ -81,9 +81,9 @@
             </div>
 
             <div class="matches-grid" *ngIf="knockouts[round].length > 0">
-              <div *ngFor="let match of knockouts[round]" class="match-card clickable fade-in"
-                (click)="goToMatch(match)" (keydown)="$event.key === 'Enter' && goToMatch(match)" tabindex="0"
-                role="button">
+              <button type="button" *ngFor="let match of knockouts[round]" class="match-card clickable fade-in"
+                (click)="goToMatch(match)"
+                style="width: 100%; border: none; font-family: inherit; color: inherit; text-align: inherit; font-weight: inherit;">
 
                 <div class="match-card-header">
                   <span class="tournament-name">
@@ -100,15 +100,14 @@
                   </div>
 
                   <div class="score-board">
-                    <div class="score-box"
-                      *ngIf="match.homeScore !== undefined && match.homeScore !== null; else noScore">
+                    <div class="score-box" *ngIf="match.homeScore !== undefined && match.homeScore !== null">
                       <span class="score-number">{{ match.homeScore }}</span>
                       <span class="score-separator">-</span>
                       <span class="score-number">{{ match.awayScore }}</span>
                     </div>
-                    <ng-template #noScore>
+                    <ng-container *ngIf="match.homeScore === undefined || match.homeScore === null">
                       <div class="vs-badge">VS</div>
-                    </ng-template>
+                    </ng-container>
                   </div>
 
                   <div class="team team-away">
@@ -118,7 +117,7 @@
                       }}</span>
                   </div>
                 </div>
-              </div>
+              </button>
             </div>
 
           </p-tabPanel>
@@ -132,8 +131,9 @@
       </div>
 
       <div class="matches-grid">
-        <div *ngFor="let match of upcomingMatches" class="match-card clickable" (click)="goToMatch(match)"
-          (keydown)="$event.key === 'Enter' && goToMatch(match)" tabindex="0" role="button">
+        <button type="button" *ngFor="let match of upcomingMatches" class="match-card clickable"
+          (click)="goToMatch(match)"
+          style="width: 100%; border: none; font-family: inherit; color: inherit; text-align: inherit; font-weight: inherit;">
 
           <div class="match-card-header">
             <span class="tournament-name">{{ formatRound(match.round) }}</span>
@@ -160,7 +160,7 @@
             </div>
           </div>
 
-        </div>
+        </button>
       </div>
     </section>
 
@@ -188,8 +188,9 @@
       </div>
 
       <div class="matches-grid mt-3" *ngIf="matchesByRound.length > 0">
-        <div *ngFor="let match of matchesByRound" class="match-card clickable fade-in" (click)="goToMatch(match)"
-          (keydown)="$event.key === 'Enter' && goToMatch(match)" tabindex="0" role="button">
+        <button type="button" *ngFor="let match of matchesByRound" class="match-card clickable fade-in"
+          (click)="goToMatch(match)"
+          style="width: 100%; border: none; font-family: inherit; color: inherit; text-align: inherit; font-weight: inherit;">
           <div class="match-card-header">
             <span class="tournament-name">{{ formatRound(match.round) }}</span>
             <span class="match-date">
@@ -207,14 +208,14 @@
             </div>
 
             <div class="score-board">
-              <div class="score-box" *ngIf="match.homeScore !== undefined && match.homeScore !== null; else noScoreJ">
+              <div class="score-box" *ngIf="match.homeScore !== undefined && match.homeScore !== null">
                 <span class="score-number">{{ match.homeScore }}</span>
                 <span class="score-separator">-</span>
                 <span class="score-number">{{ match.awayScore }}</span>
               </div>
-              <ng-template #noScoreJ>
+              <ng-container *ngIf="match.homeScore === undefined || match.homeScore === null">
                 <div class="vs-badge">VS</div>
-              </ng-template>
+              </ng-container>
             </div>
 
             <div class="team team-away">
@@ -225,7 +226,7 @@
               </span>
             </div>
           </div>
-        </div>
+        </button>
       </div>
     </section>
   </div>

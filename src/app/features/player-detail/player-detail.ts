@@ -61,7 +61,7 @@ export class PlayerDetailComponent implements OnInit {
 
     this.sportService.getPlayerById(id).subscribe({
       next: (data) => {
-        if (data && data.idPlayer) {
+        if (data?.idPlayer) {
           this.player = data;
 
           if (this.player.dateBorn) {
@@ -97,10 +97,13 @@ export class PlayerDetailComponent implements OnInit {
 
   /* --- Carga de Palmarés y Traspasos --- */
   private loadHonours(id: string): void {
+    this.loading = true;
+    this.errorFetchingPlayer = false;
+
     this.sportService.getPlayerHonours(id).subscribe(data => {
       if (data && Array.isArray(data)) {
         // Ordenar por temporada de más reciente a más antigua
-        this.honours = data.sort((a, b) => {
+        this.honours = [...data].sort((a, b) => {
           const yearA = Number.parseInt(a.strSeason) || 0;
           const yearB = Number.parseInt(b.strSeason) || 0;
           return yearB - yearA;
@@ -117,7 +120,7 @@ export class PlayerDetailComponent implements OnInit {
     this.sportService.getPlayerFormerTeams(id).subscribe(data => {
       if (data && Array.isArray(data)) {
         // Ordenar por año de salida o de ingreso de más reciente a más antiguo
-        this.formerTeams = data.sort((a, b) => {
+        this.formerTeams = [...data].sort((a, b) => {
           const yearA = Number.parseInt(a.strDeparted || a.strJoined) || 0;
           const yearB = Number.parseInt(b.strDeparted || b.strJoined) || 0;
           return yearB - yearA;
@@ -248,7 +251,9 @@ export class PlayerDetailComponent implements OnInit {
     const lowerWeight = weight.toLowerCase();
 
     // Extraemos el valor numérico de la cadena
-    const match = weight.match(/\d+(\.\d+)?/);
+    const regex = /\d+(\.\d+)?/;
+    const match = regex.exec(weight);
+    
     // Si no hay número, devolvemos el texto original
     if (!match) return weight;
 

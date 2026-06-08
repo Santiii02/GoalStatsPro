@@ -105,7 +105,7 @@ export class MundialComponent implements OnInit {
   private processGroups(standingsData: any[]): void {
     // Filtramos solo los bloques que vienen etiquetados como "Group X"
     this.groups = standingsData.filter(group =>
-      group.roundType && group.roundType.toLowerCase().includes('group')
+      group.roundType?.toLowerCase()?.includes('group')
     ).map(group => {
       group.roundType = group.roundType.replace('Group', 'Grupo');
       return group;
@@ -195,7 +195,9 @@ export class MundialComponent implements OnInit {
   /* --- Ordena las jornadas --- */
   private sortRoundOrder(round: string): number {
     const r = round.toLowerCase().trim();
-    const num = round.match(/(\d+)/);
+
+    const regex = /(\d+)/;
+    const num = regex.exec(round);
 
     // Jornadas de fase de grupos: "Round 1", "Round 2", "Round 3"... aparecen antes de la fase eliminatoria
     if (/^round\s+\d+$/i.test(r) && num) return Number.parseInt(num[1]);
@@ -229,7 +231,7 @@ export class MundialComponent implements OnInit {
 
   /* --- Información detallada del partido --- */
   goToMatch(match: Match): void {
-    if (match && match.eventId) {
+    if (match?.eventId) {
       this.router.navigate(['/match', match.eventId], {
         state: { data: match }
       });
@@ -279,7 +281,8 @@ export class MundialComponent implements OnInit {
     if (l.includes('final') && !l.includes('semi') && !l.includes('quarter')) return 'Final';
 
     // Jornadas de fase de grupos: "Group Stage - Round 3" → "Jornada 3"
-    const matchNumber = r.match(/(\d+)/);
+    const regex = /(\d+)/;
+    const matchNumber = regex.exec(r);
     if (matchNumber) return `Jornada ${matchNumber[1]}`;
 
     // "Round" por "Jornada"

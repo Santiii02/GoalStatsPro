@@ -2,15 +2,20 @@
  *  HELPER PARA LA BÚSQUEDA EN EL BUSCADOR REACTIVO
  */
 
-import { Subject, of, Observable } from 'rxjs';
+import { Subject, of, Observable, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
 import { SportDbService } from '../services/sportdb.service';
 
 export function buildSearchStream(
     searchSubject: Subject<string>,
     sportService: SportDbService
 ): Observable<any[]> {
+    const byTeamFirst = (a: any, b: any): number => {
+        if (a.type === 'team'   && b.type === 'player') return -1;
+        if (a.type === 'player' && b.type === 'team')   return  1;
+        return 0;
+    };
+    
     return searchSubject.pipe(
         debounceTime(300), // Esperamos 300ms después de que el usuario deje de escribir
         distinctUntilChanged(), // Solo busca si el texto es realmente distinto al anterior
@@ -27,10 +32,7 @@ export function buildSearchStream(
                 map(({ teams, players }) => {
                     const t = (teams || []).map((x: any) => ({ ...x, type: 'team' }));
                     const p = (players || []).map((x: any) => ({ ...x, type: 'player' }));
-                    return [...t, ...p].sort((a, b) =>
-                        a.type === 'team' && b.type === 'player' ? -1 :
-                            a.type === 'player' && b.type === 'team' ? 1 : 0
-                    );
+                    return [...t, ...p].sort(byTeamFirst);
                 })
             );
         })

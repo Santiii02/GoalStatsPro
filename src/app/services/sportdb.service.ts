@@ -1,3 +1,7 @@
+/*
+ * SERVICIO PARA CONSUMIR LAS APIS DE SPORTDB Y FLASHSCORE
+ */
+
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, throwError, timer, forkJoin, from } from 'rxjs';
@@ -27,6 +31,8 @@ export class SportDbService {
   /* --- Constantes de caché --- */
   private readonly CACHE_KEYS = {
     LIVE: 'goalstats_live',
+    LALIGA_LIVE: 'goalstats_laliga_live',
+    WC_LIVE: 'goalstats_wc_live',
     STANDINGS: `goalstats_standings_${this.CURRENT_SEASON}`,
     FIXTURES: `goalstats_fixtures_${this.CURRENT_SEASON}`,
     RESULTS: `goalstats_results_${this.CURRENT_SEASON}`,
@@ -39,7 +45,7 @@ export class SportDbService {
 
   /* --- Tiempos de vida para la caché en milisegundos --- */
   private readonly CACHE_TTL = {
-    LIVE: 60 * 60 * 1000,        // 5 minuto (Datos volátiles), para pruebas lo vamos a hacer cada hora para no agotar requests
+    LIVE: 5 * 60 * 1000,        // 5 minuto (Datos volátiles), para pruebas lo vamos a hacer cada hora para no agotar requests
     STATIC: 6 * 60 * 60 * 1000  // 6 horas (Datos estáticos como calendarios)
   };
 
@@ -83,17 +89,14 @@ export class SportDbService {
     try {
       // Intentamos guardar los datos normales
       localStorage.setItem(key, JSON.stringify(entry));
-    } catch (error) {
-      // Si QuotaExceededError
-      console.warn('⚠️ Memoria caché llena. Vaciando datos antiguos...');
-
+    } catch (quotaError) {
+      console.warn('⚠️ Memoria caché llena. Vaciando datos antiguos...', quotaError);
       try {
         // Borramos toda la caché para hacer hueco
         localStorage.clear();
-        // Intentamos guardarlo de nuevo en la memoria limpia
         localStorage.setItem(key, JSON.stringify(entry));
-      } catch (error) {
-        console.error('No se pudo guardar en caché. Archivo demasiado grande.', error);
+      } catch (retryError) {
+        console.error('No se pudo guardar en caché. Archivo demasiado grande.', retryError);
       }
     }
   }
@@ -157,6 +160,40 @@ export class SportDbService {
       tap(data => this.saveToCache(this.CACHE_KEYS.LIVE, data, this.CACHE_TTL.LIVE)),
       catchError(err => {
         console.error('Error fetching live matches:', err);
+        return of([]);
+      })
+    );
+  }
+
+  /* --- Obtiene los partidos que se están jugando en este momento de LALIGA --- */
+  getLaLigaLiveMatches(): Observable<Match[]> {
+    const cached = this.getFromCache<Match[]>(this.CACHE_KEYS.LALIGA_LIVE, this.CACHE_TTL.LIVE);
+    if (cached) return of(cached);
+
+    const url = `${this.baseUrl}${this.LALIGA_PREFIX}/live`;
+    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
+      this.getRetryStrategy(),
+      map((res: any) => Array.isArray(res) ? res : res.data || []),
+      tap(data => this.saveToCache(this.CACHE_KEYS.LALIGA_LIVE, data, this.CACHE_TTL.LIVE)),
+      catchError(err => {
+        console.error('Error fetching LaLiga live matches:', err);
+        return of([]);
+      })
+    );
+  }
+
+  /* --- Obtiene los partidos que se están jugando en este momento del Mundial 2026 --- */
+  getWorldCupLiveMatches(): Observable<Match[]> {
+    const cached = this.getFromCache<Match[]>(this.CACHE_KEYS.WC_LIVE, this.CACHE_TTL.LIVE);
+    if (cached) return of(cached);
+
+    const url = `${this.baseUrl}${this.WORLD_CUP_PREFIX}/live`;
+    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
+      this.getRetryStrategy(),
+      map((res: any) => Array.isArray(res) ? res : res.data || []),
+      tap(data => this.saveToCache(this.CACHE_KEYS.WC_LIVE, data, this.CACHE_TTL.LIVE)),
+      catchError(err => {
+        console.error('Error fetching World Cup live matches:', err);
         return of([]);
       })
     );
@@ -543,11 +580,8 @@ export class SportDbService {
           // Vemos si jugaba el equipo como local o visitante para determinar si fue victoria o derrota
           const isHome = m.homeName === teamName;
 
-          if (isHome) {
-            return homeScore > awayScore ? 'V' : 'D';
-          } else {
-            return awayScore > homeScore ? 'V' : 'D';
-          }
+          const homeWins = homeScore > awayScore;
+          return isHome ? (homeWins ? 'V' : 'D') : (homeWins ? 'D' : 'V');
         });
 
         return form;
@@ -590,7 +624,8 @@ export class SportDbService {
           const awayScore = Number(m.awayScore);
           if (homeScore === awayScore) return 'E';
           const isHome = m.homeName === teamName;
-          return isHome ? (homeScore > awayScore ? 'V' : 'D') : (awayScore > homeScore ? 'V' : 'D');
+          const homeWins = homeScore > awayScore;
+          return isHome ? (homeWins ? 'V' : 'D') : (homeWins ? 'D' : 'V');
         });
 
         return form;

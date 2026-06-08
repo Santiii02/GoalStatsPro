@@ -14,15 +14,15 @@
     </h3>
 
     <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;">
-      <div *ngFor="let team of favoriteTeamsData" (click)="goToTeamDetail(team)" (keydown.enter)="goToTeamDetail(team)"
-        tabindex="0" role="button" class="team-result-card fade-in" style="min-width: 150px;">
+      <button type="button" *ngFor="let team of favoriteTeamsData" (click)="goToTeamDetail(team)"
+        class="team-result-card fade-in" style="min-width: 150px; font-family: inherit; color: inherit;">
 
         <img #favTeamImg [src]="team.strTeamBadge || team['strBadge'] || 'assets/images/Logo.png'" width="80"
           alt="Escudo de {{ translateName(team.strTeam) }}" (error)="favTeamImg.src='assets/images/Logo.png'">
 
         <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px;">{{ translateName(team.strTeam) }}</p>
         <span class="league-tag-small">{{ getLeagueLabel(team) }}</span>
-      </div>
+      </button>
     </div>
   </div>
 
@@ -34,9 +34,9 @@
     </h3>
 
     <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;">
-      <div *ngFor="let player of favoritePlayersData" (click)="goToPlayerDetail(player.idPlayer)"
-        (keydown.enter)="goToPlayerDetail(player.idPlayer)" tabindex="0" role="button" class="team-result-card fade-in"
-        style="min-width: 150px; max-width: 150px;">
+      <button type="button" *ngFor="let player of favoritePlayersData" (click)="goToPlayerDetail(player.idPlayer)"
+        class="team-result-card fade-in"
+        style="min-width: 150px; max-width: 150px; font-family: inherit; color: inherit;">
 
         <div class="player-avatar-container">
           <img #favPlayerImg
@@ -49,7 +49,7 @@
           style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
           {{ player.strPlayer }}</p>
         <span class="league-tag-small">{{ translateName(player.strTeam) || 'Sin Equipo' }}</span>
-      </div>
+      </button>
     </div>
   </div>
 
@@ -78,8 +78,8 @@
     </div>
 
     <div class="matches-grid" *ngIf="liveMatches.length > 0">
-      <div *ngFor="let match of liveMatches" class="match-card live-border clickable" (click)="goToMatch(match)"
-        (keydown.enter)="goToMatch(match)" tabindex="0" role="button">
+      <button type="button" *ngFor="let match of liveMatches" class="match-card live-border clickable" (click)="goToMatch(match)"
+        style="width: 100%; border: none; font-family: inherit; color: inherit; text-align: inherit; font-weight: inherit;">
 
         <div class="match-card-header">
           <span class="tournament-name">{{ match.tournamentName || 'Competición' }}</span>
@@ -94,15 +94,15 @@
 
           <div class="score-board">
 
-            <div class="score-box" *ngIf="match.homeScore !== undefined && match.homeScore !== null; else noScore">
+            <div class="score-box" *ngIf="match.homeScore !== undefined && match.homeScore !== null">
               <span class="score-number">{{ match.homeScore }}</span>
               <span class="score-separator">-</span>
               <span class="score-number">{{ match.awayScore }}</span>
             </div>
 
-            <ng-template #noScore>
+            <ng-container *ngIf="match.homeScore === undefined || match.homeScore === null">
               <div class="vs-badge">VS</div>
-            </ng-template>
+            </ng-container>
 
             <div class="live-badge" *ngIf="match.gameTime && match.gameTime !== '-1'">
               <span class="blink">●</span> {{ match.gameTime }}'
@@ -116,7 +116,7 @@
           </div>
         </div>
 
-      </div>
+      </button>
     </div>
 
 
@@ -172,14 +172,13 @@
             </td>
 
             <td>
-              <div class="team-row clickable" (click)="goToTeamDetail(item.teamName)"
-                (keydown.enter)="goToTeamDetail(item.teamName)" tabindex="0" role="button"
-                style="display: flex; align-items: center; gap: 10px;">
+              <button type="button" class="team-row clickable" (click)="goToTeamDetail(item.teamName)"
+                style="display: flex; align-items: center; gap: 10px; background: none; border: none; padding: 0; font-family: inherit; font-size: inherit; color: inherit; text-align: inherit; width: 100%;">
                 <img #standingsImg [src]="item.teamBadge || item.teamLogo || 'assets/images/Logo.png'" width="30"
                   height="30" alt="Escudo" style="object-fit: contain;"
                   (error)="standingsImg.src='assets/images/Logo.png'">
                 <strong>{{ item.teamName }}</strong>
-              </div>
+              </button>
             </td>
             <td class="points-cell">{{ item.points }}</td>
             <td>{{ item.matches }}</td>

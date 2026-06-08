@@ -1,7 +1,7 @@
 /*
- *  VISUALIZACIÓN DE LOS PARTIDOS EN VIVO Y CLASIFICACIÓN GENERAL.
- *  EL USUARIO PUEDE BUSCAR UN EQUIPO Y VER SU INFORMACIÓN
- */
+*  VISUALIZACIÓN DE LOS PARTIDOS EN VIVO Y CLASIFICACIÓN GENERAL.
+*  EL USUARIO PUEDE BUSCAR UN EQUIPO Y VER SU INFORMACIÓN
+*/
 
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +14,7 @@ import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { AutoCompleteSelectEvent } from 'primeng/autocomplete';
-import { from, Subject, Subscription } from 'rxjs';
+import { forkJoin, from, Subject, Subscription } from 'rxjs';
 import { concatMap, toArray, map } from 'rxjs/operators';
 import { translateTeamName } from '../../models/team-mapper';
 import { buildSearchStream } from '../../shared/search-helper';
@@ -38,10 +38,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly userService = inject(UserService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
-
-  // Constantes de negocio
-  private readonly LIGA_NAME = 'LaLiga';
-  private readonly LIGA_ID = 'UkksTK1s';
 
   // Estado del componente
   liveMatches: Match[] = [];
@@ -135,9 +131,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loading = true;
 
     // 1. Obtener Partidos en Vivo
-    this.sportService.getLiveMatches().subscribe({
-      next: (matches: Match[]) => {
-        this.processLiveMatches(matches);
+    forkJoin({
+      laliga: this.sportService.getLaLigaLiveMatches(),
+      worldCup: this.sportService.getWorldCupLiveMatches(),
+      global: this.sportService.getLiveMatches() 
+    }).subscribe({
+      next: ({ laliga, worldCup, global }) => {
+        this.processLiveMatches(laliga, worldCup, global);
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -158,7 +158,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             concatMap(row =>
               this.sportService.searchTeams(row.teamName).pipe(
                 map(teams => {
-                  if (teams && teams.length > 0) {
+                  if (teams?.length > 0) {
                     row.teamBadge = teams[0].strTeamBadge || teams[0].strBadge;
                   }
                   return row;
@@ -189,24 +189,53 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  /* --- Selección de partidos a mostrar --- */
-  private processLiveMatches(allMatches: Match[]): void {
-    const laLigaMatches = allMatches.filter(m =>
-      (m.tournamentName && m.tournamentName.includes(this.LIGA_NAME)) ||
-      m.tournamentId === this.LIGA_ID
-    );
+  private processLiveMatches(laligaMatches: Match[], worldCupMatches: Match[], globalMatches: Match[]): void {
+    const MAX = 5;
+    const result: Match[] = [];
 
-    if (laLigaMatches.length > 0) {
-      // Prioridad 1: Partidos de La Liga.
-      this.liveMatches = laLigaMatches;
+    // Prioridad 1: LALIGA
+    result.push(...laligaMatches.slice(0, MAX));
+
+    // Prioridad 2: Mundial
+    if (result.length < MAX) {
+      result.push(...worldCupMatches.slice(0, MAX - result.length));
+    }
+
+    // Prioridad 3: Amistosos Internacionales
+    if (result.length < MAX) {
+      const friendlies = globalMatches.filter(m =>
+        m.tournamentName?.includes('Friendly International')
+      );
+      result.push(...friendlies.slice(0, MAX - result.length));
+    }
+
+    // Prioridad 4: Cualquier partido
+    if (result.length < MAX) {
+      const remaining = globalMatches.filter(m =>
+        !result.some(r => r.eventId === m.eventId)
+      );
+      result.push(...remaining.slice(0, MAX - result.length));
+    }
+
+    this.liveMatches = result;
+
+    const hasLaLiga = laligaMatches.length > 0;
+    const hasWorldCup = worldCupMatches.length > 0;
+    const hasFriendly = result.some(m => m.tournamentName?.includes('Friendly International'));
+    const hasGlobal = result.length > 0 && !hasLaLiga && !hasWorldCup && !hasFriendly;
+
+    if (hasLaLiga && hasWorldCup) {
+      this.filterMessage = 'Mostrando partidos de La Liga 🇪🇸 y del Mundial 🌍';
+    } else if (hasLaLiga) {
       this.filterMessage = 'Mostrando partidos de La Liga 🇪🇸';
+    } else if (hasWorldCup) {
+      this.filterMessage = 'Mostrando partidos del Mundial 🌍';
+    } else if (hasFriendly) {
+      this.filterMessage = 'Sin actividad en La Liga ni en el Mundial. Mostrando amistosos 🌐';
+    } else if (hasGlobal) {
+      this.filterMessage = 'Sin actividad destacada. Mostrando partidos en vivo 🌍';
     } else {
-      // Prioridad 2: Top 5 de partidos mundiales
-      this.liveMatches = allMatches.slice(0, 5);
-
-      this.filterMessage = this.liveMatches.length > 0
-        ? 'Sin actividad en La Liga. Mostrando destacados globales 🌍'
-        : '';
+      this.filterMessage = '';
     }
   }
 
@@ -223,7 +252,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       for (const name of favNames) {
         this.sportService.searchTeams(name).subscribe({
           next: (teams) => {
-            if (teams && teams.length > 0) {
+            if (teams?.length > 0) {
               this.favoriteTeamsData.push(teams[0]);
               this.cdr.detectChanges();
             }
@@ -241,7 +270,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   /* --- Información detalla del partido  --- */
   goToMatch(match: Match): void {
-    if (match && match.eventId) {
+    if (match?.eventId) {
       this.router.navigate(['/match', match.eventId], {
         state: { data: match }
       });
@@ -310,7 +339,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   /* --- Etiquetas de Liga --- */
   getLeagueLabel(team: any): string {
-    if (!team || !team.strLeague) return 'Desconocido';
+    if (!team?.strLeague) return 'Desconocido';
 
     const league = team.strLeague.toLowerCase();
 

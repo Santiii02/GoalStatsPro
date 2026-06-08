@@ -93,8 +93,8 @@
     </div>
 
     <div class="matches-list">
-      <div class="match-row" *ngFor="let match of displayedMatches" (click)="goToMatch(match)"
-        (keydown)="$event.key === 'Enter' && goToMatch(match)" tabindex="0" role="button">
+      <button class="match-row" type="button" *ngFor="let match of displayedMatches" (click)="goToMatch(match)">
+
 
         <div class="match-meta">
           <span class="round-badge" *ngIf="getRoundLabel(match)">{{ getRoundLabel(match) }}</span>
@@ -119,7 +119,7 @@
           <span class="team-name away-team" [class.fw-bold]="match.awayName === team.strTeam">{{
             translateName(match.awayName) }}</span>
         </div>
-      </div>
+      </button>
     </div>
   </div>
 
@@ -189,8 +189,9 @@
     </div>
 
     <div class="players-grid">
-      <div class="player-card fade-in" *ngFor="let player of players" (click)="goToPlayer(player.idPlayer)"
-        (keydown)="$event.key === 'Enter' && goToPlayer(player.idPlayer)" tabindex="0" role="button">
+      <button class="player-card fade-in" type="button" *ngFor="let player of players"
+        (click)="goToPlayer(player.idPlayer)">
+
 
         <div class="player-img-container">
           <img #playerImg [src]="player.strCutout || player.strThumb || 'assets/images/Avatar.png'"
@@ -210,7 +211,7 @@
           </div>
         </div>
 
-      </div>
+      </button>
     </div>
   </div>
 

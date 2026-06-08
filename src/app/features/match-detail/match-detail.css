@@ -133,8 +133,12 @@ img.clickable-team:hover {
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
     margin-top: 25px;
+}
+
+:host ::ng-deep .p-tabview .p-tabview-panels {
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
 }
 
 /* Estilos específicos de PrimeNG Tabs */
@@ -156,7 +160,7 @@ img.clickable-team:hover {
 :host ::ng-deep .p-tabview .p-tabview-nav li .p-tabview-nav-link {
     background: transparent;
     border: none;
-    color: #64748b;
+    color: #475569;
     font-weight: 600;
     transition: color 0.3s;
     white-space: nowrap;
@@ -730,5 +734,19 @@ img.clickable-team:hover {
 
     .sub-out {
         font-size: 0.7rem;
+    }
+
+    :host ::ng-deep .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+        padding: 10px 10px !important;
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+
+    :host ::ng-deep .p-tabview .p-tabview-nav-content {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    :host ::ng-deep .p-tabview .p-tabview-nav {
+        justify-content: flex-start;
     }
 }

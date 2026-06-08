@@ -318,7 +318,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
 
   /* --- Ver el partido --- */
   goToMatch(match: any): void {
-    if (match && match.eventId) {
+    if (match?.eventId) {
       this.router.navigate(['/match', match.eventId], {
         state: { data: match }
       });

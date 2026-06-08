@@ -64,9 +64,10 @@
 
         </p-autoComplete>
 
-        <i class="pi pi-search clickable search-icon" (click)="searchPlayerGlobal()"
-          (keydown.enter)="searchPlayerGlobal()" (keydown.space)="searchPlayerGlobal()" tabindex="0"
-          aria-label="Buscar jugador" role="button"></i>
+        <button type="button" class="search-icon clickable" (click)="searchPlayerGlobal()" aria-label="Buscar jugador"
+          style="background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+          <i class="pi pi-search"></i>
+        </button>
       </div>
 
     </div>
@@ -89,8 +90,7 @@
     </div>
 
     <div class="players-grid">
-      <div class="player-card fade-in" *ngFor="let p of players" (click)="goToPlayer(p)"
-        (keydown)="$event.key === 'Enter' && goToPlayer(p)" tabindex="0" role="button">
+      <button type="button" class="player-card fade-in" *ngFor="let p of players" (click)="goToPlayer(p)">
         <div class="player-img-container">
           <img #playerImg [src]="p.strCutout || p.strThumb || 'assets/images/player-placeholder.png'"
             alt="{{ p.strPlayer }}" loading="lazy"
@@ -99,23 +99,18 @@
 
         <div class="player-info">
           <strong>{{ p.strPlayer }}</strong>
-
           <div class="meta-tags">
             <span class="position-badge" [ngClass]="getPlayerRole(p.strPosition)">
               {{ translatePosition(p.strPosition) }}
             </span>
             <span class="number-badge" *ngIf="p.strNumber">#{{ p.strNumber }}</span>
           </div>
-
           <div class="nationality" *ngIf="p.strNationality">
             <small>📍 {{ translateNationality(p.strNationality) }}</small>
           </div>
-
-          <div class="team-mini" *ngIf="!selectedTeam">
-            <small><i class="pi pi-shield"></i> {{ p.strTeam }}</small>
-          </div>
         </div>
-      </div>
+      </button>
     </div>
+
   </div>
 </div>

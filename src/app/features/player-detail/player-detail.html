@@ -88,16 +88,16 @@
   <div class="mt-5" *ngIf="formerTeams.length > 0">
     <h3 class="mb-3"><i class="pi pi-history text-primary me-2"></i> Historial de Traspasos</h3>
     <div class="former-teams-grid">
-      <div class="former-team-card clickable" *ngFor="let fTeam of formerTeams"
+      <button type="button" class="former-team-card clickable" *ngFor="let fTeam of formerTeams"
         (click)="goToTeamDetail(fTeam.strFormerTeam)"
-        (keydown)="$event.key === 'Enter' && goToTeamDetail(fTeam.strFormerTeam)" tabindex="0" role="button">
+        style="background: none; border: none; padding: 0; font: inherit; color: inherit; text-align: inherit; width: 100%; cursor: pointer; display: flex; align-items: center;">
         <img #formerTeamImg [src]="fTeam.strTeamBadge || 'assets/images/Logo.png'"
           alt="Escudo de {{ fTeam.strFormerTeam }}" (error)="formerTeamImg.src='assets/images/Logo.png'">
         <div class="fteam-info">
           <strong>{{ fTeam.strFormerTeam }}</strong>
           <small class="text-muted">{{ fTeam.strJoined }} - {{ fTeam.strDeparted || 'Presente' }}</small>
         </div>
-      </div>
+      </button>
     </div>
   </div>
 
