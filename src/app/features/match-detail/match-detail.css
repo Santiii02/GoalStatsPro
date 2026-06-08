@@ -98,7 +98,7 @@ img.clickable-team:hover {
 
 /* Animación de "En Vivo" */
 .live-pulse {
-    background: #ef4444;
+    background: #b91c1c;
     /* Rojo intenso */
     color: white;
     box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);

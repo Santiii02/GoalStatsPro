@@ -87,7 +87,7 @@
 
         <div class="match-content">
           <div class="team team-home">
-            <span class="team-name">{{ match.homeName }}</span>
+            <span class="team-name">{{ translateName(match.homeName) }}</span>
             <img #homeLogoImg [src]="match.homeLogo" alt="Escudo local" class="team-logo"
               (error)="homeLogoImg.src='assets/placeholder.png'">
           </div>
@@ -112,7 +112,7 @@
           <div class="team team-away">
             <img #awayLogoImg [src]="match.awayLogo" alt="Escudo visitante" class="team-logo"
               (error)="awayLogoImg.src='assets/placeholder.png'">
-            <span class="team-name">{{ match.awayName }}</span>
+            <span class="team-name">{{ translateName(match.awayName) }}</span>
           </div>
         </div>
 

@@ -542,52 +542,50 @@ export class SportDbService {
   }
 
   /* --- Calcula la Racha (Últimos 5 partidos: V-E-D) de un equipo --- */
-  getTeamForm(teamName: string, limit: number = 5): Observable<string[]> {
-    if (!teamName) return of([]);
+  private calculateForm(matches: Match[], teamName: string, limit: number): string[] {
+    // Filtramos solo los partidos que haya jugado este equipo y que tengan resultado
+    const teamMatches = matches.filter(m =>
+      (m.homeName === teamName || m.awayName === teamName) &&
+      m.homeScore !== undefined && m.awayScore !== undefined
+    );
 
-    // Comprobamos si ya lo tenemos guardado
-    const cacheKey = `${this.CACHE_KEYS.TEAM_FORM_PREFIX}${teamName.replace(/\s/g, '_')}`;
-    const cached = this.getFromCache<string[]>(cacheKey, this.CACHE_TTL.STATIC);
-    if (cached) return of(cached);
+    // Ordenamos por fecha (del más reciente al más antiguo)
+    teamMatches.sort((a, b) => {
+      const dateA = Number(a.eventStartTime || a.startUtime || a.startTime || 0);
+      const dateB = Number(b.eventStartTime || b.startUtime || b.startTime || 0);
+      return dateB - dateA;
+    });
 
-    // Obtenemos el historial de resultados de la temporada
-    return this.getResults().pipe(
-      map(matches => {
-        // Filtramos solo los partidos que haya jugado este equipo y que tengan resultado
-        const teamMatches = matches.filter(m =>
-          (m.homeName === teamName || m.awayName === teamName) &&
-          m.homeScore !== undefined && m.awayScore !== undefined
-        );
+    // Cogemos solo los últimos 'N' partidos y calculamos si fue Victoria (V), Empate (E) o Derrota (D)
+    return teamMatches.slice(0, limit).map(m => {
+      const homeScore = Number(m.homeScore);
+      const awayScore = Number(m.awayScore);
 
-        // Ordenamos por fecha (del más reciente al más antiguo)
-        teamMatches.sort((a, b) => {
-          const dateA = a.eventStartTime ? Number(a.eventStartTime) : 0;
-          const dateB = b.eventStartTime ? Number(b.eventStartTime) : 0;
-          return dateB - dateA;
-        });
+      // Si el partido terminó en empate
+      if (homeScore === awayScore) return 'E';
 
-        // Cogemos solo los últimos 'N' partidos (por defecto 5)
-        const lastMatches = teamMatches.slice(0, limit);
+      // Vemos si jugaba el equipo como local o visitante para determinar si fue victoria o derrota
+      const isHome = m.homeName === teamName;
+      const homeWins = homeScore > awayScore;
+      if (isHome) {
+        return homeWins ? 'V' : 'D';
+      } else {
+        return homeWins ? 'D' : 'V';
+      }
+    });
+  }
 
-        // Calculamos si fue Victoria (V), Empate (E) o Derrota (D)
-        const form: string[] = lastMatches.map(m => {
-          const homeScore = Number(m.homeScore);
-          const awayScore = Number(m.awayScore);
+  /* --- Obtiene la racha de un equipo y la almacena en caché --- */
+  private getFormFromSource(
+    source: Observable<Match[]>,
+    teamName: string,
+    limit: number,
+    cacheKey: string
+  ): Observable<string[]> {
 
-          // Si el partido terminó en empate
-          if (homeScore === awayScore) return 'E';
-
-          // Vemos si jugaba el equipo como local o visitante para determinar si fue victoria o derrota
-          const isHome = m.homeName === teamName;
-
-          const homeWins = homeScore > awayScore;
-          return isHome ? (homeWins ? 'V' : 'D') : (homeWins ? 'D' : 'V');
-        });
-
-        return form;
-      }),
+    return source.pipe(
+      map(matches => this.calculateForm(matches, teamName, limit)),
       tap(form => {
-        // Guardamos la racha en caché
         if (form.length > 0) {
           this.saveToCache(cacheKey, form, this.CACHE_TTL.STATIC);
         }
@@ -596,47 +594,32 @@ export class SportDbService {
     );
   }
 
-  /* --- Calcula la Racha (Últimos 5 partidos: V-E-D) de una Selección del Mundial --- */
-  getWorldCupTeamForm(teamName: string, limit: number = 5): Observable<string[]> {
+  /* --- Calcula la Racha (Últimos 5 partidos: V-E-D) de un equipo --- */
+  getTeamForm(teamName: string, limit: number = 5): Observable<string[]> {
+    // Si no hay nombre, devolvemos array vacío
     if (!teamName) return of([]);
 
+    // Generamos una clave única para guardar esto en memoria
+    const cacheKey = `${this.CACHE_KEYS.TEAM_FORM_PREFIX}${teamName.replace(/\s/g, '_')}`;
+    const cached = this.getFromCache<string[]>(cacheKey, this.CACHE_TTL.STATIC);
+
+    // Si ya lo tenemos guardado, lo devolvemos directamente
+    if (cached) return of(cached);
+    return this.getFormFromSource(this.getResults(), teamName, limit, cacheKey);
+  }
+
+  /* --- Calcula la Racha (Últimos 5 partidos: V-E-D) de una Selección del Mundial --- */
+  getWorldCupTeamForm(teamName: string, limit: number = 5): Observable<string[]> {
+    // Si no hay nombre, devolvemos array vacío
+    if (!teamName) return of([]);
+
+    // Generamos una clave única para guardar esto en memoria
     const cacheKey = `${this.CACHE_KEYS.TEAM_FORM_PREFIX}WC_${teamName.replace(/\s/g, '_')}`;
     const cached = this.getFromCache<string[]>(cacheKey, this.CACHE_TTL.STATIC);
+
+    // Si ya lo tenemos guardado, lo devolvemos directamente
     if (cached) return of(cached);
-
-    return this.getWorldCupResults().pipe(
-      map(matches => {
-        const teamMatches = matches.filter(m =>
-          (m.homeName === teamName || m.awayName === teamName) &&
-          m.homeScore !== undefined && m.awayScore !== undefined
-        );
-
-        teamMatches.sort((a, b) => {
-          const dateA = a.startUtime || a.startTime || a.eventStartTime ? Number(a.startUtime || a.startTime || a.eventStartTime) : 0;
-          const dateB = b.startUtime || b.startTime || b.eventStartTime ? Number(b.startUtime || b.startTime || b.eventStartTime) : 0;
-          return dateB - dateA;
-        });
-
-        const lastMatches = teamMatches.slice(0, limit);
-
-        const form: string[] = lastMatches.map(m => {
-          const homeScore = Number(m.homeScore);
-          const awayScore = Number(m.awayScore);
-          if (homeScore === awayScore) return 'E';
-          const isHome = m.homeName === teamName;
-          const homeWins = homeScore > awayScore;
-          return isHome ? (homeWins ? 'V' : 'D') : (homeWins ? 'D' : 'V');
-        });
-
-        return form;
-      }),
-      tap(form => {
-        if (form.length > 0) {
-          this.saveToCache(cacheKey, form, this.CACHE_TTL.STATIC);
-        }
-      }),
-      catchError(() => of([]))
-    );
+    return this.getFormFromSource(this.getWorldCupResults(), teamName, limit, cacheKey);
   }
 
   /* --- Obtener Palmarés/Trofeos del Jugador --- */

@@ -57,6 +57,22 @@ export function getFlashscoreName(sportsDbName: string): string {
 export function translateTeamName(englishName: string): string {
   if (!englishName) return '';
   const cleanName = englishName.trim();
+
+  // Verificamos si es un equipo juvenil
+  const youthRegex = /^(.*?)\s+(U\d{2}|U-\d{2}|Sub-?\d{2})$/i;
+  const match = cleanName.match(youthRegex);
+
+  if (match) {
+    const baseCountry = match[1].trim(); // Ej: "France"
+    const suffix = match[2].toUpperCase(); // Ej: "U20"
+
+    // Traducimos solo el nombre base del país
+    const translatedCountry = COUNTRY_TRANSLATIONS[baseCountry] || baseCountry;
+
+    // Devolvemos el país traducido junto con su categoría ("País U20")
+    return `${translatedCountry} ${suffix}`;
+  }
+
   return COUNTRY_TRANSLATIONS[cleanName] || cleanName;
 }
 
