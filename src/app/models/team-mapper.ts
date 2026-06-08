@@ -61,7 +61,7 @@ export function translateTeamName(englishName: string): string {
   // Verificamos si es un equipo juvenil
   const youthSuffix = /^(U-?\d{2}|Sub-?\d{2})$/i;
   const words = cleanName.split(/\s+/);
-  const lastWord = words[words.length - 1];
+  const lastWord = words.at(-1)!;
 
   if (words.length > 1 && youthSuffix.test(lastWord)) {
     const baseCountry = words.slice(0, -1).join(' '); // Ej: "France"
