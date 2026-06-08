@@ -59,12 +59,13 @@ export function translateTeamName(englishName: string): string {
   const cleanName = englishName.trim();
 
   // Verificamos si es un equipo juvenil
-  const youthRegex = /^(.*?)\s+(U\d{2}|U-\d{2}|Sub-?\d{2})$/i;
-  const match = cleanName.match(youthRegex);
+  const youthSuffix = /^(U-?\d{2}|Sub-?\d{2})$/i;
+  const words = cleanName.split(/\s+/);
+  const lastWord = words[words.length - 1];
 
-  if (match) {
-    const baseCountry = match[1].trim(); // Ej: "France"
-    const suffix = match[2].toUpperCase(); // Ej: "U20"
+  if (words.length > 1 && youthSuffix.test(lastWord)) {
+    const baseCountry = words.slice(0, -1).join(' '); // Ej: "France"
+    const suffix = lastWord.toUpperCase(); // Ej: "U20"
 
     // Traducimos solo el nombre base del país
     const translatedCountry = COUNTRY_TRANSLATIONS[baseCountry] || baseCountry;

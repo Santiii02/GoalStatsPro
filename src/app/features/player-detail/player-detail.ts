@@ -245,8 +245,8 @@ export class PlayerDetailComponent implements OnInit {
   }
 
   /* --- Convertidor de libras a kg --- */
-  LibrasToKg(weight: string): string {
-    if (!weight) return 'N/A';
+  librasToKg(weight: string): string {
+    if (!weight || weight.trim() === '') return 'N/A';
 
     const lowerWeight = weight.toLowerCase();
 
