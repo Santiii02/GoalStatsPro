@@ -24,8 +24,11 @@ export class SportDbService {
   private readonly baseUrl = environment.apiBaseUrl;
 
   /* --- Prefijo de rutas API --- */
-  private readonly LALIGA_PREFIX = `/api/flashscore/football/spain:176/laliga:QVmLl54o/${this.CURRENT_SEASON}`;
-  private readonly WORLD_CUP_PREFIX = '/api/flashscore/football/world:8/world-cup:lvUBR5F8/2026';
+  private readonly LALIGA_BASE = `/api/flashscore/football/spain:176/laliga:QVmLl54o`;
+  private readonly LALIGA_PREFIX = `${this.LALIGA_BASE}/${this.CURRENT_SEASON}`;
+
+  private readonly WORLD_CUP_BASE = '/api/flashscore/football/world:8/world-cup:lvUBR5F8';
+  private readonly WORLD_CUP_PREFIX = `${this.WORLD_CUP_BASE}/2026`;
   private readonly SPORTSDB_PREFIX = '/api/thesportsdb';
 
   /* --- Constantes de caché --- */
@@ -45,7 +48,7 @@ export class SportDbService {
 
   /* --- Tiempos de vida para la caché en milisegundos --- */
   private readonly CACHE_TTL = {
-    LIVE: 5 * 60 * 1000,        // 5 minuto (Datos volátiles), para pruebas lo vamos a hacer cada hora para no agotar requests
+    LIVE: 5 * 60 * 1000,        // 5 minuto (Datos volátiles)
     STATIC: 6 * 60 * 60 * 1000  // 6 horas (Datos estáticos como calendarios)
   };
 
@@ -155,8 +158,10 @@ export class SportDbService {
 
     return this.http.get<any>(`${this.baseUrl}/api/flashscore/football/live`, { headers: this.getHeaders() }).pipe(
       this.getRetryStrategy(),
-      // Normalización: La API puede devolver array directo o { data: [...] }
-      map((res: any) => Array.isArray(res) ? res : res.data || []),
+      map((res: any) => {
+        if (!res) return [];
+        return Array.isArray(res) ? res : res.data || [];
+      }),
       tap(data => this.saveToCache(this.CACHE_KEYS.LIVE, data, this.CACHE_TTL.LIVE)),
       catchError(err => {
         console.error('Error fetching live matches:', err);
@@ -170,10 +175,13 @@ export class SportDbService {
     const cached = this.getFromCache<Match[]>(this.CACHE_KEYS.LALIGA_LIVE, this.CACHE_TTL.LIVE);
     if (cached) return of(cached);
 
-    const url = `${this.baseUrl}${this.LALIGA_PREFIX}/live`;
+    const url = `${this.baseUrl}${this.LALIGA_BASE}/live`;
     return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
       this.getRetryStrategy(),
-      map((res: any) => Array.isArray(res) ? res : res.data || []),
+      map((res: any) => {
+        if (!res) return [];
+        return Array.isArray(res) ? res : res.data || [];
+      }),
       tap(data => this.saveToCache(this.CACHE_KEYS.LALIGA_LIVE, data, this.CACHE_TTL.LIVE)),
       catchError(err => {
         console.error('Error fetching LaLiga live matches:', err);
@@ -187,10 +195,13 @@ export class SportDbService {
     const cached = this.getFromCache<Match[]>(this.CACHE_KEYS.WC_LIVE, this.CACHE_TTL.LIVE);
     if (cached) return of(cached);
 
-    const url = `${this.baseUrl}${this.WORLD_CUP_PREFIX}/live`;
+    const url = `${this.baseUrl}${this.WORLD_CUP_BASE}/live`;
     return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
       this.getRetryStrategy(),
-      map((res: any) => Array.isArray(res) ? res : res.data || []),
+      map((res: any) => {
+        if (!res) return [];
+        return Array.isArray(res) ? res : res.data || [];
+      }), 
       tap(data => this.saveToCache(this.CACHE_KEYS.WC_LIVE, data, this.CACHE_TTL.LIVE)),
       catchError(err => {
         console.error('Error fetching World Cup live matches:', err);
