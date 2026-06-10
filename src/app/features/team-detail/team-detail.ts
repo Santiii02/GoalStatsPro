@@ -11,7 +11,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { SportDbService } from '../../services/sportdb.service';
-import { Match, Team } from '../../models/sport.model';
+import { Match, Team, Player } from '../../models/sport.model';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { getFlashscoreName, translateTeamName, getPlayerRoleMapping, translatePositionMapping } from '../../models/team-mapper';
@@ -38,14 +38,14 @@ export class TeamDetailComponent implements OnInit, OnChanges {
 
   /* --- Variables de datos --- */
   team: Team | null = null;
-  players: any[] = [];
+  players: Player[] = [];
   loading: boolean = true;
   teamForm: string[] = [];
   isFavorite: boolean = false;
   isFavLoading: boolean = false;
-  pastMatches: any[] = [];
-  upcomingMatches: any[] = [];
-  displayedMatches: any[] = [];
+  pastMatches: Match[] = [];
+  upcomingMatches: Match[] = [];
+  displayedMatches: Match[] = [];
   showFullHistory: boolean = false;
   cleanedHistoryText: string = '';
   isWorldCupTeam: boolean = false;
@@ -136,7 +136,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
     this.sportService.getResults().subscribe(matches => {
       const filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
       this.pastMatches = this.filterUniqueMatches(filtered);
-      this.pastMatches.sort((a, b) => (b.eventStartTime || 0) - (a.eventStartTime || 0));
+      this.pastMatches.sort((a, b) => Number(b.eventStartTime || 0) - Number(a.eventStartTime || 0));
       this.calculateStats(flashscoreName);
       this.onMatchTypeChange();
       this.cdr.detectChanges();
@@ -145,7 +145,8 @@ export class TeamDetailComponent implements OnInit, OnChanges {
     this.sportService.getFixtures().subscribe(matches => {
       const filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
       this.upcomingMatches = this.filterUniqueMatches(filtered);
-      this.upcomingMatches.sort((a, b) => (a.eventStartTime || 0) - (b.eventStartTime || 0));
+      this.upcomingMatches.sort((a, b) =>
+        Number(a.eventStartTime || 0) - Number(b.eventStartTime || 0));
       this.onMatchTypeChange();
       this.cdr.detectChanges();
     });
@@ -156,7 +157,6 @@ export class TeamDetailComponent implements OnInit, OnChanges {
 
     this.sportService.getWorldCupResults().subscribe(matches => {
       const filtered = matches.filter(m => m.homeName === flashscoreName || m.awayName === flashscoreName);
-      if (filtered.length === 0) console.warn(`⚠️ Equipo no encontrado en historial Mundial: ${flashscoreName}`);
 
       this.pastMatches = this.filterUniqueMatches(filtered);
       if (this.pastMatches.length > 0) this.isWorldCupTeam = true;
@@ -279,7 +279,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   }
 
   /* --- Extraer la jornada del partido para mostrar --- */
-  getRoundLabel(match: any): string {
+  getRoundLabel(match: Match): string {
 
     // Obtenemos el nombre del torneo para descartar partidos de clasificación
     const tournamentName = match.tournamentName || match.tournament?.name || '';
@@ -302,12 +302,12 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   }
 
   /* --- Posición del jugador --- */
-  getPlayerRole(position: string): string {
+  getPlayerRole(position: string | undefined): string {
     return getPlayerRoleMapping(position);
   }
 
   /* --- Traductor de Posiciones (Inglés a Español) --- */
-  translatePosition(position: string): string {
+  translatePosition(position: string | undefined): string {
     return translatePositionMapping(position);
   }
 
@@ -317,7 +317,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   }
 
   /* --- Ver el partido --- */
-  goToMatch(match: any): void {
+  goToMatch(match: Match): void {
     if (match?.eventId) {
       this.router.navigate(['/match', match.eventId], {
         state: { data: match }
@@ -344,10 +344,10 @@ export class TeamDetailComponent implements OnInit, OnChanges {
     if (!this.team) return 'none';
 
     // Prioridad: 1. Banner, 2. Foto del estadio, 3. Fanart1
-    const bgImage = this.team['strBanner'] ||
-      this.team['strTeamBanner'] ||
-      this.team['strStadiumThumb'] ||
-      this.team['strFanart1'];
+    const bgImage = this.team.strBanner ||
+      this.team.strTeamBanner ||
+      this.team.strStadiumThumb ||
+      this.team.strFanart1;
 
     return bgImage ? `url(${bgImage})` : 'none';
   }
@@ -369,7 +369,7 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   }
 
   /* --- Obtener la fecha del partido --- */
-  getMatchDate(match: any): number {
+  getMatchDate(match: Match): number {
     const timestamp = match.startUtime || match.startTime || match.eventStartTime || 0;
     return Number(timestamp) * 1000;
   }
@@ -378,11 +378,11 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   translateName(name: string | undefined | null): string {
     if (!name) return '';
     // Solo traduce si es un equipo internacional
-    return this.isWorldCupTeam ? translateTeamName(name) : name;
+    return translateTeamName(name);
   }
 
   /* --- Etiquetas de Liga --- */
-  getLeagueLabel(team: any): string {
+  getLeagueLabel(team: Team): string {
     if (!team) return 'Desconocido';
 
     // Si nuestros endpoints ya han detectado partidos oficiales
@@ -405,7 +405,8 @@ export class TeamDetailComponent implements OnInit, OnChanges {
   }
 
   /* --- Traductor de Nacionalidad (Inglés a Español)--- */
-  translateNationality(country: string): string {
+  translateNationality(country: string | undefined): string {
+    if (!country) return '';
     return translateTeamName(country);
   }
 }

@@ -11,7 +11,7 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SportDbService } from '../../services/sportdb.service';
-import { Standing } from '../../models/sport.model';
+import { Standing, Player, TeamOption } from '../../models/sport.model';
 import { getPlayerRoleMapping, translatePositionMapping, translateTeamName } from '../../models/team-mapper';
 import { Subject, Subscription, from, of } from 'rxjs';
 import { concatMap, map, catchError, toArray, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -31,9 +31,9 @@ export class PlayersComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
 
   // Datos
-  teamsList: any[] = [];
-  selectedTeam: any = null;
-  players: any[] = [];
+  teamsList: TeamOption[] = [];
+  selectedTeam: TeamOption | null = null;
+  players: Player[] = [];
 
   // Estado del componente
   loading: boolean = false;
@@ -41,8 +41,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
   error: string | null = null;
 
   // Variables para el buscador
-  selectedPlayer: any = null;
-  filteredPlayers: any[] = [];
+  selectedPlayer: Player | string | null = null;
+  filteredPlayers: Player[] = [];
   private readonly searchSubject = new Subject<string>();
   private searchSubscription!: Subscription;
 
@@ -169,7 +169,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
   }
 
   /* --- Cambio en el Dropdown de equipos --- */
-  onTeamChange(event: any): void {
+  onTeamChange(event: { value: TeamOption | null }): void {
     if (event.value) {
       this.selectedPlayer = null;
       this.loadTeamPlayersByName(event.value.name);
@@ -177,8 +177,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
   }
 
   /* --- Filtra la lista de jugadores en tiempo real --- */
-  filterPlayersList(event: any): void {
-    const query = event.query;
+  filterPlayersList(event: { query: string }): void {
+    const { query } = event;     
     if (!query || query.trim() === '') {
       this.filteredPlayers = [];
       this.searchSubject.next('');
@@ -236,24 +236,25 @@ export class PlayersComponent implements OnInit, OnDestroy {
   }
 
   /* --- Ver el jugador --- */
-  goToPlayer(player: any): void {
+  goToPlayer(player: Player): void {
     if (player?.idPlayer) {
       this.router.navigate(['/player', player.idPlayer]);
     }
   }
 
   /* --- Posición del jugador --- */
-  getPlayerRole(position: string): string {
+  getPlayerRole(position: string | undefined): string {
     return getPlayerRoleMapping(position);
   }
 
   /* --- Traductor de Posiciones (Inglés a Español) --- */
-  translatePosition(position: string): string {
+  translatePosition(position: string | undefined): string {
     return translatePositionMapping(position);
   }
 
   /* --- Traductor de Nacionalidad (Inglés a Español)--- */
-  translateNationality(country: string): string {
+  translateNationality(country: string | undefined): string {
+    if (!country) return '';
     return translateTeamName(country);
   }
 }

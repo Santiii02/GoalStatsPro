@@ -171,7 +171,7 @@ const COUNTRY_TRANSLATIONS: Record<string, string> = {
 /*
   * TRADUCTOR DE POSICIONES (Inglés a Español)
   */
-export function translatePositionMapping(position: string): string {
+export function translatePositionMapping(position: string | undefined): string {
   if (!position) return 'Desconocido';
   const pos = position.toLowerCase();
 
@@ -205,7 +205,7 @@ const POSITION_TRANSLATIONS = [
 /*
   * POSICIÓN DEL JUGADOR
   */
-export function getPlayerRoleMapping(position: string): string {
+export function getPlayerRoleMapping(position: string | undefined): string {
   if (!position) return '';
   const pos = position.toLowerCase();
 

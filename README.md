@@ -6,7 +6,7 @@ Los usuarios registrados pueden guardar sus equipos y jugadores favoritos para a
 
 🌐 **Aplicación en producción:** https://goal-stats-pro.vercel.app
 
-🎬 **Vídeo de demostración:** https://youtu.be/Eki8yR8rONA
+🎬 **Vídeo de demostración:** https://youtu.be/kT04YdlB5tg
 
 ---
 
@@ -79,7 +79,7 @@ npm start
 
 **4. Abrir en el navegador:** `http://localhost:4200`
 
-Las llamadas a las APIs externas se redirigen automáticamente al servidor de producción mediante `proxy.conf.json`, por lo que no es necesario configurar ninguna clave de API para el desarrollo local.
+Las llamadas a las APIs externas se redirigen automáticamente al servidor de producción mediante `src/proxy.conf.json`, por lo que no es necesario configurar ninguna clave de API para el desarrollo local.
 
 ---
 

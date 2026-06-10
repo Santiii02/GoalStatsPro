@@ -3,7 +3,7 @@
  */
 
 import { Injectable, inject } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, authState, User } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, authState, User, UserCredential } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
@@ -21,7 +21,7 @@ export class AuthService {
   constructor() { }
 
   /* --- REGISTRAR UN NUEVO USUARIO --- */
-  async register(email: string, password: string): Promise<any> {
+  async register(email: string, password: string): Promise<UserCredential> {
     const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
 
     // Después de crear el usuario, creamos su documento en Firestore con datos iniciales
@@ -37,7 +37,7 @@ export class AuthService {
   }
 
   /* --- INICIAR SESIÓN Y VERIFICAR BORRADO --- */
-  async login(email: string, password: string): Promise<any> {
+  async login(email: string, password: string): Promise<UserCredential> {
     const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
 
     // Comprobamos si el admin ha borrado el documento del usuario en Firestore

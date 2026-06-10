@@ -15,6 +15,7 @@ import { ChartModule } from 'primeng/chart';
 import { TooltipModule } from 'primeng/tooltip';
 import { forkJoin } from 'rxjs';
 import { translateTeamName } from '../../models/team-mapper';
+import { MatchStat, StatGroup, MatchDetails, MatchStageSummary, MatchEventItem } from '../../models/sport.model';
 
 
 @Component({
@@ -44,9 +45,9 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
 
   startingLineups: any = null;
   substitutes: any = null;
-  matchStats: any[] = [];
-  groupedMatchStats: { category: string, stats: any[] }[] = [];
-  matchSummary: any[] = [];
+  matchStats: MatchStat[] = [];
+  groupedMatchStats: { category: string; stats: MatchStat[] }[] = [];
+  matchSummary: MatchStageSummary[] = [];
 
   // Variables para la IA
   aiAnalysis: string | null = null;
@@ -143,7 +144,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   }
 
   /* --- Determina el estado exacto del partido --- */
-  private determineMatchStatus(rawStatus: string, matchDate: Date | undefined, homeScore: any): string {
+  private determineMatchStatus(rawStatus: string, matchDate: Date | undefined, homeScore: string | number | undefined): string {
     const status = String(rawStatus || '').toUpperCase();
 
     const finalStatuses = ['FT', 'FINISHED', 'FULL TIME', 'MATCH FINISHED', 'AET', 'PEN'];
@@ -164,7 +165,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   }
 
   /* --- Calcula el estado si la API no manda datos válidos --- */
-  private guessStatusFromTime(matchDate: Date | undefined, homeScore: any): string {
+  private guessStatusFromTime(matchDate: Date | undefined, homeScore: string | number | undefined): string {
     if (!matchDate) return 'Programado';
 
     const diffMins = Math.floor((Date.now() - matchDate.getTime()) / 60000);
@@ -196,7 +197,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  private handleMatchDetailsSuccess(data: any): void {
+  private handleMatchDetailsSuccess(data: MatchDetails | null): void {
     if (!data) {
       this.handleMatchDetailsError();
       return;
@@ -223,9 +224,9 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  private processStats(stats: any): void {
+  private processStats(stats: StatGroup[] | null): void {
     if (stats && Array.isArray(stats)) {
-      const globalStats = stats.find((s: any) => s?.period === 'Match');
+      const globalStats = stats.find((s: StatGroup) => s?.period === 'Match');
       this.matchStats = globalStats ? globalStats.stats : [];
       this.groupStats();
       this.initRadarChart();
@@ -281,7 +282,6 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
 
     } catch (e) {
-      console.error(e);
       this.aiError = true;
       this.cdr.detectChanges();
     } finally {
@@ -488,7 +488,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
           }
 
           if (data.stats && Array.isArray(data.stats)) {
-            const globalStats = data.stats.find((s: any) => s?.period === 'Match');
+            const globalStats = data.stats.find(s => s?.period === 'Match');
             this.matchStats = globalStats ? globalStats.stats : [];
             this.groupStats();
             this.initRadarChart();
@@ -501,9 +501,9 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   }
 
   /* --- Calcula el porcentaje proporcional de la barra entre los dos equipos --- */
-  getStatPercent(homeVal: string, awayVal: string, isHome: boolean): number {
+  getStatPercent(homeVal: string | number, awayVal: string | number, isHome: boolean): number {
     // Extraemos el número limpio (quitando '%' o '(...)' )
-    const extractNum = (val: string) => {
+    const extractNum = (val: string | number) => {
       if (!val) return 0;
       const numStr = val.toString().split('%')[0].split('(')[0].trim();
       return Math.abs(Number.parseFloat(numStr)) || 0;
@@ -597,7 +597,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   translateTeam(name: string | undefined | null): string {
     if (!name) return '';
     return translateTeamName(name);
-}
+  }
 
   /* --- Diccionario de Explicaciones para estadísitcas --- */
   private readonly statExplanations: Record<string, string> = {
@@ -623,10 +623,10 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
 
   /* --- Procesa la lista plana de eventos de la API y la agrupa por partes --- */
   private processSummaryEvents(rawEvents: any[]): void {
-    const firstHalf: any[] = [];
-    const secondHalf: any[] = [];
+    const firstHalf: MatchEventItem[] = [];
+    const secondHalf: MatchEventItem[] = [];
 
-    rawEvents.forEach(ev => {
+    rawEvents.forEach((ev: any) => {
       const normalizedEvent = this.normalizeSingleEvent(ev);
 
       if (ev.incidentHalf == 1 || ev.incidentHalf === '1') {
@@ -642,7 +642,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   }
 
   /* --- Normaliza un único evento --- */
-  private normalizeSingleEvent(ev: any): any {
+  private normalizeSingleEvent(ev: any): MatchEventItem {
     const rawTime = String(ev.time || ev.incidentTime || '-');
     const time = rawTime.replaceAll("'", "").replaceAll('"', "");
 

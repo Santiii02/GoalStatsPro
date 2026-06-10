@@ -95,7 +95,7 @@ export class MatchesComponent implements OnInit {
         this.applyFilter();
         this.loading = false;
       },
-      error: (err: any) => {
+      error: () => {
         this.error = 'No se pudo obtener el calendario completo. Inténtelo más tarde.';
         this.loading = false;
       }

@@ -5,6 +5,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { MatchStat } from '../models/sport.model';
 
 @Injectable({ providedIn: 'root' })
 export class AiService {
@@ -12,7 +13,7 @@ export class AiService {
 
   // Función para generar el análisis de un partido usando Gemini AI
   async generateMatchAnalysis(
-    homeTeam: string, awayTeam: string, stats: any[], league: string, hasRealStats: boolean
+    homeTeam: string, awayTeam: string, stats: MatchStat[], league: string, hasRealStats: boolean
   ): Promise<string> {
     try {
       // Llamamos a la API de nuestro backend "/api/ai/analysis", que a su vez llama a Gemini

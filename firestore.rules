@@ -1,9 +1,9 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
     function esAdmin() {
       return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
@@ -15,19 +15,15 @@ service cloud.firestore {
       // Lectura: el propio usuario o un admin
       allow read: if esPropietario(userId) || esAdmin();
 
-      // Creación: solo el propio usuario y SOLO con rol 'user'
-      allow create: if esPropietario(userId)
-                    && request.resource.data.role == 'user';
+      // Creación: solo el propio usuario y si intenta crearse con rol 'user'
+      allow create: if esPropietario(userId) && request.resource.data.role == 'user';
 
-      // Actualización: el propio usuario siempre que NO cambie su rol, o un admin
-      allow update: if (esPropietario(userId)
-                        && request.resource.data.role == resource.data.role)
-                    || esAdmin();
+      // Actualización: el propio usuario (sin cambiar su rol) o un admin
+      allow update: if (esPropietario(userId) && request.resource.data.role == resource.data.role) || esAdmin();
 
       // Borrado: solo admin
       allow delete: if esAdmin();
     }
-
     match /{document=**} {
       allow read, write: if false;
     }

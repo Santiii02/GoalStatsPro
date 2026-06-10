@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
-import { UserService } from '../../services/user.service';
+import { UserService, UserDocument } from '../../services/user.service';
 
 @Component({
   selector: 'app-admin-panel',
@@ -21,7 +21,7 @@ export class AdminPanelComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
 
   // Variables para la tabla de usuarios
-  users: any[] = [];
+  users: UserDocument[] = [];
   loading: boolean = true;
 
   ngOnInit(): void {

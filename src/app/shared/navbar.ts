@@ -6,11 +6,11 @@ import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AutoCompleteSelectEvent } from 'primeng/autocomplete';
+import { AutoCompleteSelectEvent, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { SportDbService } from '../services/sportdb.service';
 import { Subject, Subscription } from 'rxjs';
 import { getFlashscoreName } from '../models/team-mapper';
-import { buildSearchStream } from '../shared/search-helper';
+import { buildSearchStream, SearchResultItem  } from '../shared/search-helper';
 import { SearchAutocompleteComponent } from '../shared/search-autocomplete';
 
 
@@ -31,17 +31,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private searchSubscription!: Subscription;
 
   /* --- Variables --- */
-  filteredItems: any[] = []; // Resultados de la búsqueda
+  filteredItems: SearchResultItem[] = []; // Resultados de la búsqueda
 
   ngOnInit(): void {
     this.searchSubscription = buildSearchStream(this.searchSubject, this.sportService).subscribe({
-      next: (items: any[]) => { this.filteredItems = items; },
+      next: (items: SearchResultItem[]) => { this.filteredItems = items; },
       error: (err: any) => { console.error('Error crítico en el buscador:', err); this.filteredItems = []; }
     });
   }
 
   /* --- Lógica de Búsqueda del usuario --- */
-  search(event: any): void {
+  search(event: AutoCompleteCompleteEvent): void {
     const query: string = event.query ?? '';
     if (query.trim().length < 2) this.filteredItems = [];
     this.searchSubject.next(query);

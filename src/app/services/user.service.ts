@@ -7,6 +7,14 @@ import { Injectable, inject } from '@angular/core';
 import { Firestore, doc, setDoc, getDoc, arrayUnion, arrayRemove, collection, getDocs, deleteDoc, updateDoc } from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
 
+export interface UserDocument {
+  uid: string;
+  email: string;
+  role: string;
+  favoriteTeams: string[];
+  favoritePlayers: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -142,7 +150,7 @@ export class UserService {
   }
 
   /* --- Obtenemos todos los usuarios (Solo para Admin) --- */
-  async getAllUsers(): Promise<any[]> {
+  async getAllUsers(): Promise<UserDocument[]> {
     try {
       // Obtenemos todos los documentos de la colección 'users'
       const usersRef = collection(this.firestore, 'users');
@@ -150,9 +158,9 @@ export class UserService {
 
       // Mapeamos los documentos a un array de objetos legibles
       return querySnapshot.docs.map(doc => ({
-        uid: doc.id,
-        ...doc.data()
-      }));
+        ...doc.data(),
+        uid: doc.id
+      } as UserDocument));
     } catch (error) {
       console.error('Error al obtener la lista de usuarios:', error);
       throw error;

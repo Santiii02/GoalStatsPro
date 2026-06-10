@@ -14,7 +14,7 @@
 
     <div class="hero-info">
       <div class="team-badge-mini" *ngIf="player.strTeam">
-        <small>{{ player.strTeam }}</small>
+        <small>{{ translateTeam(player.strTeam) }}</small>
       </div>
 
       <h1>{{ player.strPlayer }}</h1>
@@ -94,7 +94,7 @@
         <img #formerTeamImg [src]="fTeam.strTeamBadge || 'assets/images/Logo.png'"
           alt="Escudo de {{ fTeam.strFormerTeam }}" (error)="formerTeamImg.src='assets/images/Logo.png'">
         <div class="fteam-info">
-          <strong>{{ fTeam.strFormerTeam }}</strong>
+          <strong>{{ translateTeam(fTeam.strFormerTeam) }}</strong>
           <small class="text-muted">{{ fTeam.strJoined }} - {{ fTeam.strDeparted || 'Presente' }}</small>
         </div>
       </button>

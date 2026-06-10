@@ -12,6 +12,7 @@ import { SportDbService } from '../../services/sportdb.service';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { translatePositionMapping, translateTeamName } from '../../models/team-mapper';
+import { Player, PlayerHonour, FormerTeam } from '../../models/sport.model';
 
 @Component({
   selector: 'app-player-detail',
@@ -32,13 +33,13 @@ export class PlayerDetailComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
 
   // Estado del componente
-  player: any = null;
+  player: Player | null = null;
   loading: boolean = true;
   age: number | null = null;
   isFavorite: boolean = false;
   isFavLoading: boolean = false;
-  honours: any[] = [];
-  formerTeams: any[] = [];
+  honours: PlayerHonour[] = [];
+  formerTeams: FormerTeam[] = [];
   showFullBio: boolean = false;
   cleanedBioText: string = '';
   isBioEnglishOnly: boolean = false;
@@ -104,8 +105,8 @@ export class PlayerDetailComponent implements OnInit {
       if (data && Array.isArray(data)) {
         // Ordenar por temporada de más reciente a más antigua
         this.honours = [...data].sort((a, b) => {
-          const yearA = Number.parseInt(a.strSeason) || 0;
-          const yearB = Number.parseInt(b.strSeason) || 0;
+          const yearA = Number.parseInt(a.strSeason ?? '0') || 0;
+          const yearB = Number.parseInt(b.strSeason ?? '0') || 0;
           return yearB - yearA;
         });
       } else {
@@ -121,8 +122,8 @@ export class PlayerDetailComponent implements OnInit {
       if (data && Array.isArray(data)) {
         // Ordenar por año de salida o de ingreso de más reciente a más antiguo
         this.formerTeams = [...data].sort((a, b) => {
-          const yearA = Number.parseInt(a.strDeparted || a.strJoined) || 0;
-          const yearB = Number.parseInt(b.strDeparted || b.strJoined) || 0;
+          const yearA = Number.parseInt(a.strDeparted ?? a.strJoined ?? '0') || 0;
+          const yearB = Number.parseInt(b.strDeparted ?? b.strJoined ?? '0') || 0;
           return yearB - yearA;
         });
       } else {
@@ -151,7 +152,8 @@ export class PlayerDetailComponent implements OnInit {
 
   /* --- Gestión de Favoritos --- */
   private async checkIfFavorite() {
-    if (!this.authService.currentUser || !this.player?.idPlayer) return;
+    if (!this.authService.currentUser || !this.player) return;
+
     try {
       const favorites = await this.userService.getFavoritePlayers();
       this.isFavorite = favorites.includes(this.player.idPlayer);
@@ -227,25 +229,32 @@ export class PlayerDetailComponent implements OnInit {
   }
 
   /* --- Traductor de Posiciones (Inglés a Español) --- */
-  translatePosition(position: string): string {
+  translatePosition(position: string | undefined): string {
     return translatePositionMapping(position);
   }
 
 
   /* --- Información detallada del equipo --- */
-  goToTeamDetail(teamName: string): void {
+  goToTeamDetail(teamName: string | undefined): void {
     if (teamName) {
       this.router.navigate(['/team', teamName]);
     }
   }
 
   /* --- Traductor de Nacionalidad (Inglés a Español)--- */
-  translateNationality(country: string): string {
+  translateNationality(country: string | undefined): string {
+    if (!country) return '';
     return translateTeamName(country);
   }
 
+  /* --- Traductor de nombres --- */
+  translateTeam(teamName: string | undefined): string {
+    if (!teamName) return '';
+    return translateTeamName(teamName);
+  }
+
   /* --- Convertidor de libras a kg --- */
-  librasToKg(weight: string): string {
+  librasToKg(weight: string | undefined): string {
     if (!weight || weight.trim() === '') return 'N/A';
 
     const lowerWeight = weight.toLowerCase();
@@ -253,7 +262,7 @@ export class PlayerDetailComponent implements OnInit {
     // Extraemos el valor numérico de la cadena
     const regex = /\d+(\.\d+)?/;
     const match = regex.exec(weight);
-    
+
     // Si no hay número, devolvemos el texto original
     if (!match) return weight;
 
@@ -270,7 +279,7 @@ export class PlayerDetailComponent implements OnInit {
   }
 
   /* --- Convertidor de altura --- */
-  formatHeight(height: string): string {
+  formatHeight(height: string | undefined): string {
     if (!height) return 'N/A';
 
     // Cortamos la cadena en el primer paréntesis y nos quedamos con la parte izquierda

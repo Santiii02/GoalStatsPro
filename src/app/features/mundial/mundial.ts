@@ -239,7 +239,7 @@ export class MundialComponent implements OnInit {
   }
 
   /* --- Obtenemos la fecha del partido --- */
-  getMatchDate(match: any): number {
+  getMatchDate(match: Match): number {
     // Las ligas usan eventStartTime, pero los torneos internacionales usan startUtime o startTime
     const timestamp = match.startUtime || match.startTime || match.eventStartTime || 0;
     return Number(timestamp) * 1000;

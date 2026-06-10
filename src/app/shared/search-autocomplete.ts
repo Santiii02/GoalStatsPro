@@ -4,7 +4,8 @@
 import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
+import { AutoCompleteModule, AutoCompleteSelectEvent, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { SearchResultItem } from './search-helper';
 
 @Component({
     selector: 'app-search-autocomplete',
@@ -17,7 +18,7 @@ import { AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplet
 export class SearchAutocompleteComponent {
 
     /* Sugerencias de búsqueda recibidas */
-    @Input() suggestions: any[] = [];
+    @Input() suggestions: SearchResultItem[] = [];
 
     /* Texto del placeholder */
     @Input() placeholder: string = 'Buscar equipo o jugador...';
@@ -29,7 +30,7 @@ export class SearchAutocompleteComponent {
     @Input() inputStyleClass: string = '';
 
     /* Emite cuando el usuario escribe en el input */
-    @Output() completeMethod = new EventEmitter<any>();
+    @Output() completeMethod = new EventEmitter<AutoCompleteCompleteEvent>();
 
     /* Emite cuando el usuario selecciona una sugerencia */
     @Output() itemSelect = new EventEmitter<AutoCompleteSelectEvent>();
@@ -38,9 +39,9 @@ export class SearchAutocompleteComponent {
     @Output() cleared = new EventEmitter<void>();
 
     // Valor seleccionado
-    selectedItem: any = null;
+    selectedItem: SearchResultItem | null = null;
 
-    onSearch(event: any): void {
+    onSearch(event: AutoCompleteCompleteEvent): void {
         this.completeMethod.emit(event);
     }
 

@@ -7,7 +7,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, throwError, timer, forkJoin, from } from 'rxjs';
 import { map, catchError, tap, retry, concatMap, toArray, delay } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Match, Standing, Team } from '../models/sport.model';
+import { Match, Standing, Team, Player, PlayerHonour, FormerTeam, MatchDetails } from '../models/sport.model';
 import { normalizeTeamName } from '../models/team-mapper';
 
 @Injectable({
@@ -84,7 +84,7 @@ export class SportDbService {
   }
 
   /* --- Persiste un dato en localStorage con una marca de tiempo de expiración --- */
-  private saveToCache(key: string, data: any, ttl: number): void {
+  private saveToCache(key: string, data: unknown, ttl: number): void {
     const entry = {
       data: data,
       expiry: Date.now() + ttl
@@ -201,7 +201,7 @@ export class SportDbService {
       map((res: any) => {
         if (!res) return [];
         return Array.isArray(res) ? res : res.data || [];
-      }), 
+      }),
       tap(data => this.saveToCache(this.CACHE_KEYS.WC_LIVE, data, this.CACHE_TTL.LIVE)),
       catchError(err => {
         console.error('Error fetching World Cup live matches:', err);
@@ -269,8 +269,8 @@ export class SportDbService {
    */
 
   /* --- Obtiene la tabla de clasificación del Mundial --- */
-  getWorldCupStandings(): Observable<any[]> {
-    const cached = this.getFromCache<any[]>(this.CACHE_KEYS.WC_STANDINGS, this.CACHE_TTL.STATIC);
+  getWorldCupStandings(): Observable<Standing[]> {
+    const cached = this.getFromCache<Standing[]>(this.CACHE_KEYS.WC_STANDINGS, this.CACHE_TTL.STATIC);
     if (cached) return of(cached);
 
     const url = `${this.baseUrl}${this.WORLD_CUP_PREFIX}/standings`;
@@ -339,7 +339,7 @@ export class SportDbService {
           const allTeams = response.teams || [];
 
           // Solo devolvemos los de fútbol (Soccer)
-          return allTeams.filter((team: any) => team.strSport === 'Soccer');
+          return allTeams.filter((team: Team) => team.strSport === 'Soccer');
         }),
 
         // Guardamos el resultado en caché
@@ -357,12 +357,12 @@ export class SportDbService {
   }
 
   /* --- Buscar JUGADORES por nombre (utilizando la cache) --- */
-  searchPlayers(name: string): Observable<any[]> {
+  searchPlayers(name: string): Observable<Player[]> {
     // Generamos una clave única para guardar esto en memoria
     const cacheKey = `goalstats_search_player_${name.replace(/\s/g, '_')}`;
 
     // Comprobamos si ya lo tenemos guardado
-    const cached = this.getFromCache<any[]>(cacheKey, this.CACHE_TTL.STATIC);
+    const cached = this.getFromCache<Player[]>(cacheKey, this.CACHE_TTL.STATIC);
     if (cached) {
       return of(cached);
     }
@@ -374,7 +374,7 @@ export class SportDbService {
         map((response: any) => {
           const allPlayers = response.player || [];
 
-          return allPlayers.filter((p: any) => p.strSport === 'Soccer');
+          return allPlayers.filter((p: Player) => p.strSport === 'Soccer');
         }),
 
         // Guardamos el resultado en caché
@@ -392,12 +392,12 @@ export class SportDbService {
   }
 
   /* --- Obtener jugadores del equipo y ordenarlos por posición (utilizando la cache) --- */
-  getTeamPlayers(teamId: string): Observable<any[]> {
+  getTeamPlayers(teamId: string): Observable<Player[]> {
     // Generamos una clave única para guardar esto en memoria
     const cacheKey = `goalstats_players_${teamId}`;
 
     // Comprobamos si ya lo tenemos guardado
-    const cached = this.getFromCache<any[]>(cacheKey, this.CACHE_TTL.STATIC);
+    const cached = this.getFromCache<Player[]>(cacheKey, this.CACHE_TTL.STATIC);
     if (cached) {
       return of(cached);
     }
@@ -407,12 +407,12 @@ export class SportDbService {
       .pipe(
         this.getRetryStrategy(),
         map((response: any) => {
-          let players = response.player || [];
+          let players = response.player as Player[] || [];
 
-          players = players.filter((p: any) => p.strPlayer && p.strPosition && p.strPosition !== 'Manager');
+          players = players.filter((p: Player) => p.strPlayer && p.strPosition && p.strPosition !== 'Manager');
 
           // Convertir posición específica a número 
-          const getPosWeight = (pos: string) => {
+          const getPosWeight = (pos?: string | null) => {
             if (!pos) return 5;
             const p = pos.toLowerCase();
             if (p.includes('goalkeeper')) return 1;
@@ -423,7 +423,7 @@ export class SportDbService {
           };
 
           // Ordenamos el array usando el peso
-          return players.sort((a: any, b: any) => getPosWeight(a.strPosition) - getPosWeight(b.strPosition));
+          return players.sort((a: Player, b: Player) => getPosWeight(a.strPosition) - getPosWeight(b.strPosition));
         }),
 
         // Guardamos el resultado en caché
@@ -441,12 +441,12 @@ export class SportDbService {
   }
 
   /* --- Obtener detalles de un jugador por ID (utilizando la cache) --- */
-  getPlayerById(playerId: string): Observable<any> {
+  getPlayerById(playerId: string): Observable<Player | null> {
     // Generamos una clave única para guardar esto en memoria
     const cacheKey = `goalstats_player_detail_${playerId}`;
 
     // Comprobamos si ya lo tenemos guardado
-    const cached = this.getFromCache<any>(cacheKey, this.CACHE_TTL.STATIC);
+    const cached = this.getFromCache<Player | null>(cacheKey, this.CACHE_TTL.STATIC);
     if (cached) {
       return of(cached);
     }
@@ -475,7 +475,7 @@ export class SportDbService {
   }
 
   /* --- Información basica de un partido. Busca tanto en partidos en vivo como en el calendario --- */
-  getMatchBasicInfo(matchId: string): Observable<any> {
+  getMatchBasicInfo(matchId: string): Observable<Match | null> {
     // Limpiamos el ID 
     const cleanId = matchId.replace('g_1_', '');
 
@@ -491,19 +491,20 @@ export class SportDbService {
         const allMatches = [...(results.fixtures || []), ...(results.live || []), ...(results.wcFixtures || []), ...(results.wcResults || [])];
 
         // Buscamos el partido por ID (con o sin prefijo)
-        return allMatches.find(m => m.eventId === cleanId || m.eventId === `g_1_${cleanId}`);
+        return allMatches.find(m => m.eventId === cleanId || m.eventId === `g_1_${cleanId}`) ?? null;
+
       }),
       catchError(() => of(null))
     );
   }
 
   /* --- Obtener detalles de un partido (Alineaciones, Eventos, Stats) --- */
-  getMatchDetails(matchId: string): Observable<any> {
+  getMatchDetails(matchId: string): Observable<MatchDetails | null> {
     // Generamos una clave única para guardar esto en memoria
     const cacheKey = `${this.CACHE_KEYS.MATCH_DETAIL_PREFIX}${matchId}`;
 
     // Comprobamos si ya lo tenemos guardado
-    const cached = this.getFromCache<any>(cacheKey, this.CACHE_TTL.LIVE);
+    const cached = this.getFromCache<MatchDetails | null>(cacheKey, this.CACHE_TTL.LIVE);
     if (cached) {
       return of(cached);
     }
@@ -523,7 +524,7 @@ export class SportDbService {
       stats: this.http.get<any>(urlStats, { headers: this.getHeaders() }).pipe(this.getRetryStrategy(), catchError(() => of(null))),
       summary: this.http.get<any>(urlSummary, { headers: this.getHeaders() }).pipe(this.getRetryStrategy(), catchError(() => of(null)))
     }).pipe(
-      map((results: any) => {
+      map((results: any): MatchDetails | null => {
         const lineupsData = results.lineups?.data || results.lineups || null;
         const statsData = results.stats?.data || results.stats || null;
         const summaryData = results.summary?.data?.events || results.summary?.events || results.summary?.data || results.summary || null;
@@ -535,7 +536,7 @@ export class SportDbService {
           lineups: lineupsData,
           stats: statsData,
           summary: summaryData
-        };
+        } as MatchDetails;
       }),
 
       // Guardamos el resultado en caché
@@ -634,12 +635,12 @@ export class SportDbService {
   }
 
   /* --- Obtener Palmarés/Trofeos del Jugador --- */
-  getPlayerHonours(id: string): Observable<any[]> {
+  getPlayerHonours(id: string): Observable<PlayerHonour[]> {
     // Generamos una clave única para guardar esto en memoria
     const cacheKey = `goalstats_honours_${id}`;
 
     // Comprobamos si ya lo tenemos guardado
-    const cached = this.getFromCache<any[]>(cacheKey, this.CACHE_TTL.STATIC);
+    const cached = this.getFromCache<PlayerHonour[]>(cacheKey, this.CACHE_TTL.STATIC);
     if (cached) {
       return of(cached);
     }
@@ -647,7 +648,7 @@ export class SportDbService {
     // Si no está en caché llamamos a la API     
     return this.http.get<any>(`${this.SPORTSDB_PREFIX}/lookuphonours.php?id=${id}`).pipe(
       this.getRetryStrategy(),
-      map((res: any) => res.honours || []),
+      map((res: any) => (res.honours || []) as PlayerHonour[]),
 
       // Guardamos el resultado en caché
       tap(data => {
@@ -662,12 +663,12 @@ export class SportDbService {
   }
 
   /* --- Obtener Equipos Anteriores / Historial de Traspasos --- */
-  getPlayerFormerTeams(playerId: string): Observable<any[]> {
+  getPlayerFormerTeams(playerId: string): Observable<FormerTeam[]> {
     // Generamos una clave única para guardar esto en memoria
     const cacheKey = `goalstats_former_teams_${playerId}`;
 
     // Comprobamos si ya lo tenemos guardado
-    const cached = this.getFromCache<any[]>(cacheKey, this.CACHE_TTL.STATIC);
+    const cached = this.getFromCache<FormerTeam[]>(cacheKey, this.CACHE_TTL.STATIC);
 
     if (cached) {
       return of(cached);
@@ -676,7 +677,7 @@ export class SportDbService {
     // Si no está en caché llamamos a la API     
     return this.http.get<any>(`${this.SPORTSDB_PREFIX}/lookupformerteams.php?id=${playerId}`).pipe(
       this.getRetryStrategy(),
-      map((res: any) => res.formerteams || []),
+      map((res: any) => (res.formerteams || []) as FormerTeam[]),
 
       // Guardamos el resultado en caché
       tap(data => {

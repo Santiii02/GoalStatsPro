@@ -1,140 +1,155 @@
-/*
- * INTERFAZ QUE REPRESENTA UN PARTIDO DE FÚTBOL.
- */
+// Datos de partido — combina campos de sportdb.dev y TheSportsDB
 export interface Match {
-  // IDENTIFICADORES
-
-  /* --- ID único del evento --- */
   eventId?: string;
-
-  /* --- ID del torneo --- */
   tournamentId?: string;
-
-  /* --- Nombre del torneo --- */
   tournamentName?: string;
-
-  /* --- Jornada --- */
   round?: string;
+  roundInfo?: { round?: string };
+  stage?: string;
+  tournament?: { name?: string };
 
-  /* --- Fecha y hora de inicio (ej: "2025-05-12T14:00:00") --- */
   startDateTimeUtc?: string;
-  startUtime?: string | number;
-  startTime?: string | number;
-
-  /* --- Timestamp UNIX (en segundos) del inicio del partido. --- */
-  eventStartTime?: number | string;
-
-  /*
-   * Propiedad transitoria, calculado a partir de la fecha de la API. 
-'  * Se utiliza para operaciones de filtrado, ordenación y formateo en la vista.
-   */
+  startUtime?: string | number;   // Timestamp UNIX — variante 1
+  startTime?: string | number;    // Timestamp UNIX — variante 2
+  eventStartTime?: string | number;   // Timestamp UNIX — variante 3 (LaLiga)
   processedDate?: Date;
 
-  // EQUIPO LOCAL (HOME)
-  /* --- Nombre del equipo local --- */
   homeName?: string;
-
-  /* --- URL absoluta del logo/escudo del equipo local --- */
   homeLogo?: string;
+  homeScore?: string | number;     // string | number por inconsistencias entre APIs
 
-  /* --- Marcador del equipo local. Tipo unión (string | number) para manejar estados de API inconsistentes. --- */
-  homeScore?: string | number;
-
-  // EQUIPO VISITANTE (AWAY)
-  /* --- Nombre del equipo visitante --- */
   awayName?: string;
-
-  /* --- URL absoluta del logo/escudo del equipo visitante --- */
   awayLogo?: string;
-
-  /* --- Marcador del equipo visitante --- */
   awayScore?: string | number;
 
-  // ESTADO Y METADATOS
-  /* --- Minuto actual de juego --- */
-  gameTime?: string;
-
-  /* --- Estado actual del evento (ej: "Finished", "Scheduled", "Live") --- */
-  eventStatus?: string;
+  gameTime?: string;               // Minuto de juego en partidos en vivo
+  eventStatus?: string;            // Estado crudo de la API ("FINISHED", "INPROGRESS"...)
 }
 
-
-/*
- * INTERFAZ QUE REPRESENTA UNA FILA EN LA TABLA DE CLASIFICACIÓN.
- */
+// Fila de la tabla de clasificación — endpoint /standings de sportdb.dev
 export interface Standing {
-  /* --- Posición actual en la tabla (Ranking) --- */
   rank: number | string;
-
-  /* --- Identificador único del equipo --- */
   teamId?: string;
-
-  /* --- Nombre del equipo --- */
   teamName: string;
-
-  /* --- Puntos acumulados en la competición --- */
   points: number | string;
-
-  /* --- Cantidad de partidos jugados hasta la fecha --- */
   matches: number | string;
-
-  /* --- Diferencia de goles (Goles a favor - Goles en contra) --- */
   goalDiff: number | string;
-
-  /* --- Representación en string del balance de goles (ej: "45:20") --- */
   goals?: string;
-
-  /* --- Logo del equipo --- */
   teamBadge?: string;
   teamLogo?: string;
 }
 
-/*
- * INTERFAZ QUE REPRESENTA UN EQUIPO.
- */
+// Perfil de equipo — endpoints de TheSportsDB
 export interface Team {
-  /* --- Identificador único del equipo --- */
   idTeam: string;
-
-  /* --- Identificador único del equipo --- */
   id?: string;
-
-  /* --- Nombre del equipo --- */
   strTeam: string;
+  strLeague?: string;
 
-  /* --- Logo del equipo --- */
-  strTeamBadge: string;
-
-  /* --- Logo del equipo --- */
-  strBadge?: string;
-
-  /* --- Nombre de la liga --- */
-  strLeague: string;
-
-  /* --- Estadio del equipo --- */
-  strStadium?: string;
+  strTeamBadge?: string;
+  strBadge?: string;       // Escudo alternativo
   strStadiumThumb?: string;
-
-  /* --- Banner del equipo --- */
   strTeamBanner?: string;
-  strBanner?: string;
+  strBanner?: string;      // Banner alternativo
   strFanart1?: string;
-
-  /* --- Descripción del equipo --- */
-  strDescriptionES?: string;
-  strDescriptionEN?: string;
-
-  /* --- Año de creación --- */
-  intFormedYear?: string;
-
-  /* --- Deporte --- */
-  strSport?: string;
-
-  /* --- Equipación del equipo --- */
   strEquipment?: string;
 
-  /* --- Redes sociales del equipo --- */
+  strStadium?: string;
+  strDescriptionES?: string;
+  strDescriptionEN?: string;
+  intFormedYear?: string;
+  strSport?: string;
   strTwitter?: string;
   strInstagram?: string;
   strYoutube?: string;
+}
+
+// Perfil de jugador — endpoints de TheSportsDB
+export interface Player {
+  idPlayer: string;
+  strPlayer: string;
+  strPosition?: string;
+  strNationality?: string;
+
+  strThumb?: string;
+  strCutout?: string;
+  strNumber?: string;
+  strHeight?: string;
+  strWeight?: string;
+
+  strSport?: string;
+  strTeam?: string;
+  idTeam?: string;
+  strBirthLocation?: string;
+  dateBorn?: string;
+  strDescriptionEN?: string;
+  strDescriptionES?: string;
+
+  strTwitter?: string;
+  strInstagram?: string;
+  strFacebook?: string;
+  strYoutube?: string;
+}
+
+// Trofeo del palmarés de un jugador — endpoint lookuphonours de TheSportsDB
+export interface PlayerHonour {
+  idHonour?: string;
+  strPlayer?: string;
+  strTeam?: string;
+  strHonour?: string;
+  strSeason?: string;
+}
+
+// Equipo anterior del historial de traspasos — endpoint lookupformerteams de TheSportsDB
+export interface FormerTeam {
+  idFormerTeam?: string;
+  strFormerTeam?: string;
+  strTeamBadge?: string;
+  strJoined?: string;
+  strDeparted?: string;
+  idTeam?: string;
+}
+
+// Estadística individual de un partido
+export interface MatchStat {
+  statName: string;
+  homeValue: string | number;
+  awayValue: string | number;
+}
+
+// Grupo de estadísticas por categoría (posesión, tiros, faltas...) 
+export interface StatGroup {
+  period: string;
+  stats: MatchStat[];
+}
+
+// Opción del desplegable de equipos en la sección de Jugadores
+export interface TeamOption {
+  name: string;
+  badge?: string;
+}
+
+// Detalles completos de un partido
+export interface MatchDetails {
+  lineups: any;          // Estructura variable según el partido
+  stats: StatGroup[] | null;
+  summary: any;          // Estructura variable según el partido
+}
+
+// Evento individual de un partido (gol, tarjeta, sustitución) 
+export interface MatchEventItem {
+  time: string;
+  type: string;          // 'goal' | 'yellow' | 'red' | 'sub'
+  mainName: string;
+  subName?: string;
+  homeScore?: string | number;
+  awayScore?: string | number;
+  isHome: boolean;
+  reason?: string;       // "Penalti", "P.P." (propia puerta), etc.
+}
+
+// Eventos agrupados por fase del partido 
+export interface MatchStageSummary {
+  stageName: string;     // '1ER TIEMPO' | '2º TIEMPO'
+  events: MatchEventItem[];
 }

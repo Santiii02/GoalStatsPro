@@ -45,7 +45,7 @@ export class TeamsComponent implements OnInit {
         // Iniciamos la carga secuencial de imágenes
         this.loadTeamImagesSequentially();
       },
-      error: (err: any) => {
+      error: (err: unknown) => {
         console.error('Error fetching standings:', err);
         this.error = 'No se pudo cargar la información de los equipos.';
         this.loading = false;

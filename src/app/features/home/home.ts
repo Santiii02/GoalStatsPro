@@ -9,15 +9,15 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { SportDbService } from '../../services/sportdb.service';
-import { Match, Standing, Team } from '../../models/sport.model';
+import { Match, Standing, Team, Player } from '../../models/sport.model';
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { AutoCompleteSelectEvent } from 'primeng/autocomplete';
+import { AutoCompleteSelectEvent, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { forkJoin, from, Subject, Subscription } from 'rxjs';
 import { concatMap, toArray, map } from 'rxjs/operators';
 import { translateTeamName } from '../../models/team-mapper';
-import { buildSearchStream } from '../../shared/search-helper';
+import { buildSearchStream, SearchResultItem } from '../../shared/search-helper';
 import { ClassificationHelper } from '../../shared/classification-helper';
 import { SearchAutocompleteComponent } from '../../shared/search-autocomplete';
 
@@ -45,7 +45,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   loading: boolean = true;
 
   // Variables para el buscador
-  filteredItems: any[] = [];
+  filteredItems: SearchResultItem[] = [];
 
   // Busquedas de forma reactiva para evitar saturar la API y mejorar la experiencia del usuario
   private readonly searchSubject = new Subject<string>();
@@ -59,7 +59,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   loadingFavorites: boolean = false;
 
   // Variables para jugadores favoritos
-  favoritePlayersData: any[] = [];
+  favoritePlayersData: Player[] = [];
   loadingFavPlayers: boolean = false;
 
   ngOnInit(): void {
@@ -88,7 +88,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
 
     this.searchSubscription = buildSearchStream(this.searchSubject, this.sportService).subscribe({
-      next: (items: any[]) => { this.filteredItems = items; },
+      next: (items: SearchResultItem[]) => { this.filteredItems = items; },
       error: (err: any) => { console.error('Error crítico en el buscador:', err); this.filteredItems = []; }
     });
   }
@@ -99,7 +99,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   /* --- Buscador --- */
-  search(event: any): void {
+  search(event: AutoCompleteCompleteEvent): void {
     const query: string = event.query ?? '';
     if (query.trim().length < 2) this.filteredItems = [];
     this.searchSubject.next(query);
@@ -119,7 +119,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   /* --- Información detallada del equipo --- */
-  goToTeamDetail(team: any): void {
+  goToTeamDetail(team: Team | string): void {
     const teamName = typeof team === 'string' ? team : (team.strTeam || '');
     if (teamName) {
       this.router.navigate(['/team', teamName]);
@@ -134,7 +134,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     forkJoin({
       laliga: this.sportService.getLaLigaLiveMatches(),
       worldCup: this.sportService.getWorldCupLiveMatches(),
-      global: this.sportService.getLiveMatches() 
+      global: this.sportService.getLiveMatches()
     }).subscribe({
       next: ({ laliga, worldCup, global }) => {
         this.processLiveMatches(laliga, worldCup, global);
@@ -338,7 +338,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   /* --- Etiquetas de Liga --- */
-  getLeagueLabel(team: any): string {
+  getLeagueLabel(team: Team): string {
     if (!team?.strLeague) return 'Desconocido';
 
     const league = team.strLeague.toLowerCase();
