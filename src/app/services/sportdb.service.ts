@@ -536,7 +536,7 @@ export class SportDbService {
           lineups: lineupsData,
           stats: statsData,
           summary: summaryData
-        } as MatchDetails;
+        };
       }),
 
       // Guardamos el resultado en caché

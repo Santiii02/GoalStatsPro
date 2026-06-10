@@ -282,6 +282,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
 
     } catch (e) {
+      console.error('Error en Míster IA:', e);
       this.aiError = true;
       this.cdr.detectChanges();
     } finally {
